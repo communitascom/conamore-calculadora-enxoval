@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Enxoval · Conamore Hotelaria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,200..700,0..1,0&display=block" rel="stylesheet">
+<style>
+:root{
+  --azul:#055393; --azul-700:#0A4A80; --azul-900:#033A68;
+  --azul-50:#EDF4FA; --azul-100:#DBE9F5;
+  --areia:#F5F0E8; --dourado:#B98B45; --dourado-50:#FBF5EA;
+  --onix:#121618;
+  --tinta:#14202B; --tinta-2:#54626F; --tinta-3:#8B98A5;
+  --linha:#E4E9EE; --linha-2:#F0F3F6;
+  --fundo:#F7F8FA; --branco:#fff;
+  --ok:#0E6B54; --ok-bg:#E4F4EF;
+  --alerta:#8A5A00; --alerta-bg:#FDF3E0;
+  --r-lg:20px; --r:14px; --r-sm:10px;
+  --sombra:0 1px 2px rgba(16,32,48,.04), 0 8px 28px rgba(16,32,48,.06);
+}
+*{box-sizing:border-box; margin:0; padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:'Figtree',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  background:var(--fundo); color:var(--tinta); line-height:1.55; font-size:16px;
+}
+.ms{
+  font-family:'Material Symbols Rounded'; font-weight:normal; font-style:normal;
+  line-height:1; letter-spacing:normal; text-transform:none; display:inline-block;
+  white-space:nowrap; direction:ltr; -webkit-font-feature-settings:'liga';
+  -webkit-font-smoothing:antialiased; font-variation-settings:'opsz' 24,'wght' 400;
+  user-select:none; flex:none;
+}
+.ms.fill{font-variation-settings:'opsz' 24,'wght' 400,'FILL' 1}
+button,input,select{font:inherit; color:inherit}
+button{cursor:pointer; border:none; background:none}
+
+/* ---------- Cabeçalho ---------- */
+.topo{background:var(--branco); border-bottom:1px solid var(--linha); position:sticky; top:0; z-index:40}
+.topo-in{max-width:1140px; margin:0 auto; padding:14px 20px; display:flex; align-items:center; gap:14px}
+.marca{display:flex; align-items:center; text-decoration:none}
+.marca img{height:38px; width:auto; display:block}
+.topo .ajuda{
+  margin-left:auto; display:flex; align-items:center; gap:6px; font-size:13.5px; font-weight:600;
+  color:var(--tinta-2); border:1px solid var(--linha); border-radius:99px; padding:7px 14px; text-decoration:none;
+}
+.topo .ajuda:hover{border-color:var(--azul); color:var(--azul)}
+.topo .ajuda .ms{font-size:18px}
+@media (max-width:520px){
+  .topo .ajuda .so-desk{display:none}
+  .topo .ajuda{padding:9px 11px}
+  .marca img{height:30px}
+}
+
+/* ---------- Trilho de passos + barra de progresso ---------- */
+.trilho{background:var(--branco); border-bottom:1px solid var(--linha); position:relative}
+.trilho-in{max-width:1140px; margin:0 auto; padding:0 20px; display:flex; overflow-x:auto; scrollbar-width:none}
+.trilho-in::-webkit-scrollbar{display:none}
+.tp{
+  display:flex; align-items:center; gap:8px; padding:13px 4px 12px; margin-right:22px;
+  font-size:13.5px; font-weight:600; color:var(--tinta-3); white-space:nowrap; transition:.18s;
+}
+.tp .n{
+  width:21px; height:21px; border-radius:50%; background:var(--linha-2); color:var(--tinta-3);
+  display:flex; align-items:center; justify-content:center; font-size:11.5px; font-weight:700; flex:none;
+}
+.tp.feito{color:var(--tinta-2)}
+.tp.feito .n{background:var(--ok-bg); color:var(--ok)}
+.tp.feito .n .ms{font-size:14px}
+.tp.ativo{color:var(--azul)}
+.tp.ativo .n{background:var(--azul); color:#fff}
+.tp:disabled{cursor:default}
+.progresso{height:3px; background:var(--linha-2)}
+.progresso > i{
+  display:block; height:100%; width:0;
+  background:linear-gradient(90deg,var(--azul) 0%,var(--azul-700) 100%);
+  transition:width .45s cubic-bezier(.4,0,.2,1);
+}
+
+/* ---------- Layout ---------- */
+.wrap{max-width:1140px; margin:0 auto; padding:26px 20px 40px}
+.grade{display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:24px; align-items:start}
+@media (max-width:940px){ .grade{grid-template-columns:1fr} .painel{order:-1} }
+
+.card{
+  background:var(--branco); border:1px solid var(--linha);
+  border-radius:var(--r-lg); box-shadow:var(--sombra); padding:26px 28px 28px;
+}
+@media (max-width:560px){ .card{padding:20px 18px 22px; border-radius:var(--r)} .wrap{padding:18px 14px 30px} }
+
+h1{font-size:30px; line-height:1.2; font-weight:800; letter-spacing:-.02em; margin-bottom:10px}
+h2{font-size:21px; line-height:1.25; font-weight:700; letter-spacing:-.01em; margin-bottom:6px}
+.sub{font-size:15px; color:var(--tinta-2); margin-bottom:22px; max-width:56ch}
+.secao{
+  font-size:12.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--tinta-3); margin:28px 0 12px; display:flex; align-items:center; gap:9px;
+}
+.secao::after{content:""; flex:1; height:1px; background:var(--linha-2)}
+@media (max-width:560px){ h1{font-size:25px} h2{font-size:19px} }
+
+/* ---------- Campos ---------- */
+.campo{display:block; margin:20px 0 8px; font-size:13.5px; font-weight:700; color:var(--tinta)}
+.campo .dica{font-weight:500; color:var(--tinta-3); font-size:12.5px}
+.linha2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
+@media (max-width:520px){ .linha2{grid-template-columns:1fr; gap:0} }
+input[type=number],input[type=text],input[type=email],input[type=tel],select{
+  width:100%; height:50px; border:1.5px solid var(--linha); border-radius:var(--r-sm);
+  padding:0 14px; font-size:15.5px; background:var(--branco); outline:none;
+  transition:border-color .15s, box-shadow .15s;
+}
+select{
+  appearance:none; padding-right:40px; cursor:pointer;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='22' height='22' viewBox='0 0 24 24' fill='none' stroke='%2354626F' stroke-width='2.2' stroke-linecap='round'><path d='M6 9l6 6 6-6'/></svg>");
+  background-repeat:no-repeat; background-position:right 12px center;
+}
+input:focus,select:focus{border-color:var(--azul); box-shadow:0 0 0 3px var(--azul-100)}
+.stepper{display:flex; align-items:center; border:1.5px solid var(--linha); border-radius:var(--r-sm); height:50px; overflow:hidden}
+.stepper:focus-within{border-color:var(--azul); box-shadow:0 0 0 3px var(--azul-100)}
+.stepper button{width:48px; height:100%; display:flex; align-items:center; justify-content:center; color:var(--tinta-2); flex:none}
+.stepper button:hover{background:var(--linha-2); color:var(--azul)}
+.stepper input{border:none; height:100%; text-align:center; font-weight:700; font-size:17px; box-shadow:none !important; -moz-appearance:textfield}
+.stepper input::-webkit-outer-spin-button,.stepper input::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+
+.faixa{display:flex; align-items:center; gap:14px; margin-top:4px}
+input[type=range]{flex:1; -webkit-appearance:none; appearance:none; height:6px; border-radius:99px; background:var(--linha); outline:none}
+input[type=range]::-webkit-slider-thumb{
+  -webkit-appearance:none; width:24px; height:24px; border-radius:50%;
+  background:var(--azul); border:4px solid #fff; box-shadow:0 1px 5px rgba(5,83,147,.4); cursor:pointer;
+}
+input[type=range]::-moz-range-thumb{
+  width:20px; height:20px; border-radius:50%; background:var(--azul);
+  border:4px solid #fff; box-shadow:0 1px 5px rgba(5,83,147,.4); cursor:pointer;
+}
+.faixa-val{min-width:74px; text-align:right; font-weight:800; font-size:19px; font-variant-numeric:tabular-nums}
+
+/* ---------- Opções ---------- */
+.opcoes{display:grid; gap:11px}
+.opcoes.duas{grid-template-columns:1fr 1fr}
+@media (max-width:520px){ .opcoes.duas{grid-template-columns:1fr} }
+.op{
+  display:flex; align-items:center; gap:14px; text-align:left; width:100%;
+  border:1.5px solid var(--linha); border-radius:var(--r); padding:15px 16px;
+  background:var(--branco); transition:.15s; text-decoration:none; color:inherit;
+}
+.op:hover{border-color:#BFCEDC; background:#FCFDFE}
+.op:focus-visible{outline:3px solid var(--azul-100); outline-offset:1px; border-color:var(--azul)}
+.op.sel{border-color:var(--azul); background:var(--azul-50); box-shadow:inset 0 0 0 1px var(--azul)}
+.op .ic{
+  width:44px; height:44px; flex:none; border-radius:12px; background:var(--linha-2); color:var(--azul);
+  display:flex; align-items:center; justify-content:center;
+}
+.op .ic .ms{font-size:24px}
+.op.sel .ic{background:var(--branco)}
+.op .tx{flex:1; min-width:0}
+.op .tx b{display:block; font-size:15.5px; font-weight:700; line-height:1.3}
+.op .tx span{display:block; font-size:13px; color:var(--tinta-2); line-height:1.4}
+.op .ck{
+  width:22px; height:22px; border-radius:50%; border:2px solid #CBD5DF; flex:none;
+  display:flex; align-items:center; justify-content:center;
+}
+.op.sel .ck{border-color:var(--azul); background:var(--azul); box-shadow:inset 0 0 0 3.5px #fff}
+.op.quad .ck{border-radius:7px}
+.op.quad.sel .ck{box-shadow:none; color:#fff}
+.op.quad.sel .ck .ms{font-size:16px}
+.op .seta{color:var(--tinta-3)}
+
+/* Cartões de padrão do enxoval */
+.padroes{display:grid; grid-template-columns:repeat(3,1fr); gap:11px; margin-top:4px}
+@media (max-width:680px){ .padroes{grid-template-columns:1fr} }
+.pad{
+  border:1.5px solid var(--linha); border-radius:var(--r); padding:16px 15px; text-align:left;
+  background:var(--branco); transition:.15s; position:relative;
+}
+.pad:hover{border-color:#BFCEDC}
+.pad:focus-visible{outline:3px solid var(--azul-100); outline-offset:1px}
+.pad.sel{border-color:var(--azul); background:var(--azul-50); box-shadow:inset 0 0 0 1px var(--azul)}
+.pad .nv{font-size:11.5px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--tinta-3)}
+.pad.sel .nv{color:var(--azul)}
+.pad b{display:block; font-size:16px; font-weight:800; margin:5px 0 8px}
+.pad .spec{font-size:12.5px; color:var(--tinta-2); line-height:1.6}
+.pad .spec i{font-style:normal; color:var(--tinta-3)}
+
+/* ---------- Ajuda ---------- */
+.info{
+  display:inline-flex; align-items:center; justify-content:center; vertical-align:middle;
+  width:18px; height:18px; border-radius:50%; background:var(--linha-2); color:var(--tinta-2);
+  margin-left:5px; position:relative;
+}
+.info .ms{font-size:13px}
+.info:hover,.info:focus-visible{background:var(--azul); color:#fff; outline:none}
+.info .bolha{
+  display:none; position:absolute; bottom:calc(100% + 9px); left:50%; transform:translateX(-50%);
+  width:250px; background:var(--onix); color:#fff; font-size:12.5px; font-weight:500; line-height:1.5;
+  padding:11px 13px; border-radius:10px; z-index:30; text-align:left; letter-spacing:0; text-transform:none;
+}
+.info .bolha::after{content:""; position:absolute; top:100%; left:50%; transform:translateX(-50%); border:6px solid transparent; border-top-color:var(--onix)}
+.info:hover .bolha,.info:focus-visible .bolha{display:block}
+
+/* ---------- Botões ---------- */
+.nav{display:flex; gap:12px; margin-top:28px; padding-top:22px; border-top:1px solid var(--linha-2)}
+.btn{
+  height:52px; padding:0 24px; border-radius:var(--r-sm); font-size:15.5px; font-weight:700;
+  display:inline-flex; align-items:center; justify-content:center; gap:8px; transition:.15s; text-decoration:none;
+}
+.btn:focus-visible{outline:3px solid var(--azul-100); outline-offset:2px}
+.btn .ms{font-size:20px}
+.b-primary{flex:1; background:var(--azul); color:#fff}
+.b-primary:hover{background:var(--azul-900)}
+.b-primary:disabled{background:#C3CFDA; cursor:not-allowed}
+.b-ghost{background:var(--branco); border:1.5px solid var(--linha); color:var(--tinta-2); padding:0 18px}
+.b-ghost:hover{border-color:#BFCEDC; background:var(--linha-2)}
+.b-texto{color:var(--tinta-2); font-weight:600; font-size:14.5px; text-decoration:underline; text-underline-offset:3px}
+.b-texto:hover{color:var(--azul)}
+.b-full{width:100%}
+
+/* CTA do consultor */
+.consultor{
+  display:flex; align-items:center; gap:14px; margin-top:24px; padding:16px 18px;
+  background:var(--dourado-50); border:1.5px solid #EDDFC4; border-radius:var(--r);
+  text-decoration:none; color:inherit; transition:.15s;
+}
+.consultor:hover{border-color:var(--dourado)}
+.consultor .ic{
+  width:42px; height:42px; border-radius:50%; background:var(--branco); color:var(--dourado);
+  display:flex; align-items:center; justify-content:center; flex:none;
+}
+.consultor .ic .ms{font-size:23px}
+.consultor b{display:block; font-size:15px; font-weight:700}
+.consultor span{font-size:13px; color:var(--tinta-2)}
+.consultor .seta{margin-left:auto; color:var(--dourado)}
+
+/* ---------- Selos e notas ---------- */
+.selo{display:inline-flex; align-items:center; gap:7px; font-size:12.5px; font-weight:700; padding:6px 13px; border-radius:99px; margin-bottom:16px}
+.selo .ms{font-size:16px}
+.s-ok{background:var(--ok-bg); color:var(--ok)}
+.s-dourado{background:var(--dourado-50); color:var(--dourado)}
+.nota{
+  font-size:13px; color:var(--tinta-2); line-height:1.55; background:var(--linha-2);
+  border-radius:var(--r-sm); padding:13px 15px; margin-top:16px; display:flex; gap:10px; align-items:flex-start;
+}
+.nota .ms{font-size:18px; color:var(--tinta-3); margin-top:1px}
+.nota.aviso{background:var(--alerta-bg); color:var(--alerta)}
+.nota.aviso .ms{color:var(--alerta)}
+
+/* ---------- Resultado ---------- */
+.destaque{
+  background:linear-gradient(150deg,var(--azul) 0%,var(--azul-900) 100%);
+  color:#fff; border-radius:var(--r); padding:24px 26px; margin-bottom:6px;
+}
+.destaque .rot{font-size:12.5px; opacity:.82; font-weight:700; letter-spacing:.09em}
+.destaque .big{font-size:52px; font-weight:800; line-height:1.05; letter-spacing:-.03em; font-variant-numeric:tabular-nums}
+.destaque .big small{font-size:19px; font-weight:600; opacity:.8; letter-spacing:0}
+.destaque .ctx{font-size:13.5px; opacity:.85; margin-top:6px}
+@media (max-width:520px){ .destaque{padding:20px 18px} .destaque .big{font-size:42px} }
+
+.grupo{border:1px solid var(--linha); border-radius:var(--r); overflow:hidden; margin-top:14px}
+.grupo-topo{
+  display:flex; align-items:center; gap:11px; padding:13px 16px;
+  background:var(--linha-2); border-bottom:1px solid var(--linha);
+  font-size:13px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--tinta-2);
+}
+.grupo-topo .ms{font-size:19px; color:var(--azul)}
+.grupo-topo .tot{margin-left:auto; font-size:13px; letter-spacing:0; text-transform:none; color:var(--tinta-3); font-variant-numeric:tabular-nums}
+.item{border-bottom:1px solid var(--linha-2)}
+.item:last-child{border-bottom:none}
+.item-linha{display:flex; align-items:center; gap:10px; padding:12px 16px}
+.item-nome{flex:1; min-width:0}
+.item-nome .nm{font-size:15px; font-weight:600; display:block}
+.item-nome .un{font-size:12.5px; color:var(--tinta-3); display:block; font-weight:500}
+.qtd-edit{display:flex; align-items:center; border:1.5px solid var(--linha); border-radius:9px; height:42px; overflow:hidden; flex:none}
+.qtd-edit:focus-within{border-color:var(--azul); box-shadow:0 0 0 3px var(--azul-100)}
+.qtd-edit button{width:36px; height:100%; display:flex; align-items:center; justify-content:center; color:var(--tinta-2)}
+.qtd-edit button:hover{background:var(--linha-2); color:var(--azul)}
+.qtd-edit button .ms{font-size:18px}
+input.qtd-in{
+  width:62px; height:100%; border:none; text-align:center; font-weight:800; font-size:16px;
+  font-variant-numeric:tabular-nums; box-shadow:none !important; padding:0; -moz-appearance:textfield;
+}
+input.qtd-in::-webkit-outer-spin-button,input.qtd-in::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+.item.mexido .qtd-edit{border-color:var(--dourado); background:var(--dourado-50)}
+/* Item desmarcado: sai do total, mas continua visível para poder voltar */
+.marcar{
+  width:38px; height:38px; border-radius:9px; flex:none; color:var(--azul);
+  display:flex; align-items:center; justify-content:center;
+}
+.marcar:hover{background:var(--azul-50)}
+.marcar:focus-visible{outline:3px solid var(--azul-100); outline-offset:1px}
+.marcar .ms{font-size:23px}
+.item.fora .marcar{color:var(--tinta-3)}
+.item.fora .item-nome{opacity:.45}
+.item.fora .item-nome .nm{text-decoration:line-through}
+.item.fora .qtd-edit{opacity:.4; pointer-events:none}
+.item.fora{background:#FCFDFD}
+.btn-conta{width:34px; height:34px; border-radius:8px; color:var(--tinta-3); display:flex; align-items:center; justify-content:center; flex:none}
+.btn-conta:hover{background:var(--linha-2); color:var(--azul)}
+.btn-conta .ms{font-size:20px; transition:transform .2s}
+.item.aberto .btn-conta .ms{transform:rotate(180deg)}
+.conta{display:none; padding:2px 16px 16px 16px; font-size:13.5px; color:var(--tinta-2); line-height:1.6}
+.item.aberto .conta{display:block}
+.conta code{
+  display:block; background:var(--azul-50); color:var(--azul-900); border-radius:8px;
+  padding:11px 13px; margin-top:8px; font-family:ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:12.5px; line-height:1.7; white-space:pre-wrap;
+}
+.conta .refazer{margin-top:10px; font-size:13px; color:var(--dourado); font-weight:700; display:inline-flex; align-items:center; gap:5px}
+.conta .refazer .ms{font-size:16px}
+
+.acoes{display:grid; grid-template-columns:1fr 1fr; gap:11px; margin-top:16px}
+@media (max-width:520px){ .acoes{grid-template-columns:1fr} }
+.acao{
+  display:flex; align-items:center; gap:11px; border:1.5px solid var(--linha); border-radius:var(--r);
+  padding:14px 15px; font-size:14.5px; font-weight:600; color:var(--tinta); text-decoration:none; transition:.15s;
+}
+.acao:hover{border-color:var(--azul); background:var(--azul-50); color:var(--azul)}
+.acao .ms{font-size:21px; color:var(--azul)}
+
+/* ---------- Painel de contexto ---------- */
+.painel{position:sticky; top:96px}
+@media (max-width:940px){ .painel{position:static} }
+.painel .box{background:var(--branco); border:1px solid var(--linha); border-radius:var(--r-lg); box-shadow:var(--sombra); overflow:hidden}
+.painel .cab{padding:16px 20px 14px; border-bottom:1px solid var(--linha-2); display:flex; align-items:center; gap:9px}
+.painel .cab .ms{font-size:19px; color:var(--azul)}
+.painel .cab b{font-size:12.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--tinta-2)}
+.painel .corpo{padding:18px 20px 20px; font-size:13.5px; color:var(--tinta-2); line-height:1.6}
+.painel .corpo b{color:var(--tinta)}
+.painel .corpo li{margin:9px 0 0 18px}
+.painel .corpo p + p{margin-top:12px}
+.dados{display:grid; gap:1px; background:var(--linha-2); border-radius:var(--r-sm); overflow:hidden; margin-top:16px}
+.dados div{background:var(--branco); padding:11px 13px; display:flex; align-items:center; justify-content:space-between; font-size:13.5px}
+.dados div b{font-weight:700; font-variant-numeric:tabular-nums; color:var(--tinta)}
+
+.hero-ic{width:64px; height:64px; border-radius:20px; background:var(--azul-50); color:var(--azul); display:flex; align-items:center; justify-content:center; margin-bottom:20px}
+.hero-ic .ms{font-size:34px}
+.centro{text-align:center}
+.centro .hero-ic{margin-left:auto; margin-right:auto}
+.centro .sub{margin-left:auto; margin-right:auto}
+.provas{display:flex; gap:22px; flex-wrap:wrap; margin-top:26px; padding-top:22px; border-top:1px solid var(--linha-2)}
+.prova{display:flex; align-items:center; gap:10px; font-size:13.5px; color:var(--tinta-2); font-weight:600}
+.prova .ms{font-size:20px; color:var(--dourado)}
+.fade{animation:fade .28s ease}
+@keyframes fade{from{opacity:0; transform:translateY(8px)}to{opacity:1; transform:none}}
+.rodape{max-width:1140px; margin:0 auto; padding:0 20px 34px; font-size:12.5px; color:var(--tinta-3); line-height:1.6}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <div class="topo-in">
+    <a class="marca" href="#" onclick="reiniciar();return false" aria-label="Conamore Hotelaria">
+      <img src="data:image/png;base64,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" alt="Conamore Hotelaria" width="188" height="45">
+    </a>
+    <a class="ajuda" id="ajudaTopo" href="https://wa.me/5519981008989" target="_blank" rel="noopener">
+      <span class="ms">support_agent</span> <span class="so-desk">Falar com consultor</span>
+    </a>
+  </div>
+</header>
+
+<nav class="trilho" id="trilho" hidden>
+  <div class="trilho-in" id="trilhoIn"></div>
+  <div class="progresso"><i id="progresso"></i></div>
+</nav>
+
+<main class="wrap">
+  <div class="grade">
+    <div class="card fade" id="corpo"></div>
+    <aside class="painel" id="painel"></aside>
+  </div>
+</main>
+
+<footer class="rodape">
+  Estimativa de dimensionamento baseada no método PAR e no ciclo de lavanderia informado.
+  A recomendação final deve considerar sazonalidade, política interna de governança e o estado atual do enxoval.
+</footer>
+
+<script>
+/* =========================================================================
+   1. COEFICIENTES  |  ajustar aqui, sem tocar na interface
+   ========================================================================= */
+
+const SEG = {
+  hotel: {
+    nome:"Hotel / Pousada", icone:"apartment", desc:"Governança diária, hóspede fica alguns dias",
+    par:3, parVol:2, margem:10, ocupacao:65,
+    unid:"quartos", unidSing:"quarto", unidLabel:"Quartos (UHs)", porGiro:"ocupacao"
+  },
+  airbnb: {
+    nome:"Airbnb / Temporada", icone:"cottage", desc:"Giro por check-in e check-out, lavagem concentrada",
+    par:4, parVol:2, margem:15, ocupacao:55,
+    unid:"unidades", unidSing:"unidade", unidLabel:"Imóveis ou unidades", porGiro:"ocupacao"
+  },
+  motel: {
+    nome:"Motel", icone:"nightlight", desc:"Alta rotatividade, troca completa a cada locação",
+    par:5, parVol:2.5, margem:20, locacoes:3,
+    unid:"suítes", unidSing:"suíte", unidLabel:"Suítes", porGiro:"locacoes"
+  },
+  hospitalar: {
+    nome:"Hospitalar / Clínica", icone:"medical_services", desc:"Troca diária obrigatória e exigência sanitária",
+    par:5, parVol:2.5, margem:25, ocupacao:75,
+    unid:"quartos", unidSing:"quarto", unidLabel:"Quartos ou enfermarias", porGiro:"ocupacao"
+  }
+};
+
+const CAMA = {
+  solteiro:{nome:"Solteiro", travesseiros:1},
+  casal:   {nome:"Casal",    travesseiros:2},
+  queen:   {nome:"Queen",    travesseiros:2},
+  king:    {nome:"King",     travesseiros:2}
+};
+
+/* Linhas reais do catálogo Conamore Hotelaria (nomes e specs conferidos no site).
+   PENDENTE: validar com o comercial em qual faixa cada linha deve ser posicionada. */
+const PADRAO = {
+  essencial: {
+    nv:"Essencial", nome:"Operação de alto giro",
+    cama:{linha:"Classic", spec:"200 fios, mista (algodão e poliéster)"},
+    banho:{linha:"Smart", spec:"340 g/m², fio retorcido"},
+    porque:"Secagem mais rápida e custo por peça menor. Indicada quando o volume de lavagem é o que manda."
+  },
+  conforto: {
+    nv:"Conforto", nome:"Padrão de hotelaria",
+    cama:{linha:"Prime", spec:"200 fios, 100% algodão"},
+    banho:{linha:"Prime Plus", spec:"500 g/m²"},
+    porque:"O ponto de equilíbrio entre toque e durabilidade. É a escolha mais comum em pousadas e hotéis médios."
+  },
+  premium: {
+    nv:"Premium", nome:"Experiência de destaque",
+    cama:{linha:"Supreme", spec:"300 fios, percal 100% algodão"},
+    banho:{linha:"Imperial", spec:"600 g/m²"},
+    porque:"Para quem compete por avaliação e diária mais alta. O enxoval vira argumento de venda."
+  }
+};
+
+const FREQ = { diaria:1, alternada:0.5, doisDias:0.5, saida:0.34 };
+const TAT  = { interna:1, terceirizada:2.5 };
+const DESCANSO = 1;
+
+const state = {
+  passo:"intro", visitados:{}, segmento:null,
+  uh:20, camasUh:1, tipoCama:"casal", hospedesUh:2, ocupacao:null, locacoes:3,
+  lavanderia:"terceirizada", trocaCama:"diaria", trocaToalha:"diaria", margem:null,
+  itens:{ cama:true, banho:true, protecao:true, volumosos:true },
+  padrao:"conforto", ajuste:{}, fora:{},
+  lead:{ nome:"", email:"", whats:"", estabelecimento:"" },
+  res:null
+};
+
+function seg(){ return SEG[state.segmento] || SEG.hotel; }
+function ocupacaoAtual(){ return state.ocupacao != null ? state.ocupacao : seg().ocupacao; }
+function margemAtual(){ return state.margem != null ? state.margem : seg().margem; }
+function num(v){ return Number(v).toLocaleString('pt-BR'); }
+
+/* =========================================================================
+   2. MOTOR DE CÁLCULO
+   ========================================================================= */
+
+function calcular(){
+  const s = seg();
+  const leitos = state.uh * state.camasUh;
+  const travPorLeito = CAMA[state.tipoCama].travesseiros;
+  const travesseiros = leitos * travPorLeito;
+  const m = margemAtual()/100;
+  const ciclo = TAT[state.lavanderia] + DESCANSO;
+
+  const porLocacao = s.porGiro === "locacoes";
+  const ocup = ocupacaoAtual()/100;
+  const trocasCamaDia   = porLocacao ? state.locacoes : FREQ[state.trocaCama] * ocup;
+  const trocasToalhaDia = porLocacao ? state.locacoes : FREQ[state.trocaToalha] * ocup;
+  const hospedesDia = porLocacao
+      ? state.uh * state.hospedesUh * state.locacoes
+      : Math.round(state.uh * state.hospedesUh * ocup);
+
+  const p = PADRAO[state.padrao];
+  const grupos = [];
+
+  if(state.itens.cama){
+    const giro = leitos * trocasCamaDia * ciclo;
+    const piso = leitos * s.par;
+    const jogos = Math.max(piso, giro);
+    const regra = giro > piso ? "giro" : "par";
+    const explica = regra === "giro"
+      ? `${num(leitos)} leitos × ${trocasCamaDia.toFixed(2).replace('.',',')} trocas/dia × ${ciclo.toFixed(1).replace('.',',')} dias de ciclo = ${Math.ceil(giro)} jogos em rotação`
+      : `${num(leitos)} leitos × PAR ${s.par} (uso + lavagem + descanso) = ${Math.ceil(piso)} jogos`;
+    grupos.push({
+      id:"cama", nome:"Cama", icone:"bed", regra,
+      itens:[
+        { id:"lencolBaixo", nome:"Lençol com elástico", un:`${CAMA[state.tipoCama].nome} · linha ${p.cama.linha}`,
+          qtd:Math.ceil(jogos*(1+m)),
+          conta:`${explica}\n+ margem de segurança de ${margemAtual()}%\n= ${Math.ceil(jogos*(1+m))} peças` },
+        { id:"lencolCima", nome:"Lençol de cima", un:`${CAMA[state.tipoCama].nome} · linha ${p.cama.linha}`,
+          qtd:Math.ceil(jogos*(1+m)),
+          conta:`Mesma base do lençol com elástico: 1 por jogo.\n= ${Math.ceil(jogos*(1+m))} peças` },
+        { id:"fronha", nome:"Fronha", un:`${travPorLeito} por cama ${CAMA[state.tipoCama].nome.toLowerCase()} · linha ${p.cama.linha}`,
+          qtd:Math.ceil(jogos*travPorLeito*(1+m)),
+          conta:`${Math.ceil(jogos)} jogos × ${travPorLeito} travesseiro(s) por cama\n+ margem de ${margemAtual()}%\n= ${Math.ceil(jogos*travPorLeito*(1+m))} peças` }
+      ]
+    });
+  }
+
+  if(state.itens.banho){
+    const trocaToalha = porLocacao ? 1 : FREQ[state.trocaToalha];
+    const banho = Math.ceil(hospedesDia * trocaToalha * ciclo * (1+m));
+    const piso  = Math.ceil(state.uh * trocasToalhaDia * ciclo * (1+m));
+    grupos.push({
+      id:"banho", nome:"Banho", icone:"shower",
+      itens:[
+        { id:"toalhaBanho", nome:"Toalha de banho", un:`1 por hóspede por troca · linha ${p.banho.linha}`, qtd:banho,
+          conta:`${num(hospedesDia)} hóspedes/dia × ${String(trocaToalha).replace('.',',')} troca(s) por dia × ${ciclo.toFixed(1).replace('.',',')} dias de ciclo\n+ margem de ${margemAtual()}%\n= ${banho} peças` },
+        { id:"toalhaRosto", nome:"Toalha de rosto", un:`1 por hóspede por troca · linha ${p.banho.linha}`, qtd:banho,
+          conta:`Mesma base da toalha de banho: 1 por hóspede por troca.\n= ${banho} peças` },
+        { id:"toalhaPiso", nome:"Toalha de piso", un:`1 por ${s.unidSing} por troca · linha ${p.banho.linha}`, qtd:piso,
+          conta:`${num(state.uh)} ${s.unid} × ${trocasToalhaDia.toFixed(2).replace('.',',')} trocas/dia × ${ciclo.toFixed(1).replace('.',',')} dias\n+ margem de ${margemAtual()}%\n= ${piso} peças` }
+      ]
+    });
+  }
+
+  if(state.itens.protecao){
+    grupos.push({
+      id:"protecao", nome:"Proteção", icone:"shield",
+      itens:[
+        { id:"protColchao", nome:"Protetor de colchão", un:"1 em uso + 1 reserva", qtd:leitos*2,
+          conta:`${num(leitos)} leitos × 2 (uma peça em uso e uma de reserva).\nO protetor não gira a cada troca, por isso não entra no ciclo de lavanderia.\n= ${leitos*2} peças` },
+        { id:"protTrav", nome:"Protetor de travesseiro", un:"1 em uso + 1 reserva", qtd:travesseiros*2,
+          conta:`${num(travesseiros)} travesseiros (${num(leitos)} leitos × ${travPorLeito}) × 2.\n= ${travesseiros*2} peças` }
+      ]
+    });
+  }
+
+  if(state.itens.volumosos){
+    const capa = Math.ceil(leitos * s.par * (1+m));
+    grupos.push({
+      id:"volumosos", nome:"Volumosos", icone:"bedroom_parent",
+      itens:[
+        { id:"edredom", nome:"Edredom (enchimento)", un:"não lava a cada troca", qtd:Math.ceil(leitos*1.5),
+          conta:`${num(leitos)} leitos × 1,5.\nO enchimento não vai para a lavanderia a cada saída, só a capa.\n= ${Math.ceil(leitos*1.5)} peças` },
+        { id:"capaEdredom", nome:"Capa de edredom", un:"gira junto com o lençol", qtd:capa,
+          conta:`${num(leitos)} leitos × PAR ${s.par} + margem de ${margemAtual()}%.\nA capa lava junto com a roupa de cama, por isso segue o mesmo PAR.\n= ${capa} peças` },
+        { id:"colcha", nome:"Colcha ou cobreleito", un:"acabamento da cama", qtd:Math.ceil(leitos*s.parVol*(1+m)),
+          conta:`${num(leitos)} leitos × ${String(s.parVol).replace('.',',')} + margem de ${margemAtual()}%\n= ${Math.ceil(leitos*s.parVol*(1+m))} peças` }
+      ]
+    });
+  }
+
+  // Ajuste manual e itens desmarcados têm precedência sobre a recomendação
+  let total = 0, mexidos = 0, fora = 0;
+  grupos.forEach(g=>{
+    g.total = 0;
+    g.itens.forEach(it=>{
+      it.qtdRec = it.qtd;
+      if(state.ajuste[it.id] != null){ it.qtd = state.ajuste[it.id]; }
+      it.mexido = it.qtd !== it.qtdRec;
+      it.fora = !!state.fora[it.id];
+      if(it.mexido && !it.fora) mexidos++;
+      if(it.fora){ fora++; return; }        // item desmarcado não entra em nenhum total
+      total += it.qtd; g.total += it.qtd;
+    });
+  });
+
+  state.res = { grupos, total, mexidos, fora, leitos, travesseiros, hospedesDia, ciclo, trocasCamaDia };
+  return state.res;
+}
+
+/* =========================================================================
+   3. NAVEGAÇÃO
+   ========================================================================= */
+
+const PASSOS = [
+  {id:"segmento",  rot:"Operação"},
+  {id:"estrutura", rot:"Estrutura"},
+  {id:"rotina",    rot:"Rotina"},
+  {id:"itens",     rot:"Itens"},
+  {id:"resultado", rot:"Resultado"}
+];
+const ORDEM = ["intro","segmento","estrutura","rotina","itens","resultado","lead","final"];
+
+function irPara(id){
+  if(id !== "intro") state.visitados[state.passo] = true;
+  state.passo = id;
+  if(["resultado","lead","final"].includes(id)) calcular();
+  salvarUrl(); desenhar(); window.scrollTo({top:0, behavior:"smooth"});
+}
+function avancar(){
+  const i = ORDEM.indexOf(state.passo);
+  if(state.passo === "segmento" && !state.segmento) return;
+  if(i < ORDEM.length-1) irPara(ORDEM[i+1]);
+}
+function voltar(){
+  const i = ORDEM.indexOf(state.passo);
+  if(i > 0) irPara(ORDEM[i-1]);
+}
+
+function salvarUrl(){
+  const p = new URLSearchParams();
+  if(state.segmento){
+    p.set('s',state.segmento); p.set('uh',state.uh); p.set('c',state.camasUh);
+    p.set('t',state.tipoCama); p.set('h',state.hospedesUh); p.set('o',ocupacaoAtual());
+    p.set('l',state.lavanderia); p.set('tc',state.trocaCama); p.set('tt',state.trocaToalha);
+    p.set('m',margemAtual()); p.set('lo',state.locacoes); p.set('pd',state.padrao);
+    p.set('i',Object.keys(state.itens).filter(k=>state.itens[k]).join(','));
+    p.set('p',state.passo);
+  }
+  history.replaceState(null,"", p.toString() ? "#"+p.toString() : location.pathname);
+}
+function lerUrl(){
+  if(!location.hash) return;
+  const p = new URLSearchParams(location.hash.slice(1));
+  if(!p.get('s') || !SEG[p.get('s')]) return;
+  state.segmento = p.get('s');
+  state.uh = +p.get('uh')||20; state.camasUh = +p.get('c')||1;
+  state.tipoCama = CAMA[p.get('t')] ? p.get('t') : "casal";
+  state.hospedesUh = +p.get('h')||2; state.ocupacao = +p.get('o')||null;
+  state.lavanderia = TAT[p.get('l')] ? p.get('l') : "terceirizada";
+  state.trocaCama = p.get('tc')||"diaria"; state.trocaToalha = p.get('tt')||"diaria";
+  state.margem = +p.get('m')||null; state.locacoes = +p.get('lo')||3;
+  state.padrao = PADRAO[p.get('pd')] ? p.get('pd') : "conforto";
+  if(p.get('i')){
+    const on = p.get('i').split(',');
+    Object.keys(state.itens).forEach(k=> state.itens[k] = on.includes(k));
+  }
+  if(ORDEM.includes(p.get('p'))) state.passo = p.get('p');
+  PASSOS.forEach(x=>{ if(ORDEM.indexOf(x.id) < ORDEM.indexOf(state.passo)) state.visitados[x.id]=true; });
+  calcular();
+}
+
+/* =========================================================================
+   4. TELAS
+   ========================================================================= */
+
+const TELA = {
+
+intro: () => `
+  <div class="hero-ic"><span class="ms">calculate</span></div>
+  <span class="selo s-dourado"><span class="ms fill">bolt</span> Gratuito · leva 2 minutos</span>
+  <h1>Quanto enxoval a sua operação precisa ter em estoque?</h1>
+  <p class="sub">Cama, banho, proteção e volumosos dimensionados pelo método PAR, ajustados ao seu tipo de operação,
+  ao ciclo da sua lavanderia e à sua política de troca. Sem faltar na alta temporada e sem capital parado na prateleira.</p>
+  <button class="btn b-primary b-full" onclick="irPara('segmento')">Calcular meu enxoval <span class="ms">arrow_forward</span></button>
+  <div class="provas">
+    <div class="prova"><span class="ms fill">verified</span> Método usado pela governança hoteleira</div>
+    <div class="prova"><span class="ms fill">visibility</span> Você vê a conta de cada item</div>
+    <div class="prova"><span class="ms fill">lock_open</span> Resultado sem cadastro</div>
+  </div>`,
+
+segmento: () => `
+  <h2>Qual é o tipo da sua operação?</h2>
+  <p class="sub">Cada operação tem um giro diferente. Isso define o PAR mínimo, a margem de segurança e as próximas perguntas.</p>
+  <div class="opcoes">
+    ${Object.entries(SEG).map(([k,v])=>`
+      <button class="op ${state.segmento===k?'sel':''}" role="radio" aria-checked="${state.segmento===k}" onclick="escolherSeg('${k}')">
+        <span class="ic"><span class="ms">${v.icone}</span></span>
+        <span class="tx"><b>${v.nome}</b><span>${v.desc}</span></span>
+        <span class="ck"></span>
+      </button>`).join('')}
+  </div>
+  <div class="nav">
+    <button class="btn b-ghost" onclick="irPara('intro')"><span class="ms">arrow_back</span></button>
+    <button class="btn b-primary" onclick="avancar()" ${state.segmento?'':'disabled'}>Continuar <span class="ms">arrow_forward</span></button>
+  </div>`,
+
+estrutura: () => {
+  const s = seg(), porLocacao = s.porGiro==="locacoes";
+  return `
+  <h2>Como é a sua estrutura?</h2>
+  <p class="sub">São os dados que definem o volume: quantos leitos você tem para vestir e quantos hóspedes passam por eles.</p>
+  <div class="linha2">
+    <div>
+      <label class="campo" for="fUh">${s.unidLabel}
+        ${tip("UH significa Unidade Habitacional: cada quarto, suíte ou imóvel que você aluga.")}</label>
+      ${stepper("fUh","uh",1,999)}
+    </div>
+    <div>
+      <label class="campo" for="fCamas">Camas por ${s.unidSing}</label>
+      <select id="fCamas" onchange="mudar('camasUh',+this.value)">
+        ${[1,2,3,4].map(n=>`<option value="${n}" ${state.camasUh==n?'selected':''}>${n} cama${n>1?'s':''}</option>`).join('')}
+      </select>
+    </div>
+  </div>
+  <div class="linha2">
+    <div>
+      <label class="campo" for="fTipo">Tipo de cama predominante <span class="dica">define fronhas e tamanho do lençol</span></label>
+      <select id="fTipo" onchange="mudar('tipoCama',this.value)">
+        ${Object.entries(CAMA).map(([k,v])=>`<option value="${k}" ${state.tipoCama===k?'selected':''}>${v.nome} · ${v.travesseiros} travesseiro${v.travesseiros>1?'s':''}</option>`).join('')}
+      </select>
+    </div>
+    <div>
+      <label class="campo" for="fHosp">Hóspedes por ${s.unidSing} <span class="dica">define as toalhas</span></label>
+      <select id="fHosp" onchange="mudar('hospedesUh',+this.value)">
+        ${[1,2,3,4,5,6].map(n=>`<option value="${n}" ${state.hospedesUh==n?'selected':''}>${n} hóspede${n>1?'s':''}</option>`).join('')}
+      </select>
+    </div>
+  </div>
+  ${porLocacao ? `
+    <label class="campo" for="fLoc">Locações por suíte, por dia
+      ${tip("Quantas vezes, em média, a mesma suíte é ocupada em um dia. Cada locação exige troca completa de cama e banho.")}</label>
+    <div class="faixa">
+      <input type="range" id="fLoc" min="1" max="6" step="0.5" value="${state.locacoes}"
+        oninput="mudarVivo('locacoes',+this.value,'rLoc',v=>String(v).replace('.',','))">
+      <span class="faixa-val" id="rLoc">${String(state.locacoes).replace('.',',')}</span>
+    </div>`
+  : `
+    <label class="campo" for="fOcup">Ocupação média
+      ${tip("Percentual médio dos quartos ocupados ao longo do ano. Se não souber, deixe o valor sugerido para o seu segmento.")}
+      <span class="dica">${state.ocupacao==null?'sugerido para '+s.nome:'definido por você'}</span></label>
+    <div class="faixa">
+      <input type="range" id="fOcup" min="20" max="100" step="5" value="${ocupacaoAtual()}"
+        oninput="mudarVivo('ocupacao',+this.value,'rOcup',v=>v+'%')">
+      <span class="faixa-val" id="rOcup">${ocupacaoAtual()}%</span>
+    </div>`}
+  <div class="nav">
+    <button class="btn b-ghost" onclick="voltar()"><span class="ms">arrow_back</span></button>
+    <button class="btn b-primary" onclick="avancar()">Continuar <span class="ms">arrow_forward</span></button>
+  </div>`;
+},
+
+rotina: () => {
+  const s = seg(), porLocacao = s.porGiro==="locacoes";
+  return `
+  <h2>Como funciona a sua rotina?</h2>
+  <p class="sub">O tempo de lavanderia é o que mais muda o resultado. Quanto mais demora a peça voltar, mais peças você precisa ter girando.</p>
+  <label class="campo">Lavanderia
+    ${tip("TAT é o tempo entre a peça sair do quarto e voltar pronta para uso. Somamos 1 dia de descanso, que preserva a fibra e a maciez.")}</label>
+  <div class="opcoes duas">
+    ${[["interna","Interna","Giro em torno de 24h","local_laundry_service"],
+       ["terceirizada","Terceirizada","Giro de 48h a 72h","local_shipping"]].map(([k,t,d,ic])=>`
+      <button class="op ${state.lavanderia===k?'sel':''}" onclick="mudar('lavanderia','${k}',true)">
+        <span class="ic"><span class="ms">${ic}</span></span>
+        <span class="tx"><b>${t}</b><span>${d}</span></span>
+      </button>`).join('')}
+  </div>
+  ${porLocacao ? `
+    <div class="nota"><span class="ms">bolt</span>
+      <div>Em motel, cama e banho são trocados a cada locação. A política de troca por diária não se aplica, o giro vem das
+      <b>${String(state.locacoes).replace('.',',')} locações por dia</b> que você informou.</div>
+    </div>`
+  : `
+  <div class="linha2">
+    <div>
+      <label class="campo" for="fTc">Troca de roupa de cama</label>
+      <select id="fTc" onchange="mudar('trocaCama',this.value,true)">
+        <option value="diaria" ${state.trocaCama==='diaria'?'selected':''}>Diária</option>
+        <option value="alternada" ${state.trocaCama==='alternada'?'selected':''}>Dia sim, dia não</option>
+        <option value="saida" ${state.trocaCama==='saida'?'selected':''}>Só na saída do hóspede</option>
+      </select>
+    </div>
+    <div>
+      <label class="campo" for="fTt">Troca de toalhas</label>
+      <select id="fTt" onchange="mudar('trocaToalha',this.value,true)">
+        <option value="diaria" ${state.trocaToalha==='diaria'?'selected':''}>Diária</option>
+        <option value="doisDias" ${state.trocaToalha==='doisDias'?'selected':''}>A cada 2 dias</option>
+        <option value="saida" ${state.trocaToalha==='saida'?'selected':''}>Só na saída do hóspede</option>
+      </select>
+    </div>
+  </div>`}
+  <label class="campo" for="fMarg">Margem de segurança
+    ${tip("Folga para perdas, manchas, peças em manutenção e picos de ocupação. Já vem sugerida conforme o seu segmento.")}
+    <span class="dica">${state.margem==null?'sugerida para '+s.nome:'definida por você'}</span></label>
+  <div class="faixa">
+    <input type="range" id="fMarg" min="0" max="35" step="5" value="${margemAtual()}"
+      oninput="mudarVivo('margem',+this.value,'rMarg',v=>v+'%')">
+    <span class="faixa-val" id="rMarg">${margemAtual()}%</span>
+  </div>
+  <div class="nav">
+    <button class="btn b-ghost" onclick="voltar()"><span class="ms">arrow_back</span></button>
+    <button class="btn b-primary" onclick="avancar()">Continuar <span class="ms">arrow_forward</span></button>
+  </div>`;
+},
+
+itens: () => `
+  <h2>O que você quer dimensionar?</h2>
+  <p class="sub">Desmarque o que já está resolvido na sua operação. Você pode voltar e incluir depois.</p>
+  <div class="opcoes">
+    ${[["cama","Cama","Lençol com elástico, lençol de cima e fronhas","bed"],
+       ["banho","Banho","Toalhas de banho, rosto e piso","shower"],
+       ["protecao","Proteção","Protetores de colchão e travesseiro","shield"],
+       ["volumosos","Volumosos","Edredom, capa e colcha","bedroom_parent"]].map(([k,t,d,ic])=>`
+      <button class="op quad ${state.itens[k]?'sel':''}" role="checkbox" aria-checked="${state.itens[k]}" onclick="alternarItem('${k}')">
+        <span class="ic"><span class="ms">${ic}</span></span>
+        <span class="tx"><b>${t}</b><span>${d}</span></span>
+        <span class="ck">${state.itens[k]?'<span class="ms">check</span>':''}</span>
+      </button>`).join('')}
+  </div>
+  <div class="nav">
+    <button class="btn b-ghost" onclick="voltar()"><span class="ms">arrow_back</span></button>
+    <button class="btn b-primary" onclick="avancar()">Ver o resultado <span class="ms">auto_awesome</span></button>
+  </div>`,
+
+resultado: () => {
+  const r = state.res, s = seg(), p = PADRAO[state.padrao];
+  const regraCama = (r.grupos.find(g=>g.id==="cama")||{}).regra;
+  return `
+  <span class="selo s-ok"><span class="ms fill">check_circle</span> Cálculo pronto</span>
+  <h2>O enxoval ideal da sua operação</h2>
+  <p class="sub">${s.nome} · ${num(state.uh)} ${s.unid} · ${num(r.leitos)} leitos ·
+    ${s.porGiro==="locacoes" ? String(state.locacoes).replace('.',',')+" locações/dia" : "ocupação "+ocupacaoAtual()+"%"} ·
+    ciclo de ${r.ciclo.toFixed(1).replace('.',',')} dias</p>
+
+  <div class="destaque">
+    <div class="rot">TOTAL DE PEÇAS</div>
+    <div class="big" id="totalBig">${num(r.total)} <small>peças</small></div>
+    <div class="ctx">Para a operação girar sem falta e sem estoque parado.</div>
+  </div>
+
+  ${regraCama ? `<div class="nota"><span class="ms">${regraCama==='giro'?'sync':'inventory_2'}</span><div>${
+    regraCama==="giro"
+    ? `Na sua operação, quem mandou no número da cama foi o <b>giro da lavanderia</b>, não o PAR mínimo. O ciclo de ${r.ciclo.toFixed(1).replace('.',',')} dias exige mais peças em rotação do que as ${s.par}x por leito.`
+    : `O número da cama está no <b>PAR mínimo de ${s.par}x por leito</b> (uma peça em uso, uma na lavagem, uma em descanso). Seu giro atual cabe dentro desse estoque.`
+  }</div></div>` : ''}
+
+  <div class="secao">Quantidades</div>
+  <p style="font-size:13.5px;color:var(--tinta-2);margin:-4px 0 12px">
+    Ajuste a quantidade se a sua realidade for diferente e desmarque o que você não vai comprar agora.
+    Toque na seta para ver a conta por trás de cada número.</p>
+  ${r.grupos.map(g=>`
+    <div class="grupo">
+      <div class="grupo-topo"><span class="ms">${g.icone}</span> ${g.nome}
+        <span class="tot" id="tot-${g.id}">${num(g.total)} peças</span></div>
+      ${g.itens.map(it=>`
+        <div class="item ${it.mexido?'mexido':''} ${it.fora?'fora':''}" id="it-${it.id}">
+          <div class="item-linha">
+            <span class="item-nome"><span class="nm">${it.nome}</span><span class="un">${it.un}</span></span>
+            <span class="qtd-edit">
+              <button type="button" aria-label="Diminuir" onclick="ajustar('${it.id}',-1)"><span class="ms">remove</span></button>
+              <input class="qtd-in" type="number" min="0" value="${it.qtd}" aria-label="${it.nome}"
+                oninput="ajustarDireto('${it.id}',this.value)">
+              <button type="button" aria-label="Aumentar" onclick="ajustar('${it.id}',1)"><span class="ms">add</span></button>
+            </span>
+            <button class="marcar" role="checkbox" aria-checked="${!it.fora}"
+              aria-label="${it.fora?'Incluir':'Tirar'} ${it.nome} da lista"
+              title="${it.fora?'Incluir na lista':'Tirar da lista'}" onclick="alternarFora('${it.id}')">
+              <span class="ms${it.fora?'':' fill'}">${it.fora?'check_box_outline_blank':'check_box'}</span></button>
+            <button class="btn-conta" aria-expanded="false" aria-label="Ver a conta" onclick="abrirConta('${it.id}')">
+              <span class="ms">expand_more</span></button>
+          </div>
+          <div class="conta">
+            <b>Como chegamos nesse número</b><code>${it.conta}</code>
+            ${it.mexido?`<button class="refazer" onclick="limparAjuste('${it.id}')">
+              <span class="ms">restart_alt</span> Voltar ao recomendado (${num(it.qtdRec)})</button>`:''}
+          </div>
+        </div>`).join('')}
+    </div>`).join('')}
+
+  <div class="secao">Padrão do enxoval</div>
+  <p style="font-size:13.5px;color:var(--tinta-2);margin:-4px 0 14px">
+    A quantidade não muda, mas fio e gramatura mudam o toque, a durabilidade e o custo por peça.
+    Escolha o padrão para a lista sair com a linha certa.</p>
+  <div class="padroes">
+    ${Object.entries(PADRAO).map(([k,v])=>`
+      <button class="pad ${state.padrao===k?'sel':''}" onclick="mudarPadrao('${k}')" aria-pressed="${state.padrao===k}">
+        <span class="nv">${v.nv}</span>
+        <b>${v.nome}</b>
+        <span class="spec"><i>Cama</i> ${v.cama.linha}<br>${v.cama.spec}<br>
+        <i style="display:inline-block;margin-top:6px">Banho</i> ${v.banho.linha}<br>${v.banho.spec}</span>
+      </button>`).join('')}
+  </div>
+  <div class="nota"><span class="ms">lightbulb</span><div>${p.porque}</div></div>
+
+  <a class="consultor" href="${linkWhats()}" target="_blank" rel="noopener">
+    <span class="ic"><span class="ms fill">support_agent</span></span>
+    <span><b>Tem dúvida no número ou no padrão?</b><span>Fale agora com um consultor, seu cálculo vai junto na mensagem</span></span>
+    <span class="ms seta">chat</span>
+  </a>
+
+  <div class="nav">
+    <button class="btn b-ghost" onclick="voltar()"><span class="ms">arrow_back</span></button>
+    <button class="btn b-primary" onclick="irPara('lead')">Receber a lista de compras <span class="ms">arrow_forward</span></button>
+  </div>
+  <div class="acoes">
+    <a class="acao" href="#" onclick="copiarResumo(this);return false"><span class="ms">content_copy</span> Copiar o resumo</a>
+    <a class="acao" href="#" onclick="window.print();return false"><span class="ms">print</span> Imprimir ou salvar em PDF</a>
+  </div>`;
+},
+
+lead: () => `
+  <div class="hero-ic"><span class="ms">description</span></div>
+  <h2>A sua lista de compras, pronta para orçar</h2>
+  <p class="sub">Enviamos o detalhamento por categoria, com as quantidades, a linha escolhida e a conta de cada item,
+  no formato que o fornecedor consegue cotar direto. Você já viu o resultado completo, este passo é só para receber o documento.</p>
+  <label class="campo" for="lNome">Nome</label>
+  <input id="lNome" type="text" placeholder="Como podemos te chamar" value="${state.lead.nome}" oninput="state.lead.nome=this.value">
+  <label class="campo" for="lEstab">Nome do estabelecimento</label>
+  <input id="lEstab" type="text" placeholder="Ex.: Pousada Vista Mar" value="${state.lead.estabelecimento}" oninput="state.lead.estabelecimento=this.value">
+  <div class="linha2">
+    <div>
+      <label class="campo" for="lMail">E-mail</label>
+      <input id="lMail" type="email" placeholder="voce@email.com" value="${state.lead.email}" oninput="state.lead.email=this.value">
+    </div>
+    <div>
+      <label class="campo" for="lZap">WhatsApp <span class="dica">opcional</span></label>
+      <input id="lZap" type="tel" placeholder="(00) 00000-0000" value="${state.lead.whats}" oninput="state.lead.whats=this.value">
+    </div>
+  </div>
+  <button class="btn b-primary b-full" style="margin-top:26px" onclick="irPara('final')">
+    Enviar a lista para mim <span class="ms">send</span></button>
+  <div class="centro" style="margin-top:14px">
+    <button class="b-texto" onclick="irPara('final')">Não quero receber, só ver as opções</button>
+  </div>`,
+
+final: () => {
+  const r = state.res, p = PADRAO[state.padrao];
+  return `
+  <span class="selo s-ok"><span class="ms fill">mark_email_read</span> Lista enviada</span>
+  <h2>Quer que a gente monte esse enxoval com você?</h2>
+  <p class="sub">São ${num(r.total)} peças no padrão <b>${p.nv}</b>, com cama linha ${p.cama.linha} e banho linha ${p.banho.linha}.
+  A partir daqui um consultor confere o dimensionamento e fecha a linha certa para o seu giro.</p>
+  <div class="opcoes">
+    <a class="op" href="${linkWhats()}" target="_blank" rel="noopener">
+      <span class="ic"><span class="ms">forum</span></span>
+      <span class="tx"><b>Falar com um consultor</b><span>Seu cálculo vai preenchido na mensagem</span></span>
+      <span class="ms seta">chevron_right</span>
+    </a>
+    <a class="op" href="https://www.conamore.com.br" target="_blank" rel="noopener">
+      <span class="ic"><span class="ms">storefront</span></span>
+      <span class="tx"><b>Ver as linhas no catálogo</b><span>Cama, banho, proteção e volumosos</span></span>
+      <span class="ms seta">chevron_right</span>
+    </a>
+  </div>
+  <div class="acoes">
+    <a class="acao" href="#" onclick="irPara('resultado');return false"><span class="ms">arrow_back</span> Voltar ao resultado</a>
+    <a class="acao" href="#" onclick="reiniciar();return false"><span class="ms">restart_alt</span> Refazer o cálculo</a>
+  </div>`;
+}
+};
+
+/* =========================================================================
+   5. PAINEL DE CONTEXTO
+   O painel explica o passo atual. O número só aparece no resultado, de propósito.
+   ========================================================================= */
+
+const CONTEXTO = {
+  intro: () => ({icone:"school", titulo:"Como calculamos", corpo:`
+    <p>A base é o <b>PAR</b>, o número de jogos que cada leito precisa ter para a operação nunca parar.</p>
+    <ul><li><b>1 em uso</b> na cama do hóspede</li>
+    <li><b>1 na lavanderia</b>, no ciclo de lavagem</li>
+    <li><b>1 em descanso</b>, que preserva a fibra e a maciez</li></ul>
+    <p>Em cima desse piso entram o seu giro real, o tempo da sua lavanderia e uma margem de segurança.</p>`}),
+
+  segmento: () => ({icone:"school", titulo:"Por que isso importa", corpo:`
+    <p>O tipo de operação muda o <b>PAR mínimo</b>: um hotel trabalha com 3 jogos por leito, um motel precisa de 5,
+    porque a mesma suíte é trocada várias vezes no mesmo dia.</p>
+    <p>Também muda a pergunta seguinte. Ocupação média faz sentido para hotel e temporada, mas não para motel,
+    onde o que conta é o número de locações por dia.</p>`}),
+
+  estrutura: () => ({icone:"straighten", titulo:"O que estamos medindo", corpo:`
+    <p>Cama se calcula <b>por leito</b>, banho se calcula <b>por hóspede</b>. Por isso as duas perguntas existem separadas.</p>
+    <p>O tipo de cama define quantas fronhas entram por jogo e qual tamanho de lençol vai na lista.</p>
+    <div class="dados">
+      <div><span>Leitos para vestir</span><b id="cLeitos">${num(state.uh*state.camasUh)}</b></div>
+      <div><span>Travesseiros</span><b id="cTrav">${num(state.uh*state.camasUh*CAMA[state.tipoCama].travesseiros)}</b></div>
+    </div>`}),
+
+  rotina: () => ({icone:"schedule", titulo:"O que mais pesa na conta", corpo:`
+    <p>Uma peça só volta para o quarto depois de lavar, secar, passar e <b>descansar</b>. Esse intervalo inteiro é
+    estoque que precisa existir em duplicata.</p>
+    <p>Trocar de lavanderia terceirizada para interna costuma derrubar o estoque necessário quase pela metade,
+    e é a conta que mais surpreende quem nunca fez.</p>
+    <div class="dados">
+      <div><span>Ciclo da peça</span><b id="cCiclo">${(TAT[state.lavanderia]+DESCANSO).toFixed(1).replace('.',',')} dias</b></div>
+      <div><span>Margem</span><b id="cMargem">${margemAtual()}%</b></div>
+    </div>`}),
+
+  itens: () => ({icone:"checklist", titulo:"Quase lá", corpo:`
+    <p>Marque só o que você quer dimensionar agora. Muita operação já tem proteção e volumosos resolvidos
+    e só precisa recalcular cama e banho.</p>
+    <p>No próximo passo aparece o resultado completo, item a item, com a conta de cada número.</p>`}),
+
+  resultado: () => ({icone:"inventory_2", titulo:"Seu dimensionamento", corpo:`
+    <div class="dados">
+      <div><span>Total de peças</span><b>${num(state.res.total)}</b></div>
+      <div><span>Leitos</span><b>${num(state.res.leitos)}</b></div>
+      <div><span>Hóspedes por dia</span><b>${num(state.res.hospedesDia)}</b></div>
+      <div><span>Ciclo da peça</span><b>${state.res.ciclo.toFixed(1).replace('.',',')} dias</b></div>
+      <div><span>Margem</span><b>${margemAtual()}%</b></div>
+      <div><span>Padrão</span><b>${PADRAO[state.padrao].nv}</b></div>
+    </div>
+    ${state.res.mexidos?`<p style="margin-top:14px;font-size:12.5px;color:var(--dourado)">
+      ${state.res.mexidos} item(ns) com quantidade ajustada por você.</p>`:''}
+    ${state.res.fora?`<p style="margin-top:8px;font-size:12.5px;color:var(--tinta-3)">
+      ${state.res.fora} item(ns) tirado(s) da lista.</p>`:''}`})
+};
+CONTEXTO.lead = CONTEXTO.resultado;
+CONTEXTO.final = CONTEXTO.resultado;
+
+function desenharPainel(){
+  const ctx = (CONTEXTO[state.passo] || CONTEXTO.intro)();
+  document.getElementById('painel').innerHTML = `
+    <div class="box">
+      <div class="cab"><span class="ms">${ctx.icone}</span><b>${ctx.titulo}</b></div>
+      <div class="corpo">${ctx.corpo}</div>
+    </div>`;
+}
+
+/* =========================================================================
+   6. RENDER
+   ========================================================================= */
+
+function trilhoHtml(){
+  const iAtual = ORDEM.indexOf(state.passo);
+  return PASSOS.map((p,i)=>{
+    const iP = ORDEM.indexOf(p.id);
+    const ativo = p.id === state.passo;
+    const feito = iP < iAtual;
+    const clicavel = feito || state.visitados[p.id];
+    return `<button class="tp ${ativo?'ativo':''} ${feito?'feito':''}" ${clicavel?`onclick="irPara('${p.id}')"`:'disabled'}>
+      <span class="n">${feito?'<span class="ms">check</span>':i+1}</span>${p.rot}</button>`;
+  }).join('');
+}
+
+function desenhar(){
+  const corpo = document.getElementById('corpo');
+  corpo.className = "card"; void corpo.offsetWidth; corpo.className = "card fade";
+  corpo.innerHTML = TELA[state.passo]();
+
+  const trilho = document.getElementById('trilho');
+  trilho.hidden = state.passo === "intro";
+  if(!trilho.hidden){
+    document.getElementById('trilhoIn').innerHTML = trilhoHtml();
+    const i = ORDEM.indexOf(state.passo);
+    const pct = Math.min(100, Math.round(i / (ORDEM.indexOf("resultado")) * 100));
+    document.getElementById('progresso').style.width = pct + "%";
+  }
+  document.getElementById('ajudaTopo').href = state.segmento ? linkWhats() : "https://wa.me/5519981008989";
+  desenharPainel();
+}
+
+/* =========================================================================
+   7. INTERAÇÕES
+   ========================================================================= */
+
+function escolherSeg(k){ state.segmento = k; desenhar(); }
+
+function mudar(chave, valor, redesenhar){
+  state[chave] = valor; salvarUrl();
+  if(redesenhar) desenhar(); else atualizarContexto();
+}
+/* Atualiza só o rótulo do controle e o painel, sem redesenhar a tela (não perde o foco) */
+function mudarVivo(chave, valor, idVal, fmt){
+  state[chave] = valor;
+  const v = document.getElementById(idVal); if(v) v.textContent = fmt(valor);
+  salvarUrl(); atualizarContexto();
+}
+function passo(chave, delta, min, max){
+  state[chave] = Math.min(max, Math.max(min, (+state[chave]||min) + delta));
+  const el = document.querySelector(`[data-campo="${chave}"]`);
+  if(el) el.value = state[chave];
+  salvarUrl(); atualizarContexto();
+}
+function digitou(chave, valor, min, max){
+  state[chave] = Math.min(max, Math.max(min, +valor||min));
+  salvarUrl(); atualizarContexto();
+}
+/* Só os dados de contexto do painel se mexem durante a digitação */
+function atualizarContexto(){
+  const set = (id, txt)=>{ const e = document.getElementById(id); if(e) e.textContent = txt; };
+  set('cLeitos', num(state.uh*state.camasUh));
+  set('cTrav',   num(state.uh*state.camasUh*CAMA[state.tipoCama].travesseiros));
+  set('cCiclo',  (TAT[state.lavanderia]+DESCANSO).toFixed(1).replace('.',',')+" dias");
+  set('cMargem', margemAtual()+"%");
+}
+function alternarItem(k){
+  const ligados = Object.values(state.itens).filter(Boolean).length;
+  if(state.itens[k] && ligados === 1) return; // nunca deixa zerar tudo
+  state.itens[k] = !state.itens[k];
+  salvarUrl(); desenhar();
+}
+function mudarPadrao(k){ state.padrao = k; calcular(); salvarUrl(); desenhar(); }
+
+/* --- Ajuste manual de quantidade no resultado --- */
+function itemPorId(id){ return state.res.grupos.flatMap(g=>g.itens).find(x=>x.id===id); }
+function ajustar(id, delta){
+  const it = itemPorId(id);
+  gravarAjuste(id, Math.max(0, it.qtd + delta));
+  const inp = document.querySelector(`#it-${id} .qtd-in`);
+  if(inp) inp.value = itemPorId(id).qtd;
+}
+function ajustarDireto(id, valor){ gravarAjuste(id, Math.max(0, Math.round(+valor||0))); }
+function limparAjuste(id){ delete state.ajuste[id]; calcular(); desenhar(); }
+function alternarFora(id){
+  if(state.fora[id]) delete state.fora[id]; else state.fora[id] = true;
+  calcular(); desenhar();
+}
+function gravarAjuste(id, valor){
+  state.ajuste[id] = valor;
+  const r = calcular();
+  const it = itemPorId(id);
+  const linha = document.getElementById('it-'+id);
+  if(linha) linha.classList.toggle('mexido', it.mexido);
+  const g = r.grupos.find(g=>g.itens.some(x=>x.id===id));
+  const tot = document.getElementById('tot-'+g.id);
+  if(tot) tot.textContent = num(g.total)+" peças";
+  const big = document.getElementById('totalBig');
+  if(big) big.innerHTML = num(r.total)+' <small>peças</small>';
+  desenharPainel();
+  document.getElementById('ajudaTopo').href = linkWhats();
+}
+function abrirConta(id){
+  const el = document.getElementById('it-'+id);
+  el.classList.toggle('aberto');
+  el.querySelector('.btn-conta').setAttribute('aria-expanded', el.classList.contains('aberto'));
+}
+
+function reiniciar(){
+  state.passo="intro"; state.segmento=null; state.visitados={};
+  state.ocupacao=null; state.margem=null; state.ajuste={}; state.fora={}; state.padrao="conforto";
+  history.replaceState(null,"",location.pathname);
+  desenhar(); window.scrollTo({top:0,behavior:"smooth"});
+}
+
+/* --- Saídas --- */
+function resumoTexto(){
+  if(!state.segmento) return "";
+  const r = state.res || calcular(), s = seg(), p = PADRAO[state.padrao];
+  let t = `Calculadora de Enxoval Conamore\n${s.nome} · ${num(state.uh)} ${s.unid} · ${num(r.leitos)} leitos\n`;
+  t += `Ciclo de ${r.ciclo.toFixed(1).replace('.',',')} dias · margem de ${margemAtual()}%\n`;
+  t += `Padrão ${p.nv}: cama ${p.cama.linha} (${p.cama.spec}), banho ${p.banho.linha} (${p.banho.spec})\n\n`;
+  r.grupos.forEach(g=>{
+    const dentro = g.itens.filter(it=>!it.fora);
+    if(!dentro.length) return;                 // grupo inteiro desmarcado não vai para a lista
+    t += g.nome.toUpperCase()+"\n";
+    dentro.forEach(it=> t += `- ${it.nome}: ${num(it.qtd)}${it.mexido?' (ajustado)':''}\n`);
+    t += "\n";
+  });
+  t += `TOTAL: ${num(r.total)} peças`;
+  return t;
+}
+function copiarResumo(el){
+  const aviso = (icone, texto)=>{
+    if(!el) return;
+    const antes = el.innerHTML;
+    el.innerHTML = `<span class="ms">${icone}</span> ${texto}`;
+    setTimeout(()=>{ el.innerHTML = antes; }, 2200);
+  };
+  if(!navigator.clipboard){ aviso('warning','Copie pelo navegador'); return; }
+  navigator.clipboard.writeText(resumoTexto())
+    .then(()=> aviso('check','Copiado'))
+    .catch(()=> aviso('warning','Não foi possível copiar'));
+}
+function linkWhats(){
+  const base = "https://wa.me/5519981008989?text=";
+  if(!state.segmento) return "https://wa.me/5519981008989";
+  return base + encodeURIComponent(resumoTexto() + "\n\nGostaria de falar sobre esse dimensionamento.");
+}
+
+/* --- Auxiliares de markup --- */
+function tip(txt){
+  return `<button class="info" type="button" aria-label="Ajuda"><span class="ms">help</span><span class="bolha">${txt}</span></button>`;
+}
+function stepper(id, chave, min, max){
+  return `<div class="stepper">
+    <button type="button" onclick="passo('${chave}',-1,${min},${max})" aria-label="Diminuir"><span class="ms">remove</span></button>
+    <input id="${id}" data-campo="${chave}" type="number" min="${min}" max="${max}" value="${state[chave]}"
+      oninput="digitou('${chave}',this.value,${min},${max})">
+    <button type="button" onclick="passo('${chave}',1,${min},${max})" aria-label="Aumentar"><span class="ms">add</span></button>
+  </div>`;
+}
+
+lerUrl();
+desenhar();
+</script>
+</body>
+</html>
