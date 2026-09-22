@@ -65,29 +65,33 @@ button{white-space:normal!important}
 .marca,.marca:hover,.marca:focus{color:inherit!important}
 .conteudo a,.conteudo a:hover,.conteudo a:focus,.conteudo a:visited{color:var(--azul-link)!important}
 .ver-todos,.ver-todos:hover,.ver-todos:focus{color:var(--azul)!important}
-.trilho button,.trilho button:hover,.trilho button:focus{color:var(--tinta-3)!important}
+.trilho button,.trilho button:hover,.trilho button:focus{color:var(--tinta-3)!important;background:none!important}
 .trilho .feito,.trilho .feito:hover,.trilho .feito:focus{color:var(--tinta-2)!important}
 .trilho .ativo,.trilho .ativo:hover,.trilho .ativo:focus{color:var(--azul)!important;border-bottom-color:var(--azul)!important}
 .opcoes button,.opcoes button:hover,.opcoes button:focus{border-color:var(--linha)!important}
 .opcoes button:hover{border-color:var(--azul-borda)!important}
-.opcoes button[aria-pressed="true"],.opcoes button[aria-pressed="true"]:hover,.opcoes button[aria-pressed="true"]:focus{border-color:var(--azul)!important}
-.par-btn button,.par-btn button:hover,.par-btn button:focus{border-color:var(--linha)!important}
-.par-btn button[aria-pressed="true"],.par-btn button[aria-pressed="true"]:hover,.par-btn button[aria-pressed="true"]:focus{border-color:var(--azul)!important}
-.voltar,.voltar:hover,.voltar:focus{border-color:var(--linha)!important;color:var(--tinta-2)!important}
+.opcoes button[aria-pressed="true"],.opcoes button[aria-pressed="true"]:hover,.opcoes button[aria-pressed="true"]:focus{border-color:var(--azul)!important;background:var(--azul-suave)!important}
+.par-btn button,.par-btn button:focus{border-color:var(--linha)!important;background:var(--card)!important}
+.par-btn button:hover{border-color:var(--linha)!important;background:var(--card)!important}
+.par-btn button[aria-pressed="true"],.par-btn button[aria-pressed="true"]:hover,.par-btn button[aria-pressed="true"]:focus{border-color:var(--azul)!important;background:var(--azul-suave)!important}
+.voltar,.voltar:hover,.voltar:focus{border-color:var(--linha)!important;color:var(--tinta-2)!important;background:none!important}
 .voltar:hover{border-color:var(--azul)!important;color:var(--azul)!important}
 .avancar,.avancar:hover,.avancar:focus{color:#fff!important}
 .btn-loja,.btn-loja:hover,.btn-loja:focus{color:#fff!important}
 .btn-wa,.btn-wa:focus{color:#05391C!important}
 .btn-wa:hover{color:#fff!important}
-.btn-linha,.btn-linha:hover,.btn-linha:focus{border-color:var(--linha)!important;color:var(--tinta)!important}
+.btn-linha,.btn-linha:hover,.btn-linha:focus{border-color:var(--linha)!important;color:var(--tinta)!important;background:none!important}
 .btn-linha:hover{border-color:var(--azul)!important;color:var(--azul)!important}
 .wa-topo,.wa-topo:focus{border-color:var(--wa)!important;color:var(--wa-escuro)!important}
 .wa-topo:hover{color:#fff!important}
 .wa-linha a,.wa-linha a:hover,.wa-linha a:focus{color:var(--wa-escuro)!important}
-.stepper button,.stepper button:hover,.stepper button:focus{color:var(--azul)!important}
-.fechar,.fechar:hover,.fechar:focus{color:var(--tinta-3)!important}
-.fechar:hover{color:var(--tinta)!important}
-.refazer button,.refazer button:hover,.refazer button:focus{color:var(--azul-link)!important}
+.stepper button,.stepper button:focus{color:var(--azul)!important;background:var(--card-2)!important}
+.stepper button:hover{color:var(--azul)!important;background:var(--azul-suave)!important}
+.fechar,.fechar:focus{color:var(--tinta-3)!important;background:none!important}
+.fechar:hover{color:var(--tinta)!important;background:var(--linha-2)!important}
+.opcoes button:focus{border-color:var(--linha)!important;background:var(--card)!important}
+.par-btn button:focus{background:var(--card)!important}
+.refazer button,.refazer button:hover,.refazer button:focus{color:var(--azul-link)!important;background:none!important}
 .stepper,.stepper:focus-within{border-color:var(--linha)!important}
 .stepper:focus-within{border-color:var(--azul)!important}
 select.sel,select.sel:focus{border-color:var(--linha)!important}
@@ -280,13 +284,13 @@ select.sel:focus{border-color:var(--azul)}
 .modal .lgpd{display:flex;gap:9px;font-size:13.5px;color:var(--tinta-3);align-items:flex-start;line-height:1.4}
 .modal .lgpd input{accent-color:var(--azul);margin-top:3px;flex:none}
 
-/* ---------- whatsapp flutuante (igual ao blog) ---------- */
-.wa-flut{position:fixed;top:0;left:0;right:0;z-index:55;display:flex;align-items:center;justify-content:center;gap:10px;background:var(--wa);color:#05391C;padding:13px 20px;font-size:15.5px;font-weight:600;text-decoration:none;box-shadow:0 4px 14px rgba(0,0,0,.18);transform:translateY(-100%);visibility:hidden;transition:transform .25s ease,visibility .25s}
-.wa-flut.visivel{transform:translateY(0);visibility:visible}
-.wa-flut svg{width:22px;height:22px;fill:#05391C;flex:none}
+/* ---------- whatsapp flutuante: botão compacto no topo, aparece ao rolar ---------- */
+.wa-flut{position:fixed;top:16px;right:20px;z-index:55;display:flex;align-items:center;gap:9px;background:var(--wa);color:#05391C;border-radius:99px;padding:12px 18px;font-size:15px;font-weight:600;text-decoration:none;box-shadow:0 6px 18px rgba(0,0,0,.22);opacity:0;transform:translateY(-14px);visibility:hidden;pointer-events:none;transition:opacity .2s,transform .2s,visibility .2s}
+.wa-flut.visivel{opacity:1;transform:translateY(0);visibility:visible;pointer-events:auto}
+.wa-flut svg{width:20px;height:20px;fill:#05391C;flex:none}
 .wa-flut:hover{background:var(--wa-escuro);color:#fff}
 .wa-flut:hover svg{fill:#fff}
-@media (max-width:560px){.wa-flut{padding:12px 16px;font-size:14.5px}}
+@media (max-width:560px){.wa-flut{top:12px;right:14px;padding:11px 15px;font-size:14px}.wa-flut span{display:none}}
 
 /* ---------- conteúdo ---------- */
 .conteudo{max-width:800px;padding:72px 0 40px}
@@ -743,8 +747,8 @@ function aplicarSegmento(){
 }
 function notas(){
   const s = seg(), r = calcular();
-  $('notaEstrutura').innerHTML = `São <b>${num(r.leitos)} leitos</b> para vestir e <b>${num(r.leitos*CAMA[state.tipoCama].trav)} travesseiros</b>. É sobre esse número que todo o cálculo da cama acontece.`;
-  $('notaRotina').innerHTML = `Com lavanderia ${state.lavanderia}, uma peça leva <b>${dec(r.ciclo)} dias</b> para voltar ao quarto, contando o dia de descanso da fibra. Margem de segurança aplicada: <b>${s.margem}%</b>.`;
+  $('notaEstrutura').innerHTML = `<span>São <b>${num(r.leitos)} leitos</b> para vestir e <b>${num(r.leitos*CAMA[state.tipoCama].trav)} travesseiros</b>. É sobre esse número que todo o cálculo da cama acontece.</span>`;
+  $('notaRotina').innerHTML = `<span>Com lavanderia ${state.lavanderia}, uma peça leva <b>${dec(r.ciclo)} dias</b> para voltar ao quarto, contando o dia de descanso da fibra. Margem de segurança aplicada: <b>${s.margem}%</b>.</span>`;
 }
 function desenharResultado(){
   const r = calcular(), s = seg();
