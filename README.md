@@ -1,10 +1,17 @@
 # Calculadora de Enxoval | Conamore Hotelaria
 
-Ferramenta web que dimensiona a quantidade de enxoval (cama, banho, proteção e volumosos) que um meio de hospedagem precisa manter em estoque, pelo método PAR ajustado ao giro real da operação.
+Landing page com a calculadora de enxoval (cama, banho, proteção e volumosos) da Conamore Hotelaria, seguida de um artigo de SEO sobre o mesmo tema. Pensada para funcionar como a pillar page da campanha: capta lead qualificado e serve de destino para os artigos satélites do blog.
 
-Protótipo navegável, arquivo único, sem dependência de build ou servidor de aplicação.
+Arquivo único, sem dependência de build ou servidor de aplicação.
 
 **No ar:** https://communitascom.github.io/conamore-calculadora-enxoval/
+
+## Estrutura da página
+
+1. Topo: logo, título e chamada à esquerda; calculadora em 3 passos (Operação, Estrutura, Rotina) ao lado, com resultado revelado só no fim do fluxo.
+2. Faixa "Como a conta é feita": três cartões explicando PAR, ciclo da peça e giro real.
+3. Artigo de SEO sobre roupa de cama de hotel: método PAR, tipos de lençol, gramatura, gestão de estoque, FAQ.
+4. Banner de CTA e "Continue lendo", com 3 posts reais do blog (marcado com `ItemList` em JSON-LD para SEO) e rodapé com logo e redes sociais.
 
 ## Como funciona o cálculo
 
@@ -19,7 +26,7 @@ Volumosos  capa = leitos × PAR × (1 + margem)        enchimento = leitos × 1,
 
 `dias de ciclo = TAT da lavanderia + 1 dia de descanso`
 
-Quando o giro supera o PAR, a tela avisa qual das duas regras mandou no número. É o que sustenta a confiança no resultado.
+Quando o giro supera o PAR, a tela avisa qual das duas regras mandou no número.
 
 ## Coeficientes por segmento
 
@@ -30,7 +37,22 @@ Quando o giro supera o PAR, a tela avisa qual das duas regras mandou no número.
 | Motel | 5 | 2,5 | 20% | locações por dia |
 | Hospitalar / Clínica | 5 | 2,5 | 25% | ocupação média |
 
-Motel não usa ocupação: o giro vem do número de locações por suíte por dia, e cada locação exige troca completa de cama e banho.
+Motel não usa ocupação: o giro vem do número de locações por suíte por dia.
+
+## Casos de regressão
+
+Hotel, casal, 2 hóspedes, 65% de ocupação, lavanderia terceirizada, troca diária, salvo indicação:
+
+| Cenário | Total |
+|---|---|
+| Hotel, 1 quarto (padrão inicial da tela) | 41 |
+| Hotel, 2 quartos | 85 |
+| Hotel, 20 quartos | 777 |
+| Airbnb, 1 unidade, 55%, só na saída | 41 |
+| Hotel, 50 quartos, queen, 80%, lavanderia própria | 1.750 |
+| Motel, 10 suítes, 3 locações/dia | 1.299 |
+
+Rodar esses seis cenários contra o motor (bloco `<script>`, coeficientes no topo) antes de publicar qualquer mudança de fórmula.
 
 ## Onde mexer
 
@@ -38,27 +60,30 @@ Tudo em `index.html`, num bloco isolado no topo do script:
 
 - `SEG` | coeficientes por segmento
 - `CAMA` | tipos de cama e travesseiros por cama
-- `PADRAO` | linhas do catálogo por faixa (fio e gramatura)
+- `LINHA` | linha de catálogo recomendada (hoje fixa em Prime / Prime Plus para todos os segmentos)
 - `FREQ`, `TAT`, `DESCANSO` | política de troca e ciclo de lavanderia
+- `WHATS` | número de WhatsApp usado em todos os CTAs
 
-A interface não precisa ser tocada para ajustar número nenhum.
+A interface (CSS, HTML) não precisa ser tocada para ajustar número nenhum.
 
-## Pendências antes de publicar para o cliente
+## Pendências conhecidas
 
-- [ ] Validar os coeficientes da tabela acima com o comercial da Conamore
-- [ ] Confirmar em qual faixa cada linha entra. Existem também Harmony 160, Confort 180 e Serenity 400, fora dos três cartões atuais
-- [ ] Definir o destino do lead (CRM, planilha ou automação) e quem faz o follow-up
-- [ ] Gerar de fato o relatório em PDF prometido na tela de captação
-- [ ] Confirmar o número de WhatsApp do consultor
+- Estado do cálculo não vive mais na URL (o protótipo anterior tinha; esta versão ainda não).
+- Sem seleção de grupos nem ajuste manual de item no resultado (quem só precisa repor toalhas recebe a lista completa).
+- Escolha de linha do catálogo (Essencial/Conforto/Premium) ainda não existe; todo resultado recomenda Prime.
+- Coeficientes da tabela acima seguem pendentes de validação final com o comercial.
+- Integração do formulário de captação (modal "Receber por e-mail") com CRM ainda não existe; é só simulação.
 
 ## Decisões de produto registradas
 
-**Sem preço na tela.** A Conamore vende por atacado e por volume. Qualquer valor exibido ou fica errado ou vira âncora contra o comercial. A ferramenta entrega quantidade e linha recomendada, e o preço é o motivo de falar com o consultor.
+**Sem preço na tela.** A Conamore vende por atacado e por volume. Qualquer valor exibido ou fica errado ou vira âncora contra o comercial.
 
-**O resultado só aparece no fim.** Número atualizando durante o preenchimento gera ancoragem: a pessoa passa a ajustar o input para chegar ao número em vez de responder a verdade, e o dado é justamente o que qualifica o lead. O painel lateral explica cada passo, o número fica para a revelação.
+**O resultado só aparece no fim.** Evita que a pessoa ajuste os inputs para "acertar" um número em vez de responder a verdade sobre a operação, o que é justamente o que qualifica o lead.
 
-**Captação híbrida.** O resultado completo aparece sem cadastro. O formulário só aparece depois, para receber a lista de compras. Menos atrito, lead mais qualificado.
+**Captação híbrida.** O resultado completo aparece sem cadastro. O formulário só aparece depois, para receber a lista de compras.
+
+**Container do artigo mais estreito que o do topo.** O bloco de texto (800px) é intencionalmente mais estreito que o grid da calculadora (1120px), para não sobrar vazio ao lado do texto em telas largas.
 
 ## Stack
 
-HTML, CSS e JavaScript puros num arquivo. Material Symbols Rounded e Figtree via Google Fonts. Logo embutido em base64. O estado do cálculo vive na URL, então o link pode ser compartilhado e sobrevive a um refresh.
+HTML, CSS e JavaScript puros num arquivo. Varta via Google Fonts. Logo e as imagens (capas dos posts relacionados, foto de lençol) embutidos em base64, extraídos do próprio blog da Conamore Hotelaria.
