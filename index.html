@@ -815,6 +815,7 @@ function avisar(t){ const el = $('aviso'); el.textContent = t; el.classList.add(
 
 document.querySelectorAll('.passo h2').forEach(h=>h.tabIndex = -1);
 opcoesSegmento(); aplicarSegmento(); notas(); trilho(); atualizarWhats(null);
+document.querySelectorAll("p").forEach(p=>{ if(!p.textContent.trim() && !p.querySelector("img,svg,a,button,input")) p.style.display="none"; });
 const rodape = document.querySelector('footer');
 if(rodape && 'IntersectionObserver' in window){
   new IntersectionObserver(([e])=>{ $('waFlut').classList.toggle('recuado', e.isIntersecting); }, {rootMargin:'0px 0px -10px 0px'}).observe(rodape);
