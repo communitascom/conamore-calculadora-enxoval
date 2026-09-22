@@ -73,6 +73,8 @@ A interface (CSS, HTML) não precisa ser tocada para ajustar número nenhum.
 - Escolha de linha do catálogo (Essencial/Conforto/Premium) ainda não existe; todo resultado recomenda Prime.
 - Coeficientes da tabela acima seguem pendentes de validação final com o comercial.
 - Integração do formulário de captação (modal "Receber por e-mail") com CRM ainda não existe; é só simulação.
+- A página "Montar meu pedido na loja" (compra-rapida) ainda não recebe os produtos calculados via URL; é para decidir numa segunda fase.
+- Popup condicional (mensagem diferente se a pessoa clicou em loja/WhatsApp/e-mail vs. não fez nada) ainda não existe; ideia registrada, sem data.
 
 ## Decisões de produto registradas
 
@@ -83,6 +85,12 @@ A interface (CSS, HTML) não precisa ser tocada para ajustar número nenhum.
 **Captação híbrida.** O resultado completo aparece sem cadastro. O formulário só aparece depois, para receber a lista de compras.
 
 **Container do artigo mais estreito que o do topo.** O bloco de texto (800px) é intencionalmente mais estreito que o grid da calculadora (1120px), para não sobrar vazio ao lado do texto em telas largas.
+
+**"Copiar resumo" virou "Baixar lista completa".** Em vez de copiar texto para a área de transferência, o botão abre o mesmo modal de captação; ao enviar, a pessoa baixa a lista em Excel na hora (via SheetJS, carregado do cdnjs) além de "receber por e-mail" (simulado). Consolida em 1 CTA em vez de 2, e transforma uma ação de baixo valor (copiar) numa de captação de lead.
+
+**Grades com `minmax(0,1fr)`, nunca `1fr` puro.** Toda `grid-template-columns` da página usa `minmax(0,1fr)` em vez de `1fr` sozinho, porque uma coluna `1fr` sem `minmax` não encolhe abaixo do conteúdo mínimo (min-content) — se o texto de um botão não couber, a grade força a página a ficar mais larga que o container e o `overflow:hidden` do card corta o texto. Foi exatamente esse bug que cortou "Hospitalar ou clínica" nos cards de opção.
+
+**O tema do WordPress precisa de blindagem explícita.** O Hello Elementor carrega um `reset.css` em toda página do site (mesmo com o template Elementor Canvas), que define borda e cor `#CC3366` (magenta) padrão em `button`/`a` e nos estados `:hover`/`:focus`. A página tem um bloco de CSS "blindagem" logo no topo do `<style>` que reforça `border-color`/`color` com `!important` em cada componente próprio — sem isso, todo botão mostra um fio magenta ao passar o mouse ou clicar. Cuidado ao editar esse bloco: um `!important` genérico demais (ex.: `a{color:inherit!important}` sem exceções) quebra qualquer link que dependa de herdar uma cor diferente da do body, como o WhatsApp flutuante e os botões do CTA "Pronto para montar o pedido?" — sempre listar exceção por componente, nunca um seletor solto.
 
 ## Stack
 
