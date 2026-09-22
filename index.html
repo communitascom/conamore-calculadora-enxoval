@@ -54,6 +54,7 @@ a{color:inherit}
 .avancar:focus-visible,.btn-loja:focus-visible,.btn-wa:focus-visible,.wa-flut:focus-visible,.res-topo:focus-visible{outline-color:#fff}
 /* blindagem: o tema do WP (hello-elementor/reset.css) define borda e cor #CC3366 em button/a e nos estados :hover/:focus, valendo em toda página do site */
 button,button:hover,button:focus,button:active{border-color:transparent!important}
+button{white-space:normal!important}
 .wa-flut,.wa-flut:focus{color:#05391C!important}
 .wa-flut:hover{color:#fff!important}
 .rodape-social a,.rodape-social a:focus{color:var(--tinta-3)!important}
@@ -153,7 +154,7 @@ input, textarea{caret-color:var(--azul-fundo)}
 /* opções grandes */
 .opcoes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
 @media (max-width:560px){.opcoes{grid-template-columns:1fr}}
-.opcoes button{border:1.5px solid var(--linha);background:var(--card);border-radius:var(--r-sm);padding:18px 18px;text-align:left;transition:.15s;display:block}
+.opcoes button{border:1.5px solid var(--linha);background:var(--card);border-radius:var(--r-sm);padding:18px 18px;text-align:left;transition:.15s;display:block;white-space:normal}
 .opcoes button:hover{border-color:var(--azul-borda);background:var(--card-2)}
 .opcoes button strong{display:block;font-size:18px;font-weight:600;color:var(--tinta);margin-bottom:3px}
 .opcoes button span{display:block;font-size:14.5px;color:var(--tinta-2);line-height:1.4}
@@ -181,7 +182,7 @@ select.sel:focus{border-color:var(--azul)}
 .deslize output{font-size:28px;font-weight:700;color:var(--azul);min-width:78px;text-align:right}
 .par-btn{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
 @media (max-width:560px){.par-btn{grid-template-columns:1fr}}
-.par-btn button{border:1.5px solid var(--linha);background:var(--card);border-radius:var(--r-sm);padding:15px 16px;text-align:left}
+.par-btn button{border:1.5px solid var(--linha);background:var(--card);border-radius:var(--r-sm);padding:15px 16px;text-align:left;white-space:normal}
 .par-btn button strong{display:block;font-size:16.5px;font-weight:600;color:var(--tinta)}
 .par-btn button span{display:block;font-size:14px;color:var(--tinta-2);margin-top:2px}
 .par-btn button[aria-pressed="true"]{border-color:var(--azul);background:var(--azul-suave);box-shadow:inset 0 0 0 1px var(--azul)}
