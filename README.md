@@ -18,11 +18,15 @@ Arquivo único, sem dependência de build ou servidor de aplicação.
 O piso é o **PAR**: cada leito precisa de N jogos para a operação nunca parar (1 em uso, 1 na lavanderia, 1 em descanso). Sobre esse piso entram o giro real, o ciclo da lavanderia e uma margem de segurança.
 
 ```
-Cama       jogos = máx( leitos × PAR ,  leitos × trocas/dia × dias de ciclo ) × (1 + margem)
-Banho      peças = hóspedes/dia × trocas/dia × dias de ciclo × (1 + margem)
-Proteção   peças = leitos (ou travesseiros) × 2      não gira no ciclo de lavagem
-Volumosos  capa = leitos × PAR × (1 + margem)        enchimento = leitos × 1,5
+Cama       jogos por cama = máx( PAR ,  trocas/dia × dias de ciclo );  por tamanho: camas × jogos por cama × (1 + margem)
+Banho      peças = máx( hóspedes/dia × trocas/dia × dias de ciclo × (1 + margem) ,  banheiros × PAR )
+Piso       toalha de piso = banheiros × trocas/dia × dias de ciclo × (1 + margem)
+Complementos (fora do total)  protetores = camas (ou travesseiros) × 2;  capa = camas × PAR × (1 + margem);  enchimento = camas × 1,5
 ```
+
+Entradas da etapa 2: camas no total, banheiros e a distribuição das camas por tamanho (solteiro 1 pessoa e 1 travesseiro; casal, queen e king 2 e 2). Camas sem tamanho escolhido contam como casal. Hóspedes por dia = capacidade das camas × ocupação. O total do topo é só cama e banho; os complementos são recomendados, marcados e editados pela pessoa, e entram à parte.
+
+Fora da metodologia original (decisão de 30/09/2026): piso de toalhas de banho e rosto por banheiro (banheiros × PAR) e ocupação padrão de 50% para hotel, pousada e Airbnb.
 
 `dias de ciclo = TAT da lavanderia + 1 dia de descanso`
 
@@ -32,8 +36,8 @@ Quando o giro supera o PAR, a tela avisa qual das duas regras mandou no número.
 
 | Segmento | PAR | Volumosos | Margem | Motor do giro |
 |---|---|---|---|---|
-| Hotel / Pousada | 3 | 2 | 10% | ocupação média |
-| Airbnb / Temporada | 4 | 2 | 15% | ocupação média |
+| Hotel / Pousada | 3 | 2 | 10% | ocupação média (padrão 50%) |
+| Airbnb / Temporada | 4 | 2 | 15% | ocupação média (padrão 50%) |
 | Motel | 5 | 2,5 | 20% | locações por dia |
 | Hospitalar / Clínica | 5 | 2,5 | 25% | ocupação média |
 
@@ -41,16 +45,16 @@ Motel não usa ocupação: o giro vem do número de locações por suíte por di
 
 ## Casos de regressão
 
-Hotel, casal, 2 hóspedes, 65% de ocupação, lavanderia terceirizada, troca diária, salvo indicação:
+Camas de casal, lavanderia terceirizada, troca diária, ocupação padrão do segmento (50%), salvo indicação:
 
 | Cenário | Total |
 |---|---|
-| Hotel, 1 quarto (padrão inicial da tela) | 41 |
-| Hotel, 2 quartos | 85 |
-| Hotel, 20 quartos | 777 |
-| Airbnb, 1 unidade, 55%, só na saída | 41 |
-| Hotel, 50 quartos, queen, 80%, lavanderia própria | 1.750 |
-| Motel, 10 suítes, 3 locações/dia | 1.299 |
+| Hotel, 1 cama, 1 banheiro (padrão inicial da tela) | 25 |
+| Hotel, 2 camas, 1 banheiro | 46 |
+| Hotel, 20 camas, 20 banheiros | 457 |
+| Airbnb, 1 cama, 1 banheiro, só na saída | 29 |
+| Hotel, 50 camas queen, 50 banheiros, 80%, lavanderia própria | 1.100 |
+| Motel, 10 suítes (10 camas, 10 banheiros), 3 locações/dia | 1.134 |
 
 Rodar esses seis cenários contra o motor (bloco `<script>`, coeficientes no topo) antes de publicar qualquer mudança de fórmula.
 
@@ -95,3 +99,8 @@ A interface (CSS, HTML) não precisa ser tocada para ajustar número nenhum.
 ## Stack
 
 HTML, CSS e JavaScript puros num arquivo. Varta via Google Fonts. Logo e as imagens (capas dos posts relacionados, foto de lençol) embutidos em base64, extraídos do próprio blog da Conamore Hotelaria.
+
+## Pendências (30/09/2026)
+
+- RD Station: o formulário já monta a conversão (campos `cf_calc_*` e tags `calculadora-enxoval`, `segmento-*`, `porte-*`, `calculadora-enviar-lista`), mas `RD.chave` está vazia. Falta a chave pública da conta e criar os campos personalizados no RD.
+- Republicar no WordPress (página 3303) e no artifact público.

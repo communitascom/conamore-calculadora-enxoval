@@ -284,6 +284,8 @@ select.sel:focus{border-color:var(--azul)}
 .modal input[type=text],.modal input[type=email],.modal input[type=tel]{height:52px;border:1.5px solid var(--linha);border-radius:var(--r-sm);padding:0 15px;background:var(--card);outline:none;font-size:16px;width:100%}
 .modal input:focus{border-color:var(--azul)}
 .modal .lgpd{display:flex;gap:9px;font-size:13.5px;color:var(--tinta-3);align-items:flex-start;line-height:1.4}
+.modal .lgpd-lista{padding:12px 14px;background:var(--azul-suave);border-radius:var(--r-sm);color:var(--tinta-2);font-size:14.5px}
+.modal .lgpd-lista b{color:var(--azul)}
 .modal .lgpd input{accent-color:var(--azul);margin-top:3px;flex:none}
 
 /* ---------- whatsapp flutuante: botão compacto no topo, aparece ao rolar ---------- */
@@ -357,6 +359,34 @@ select.sel:focus{border-color:var(--azul)}
 @media (max-width:560px){.rodape{padding:28px 0 32px}}
 .aviso{position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(12px);background:var(--tinta);color:var(--pagina);padding:12px 20px;border-radius:99px;font-size:15px;font-weight:500;opacity:0;transition:.25s;pointer-events:none;z-index:70}
 .aviso.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ---------- v2: camas por tamanho, complementos ---------- */
+.sub{font-size:14px;color:var(--tinta-3);line-height:1.4;margin-top:8px;min-height:2.8em}
+.sub[hidden]{display:none}
+.bloco > .sub{min-height:2.8em}
+.grade4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.mini label{display:block;font-size:14.5px;font-weight:600;color:var(--tinta);margin-bottom:6px}
+.stepper.sm{height:50px}
+.stepper.sm button{width:34px;font-size:20px}
+.stepper.sm input{font-size:19px;min-width:0;padding:0}
+#tamStatus{margin-left:4px}
+#tamStatus.ok{color:var(--wa-escuro)}
+.total-compl{font-size:15px;color:#C9DDF1;margin:2px 0 0}
+.total-compl b{color:#fff}
+.compl{margin-top:14px;border:1px solid var(--linha);border-radius:var(--r-sm);background:var(--card);padding:14px 18px 6px}
+.compl-cab{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
+.compl h3{font-size:18px;font-weight:600;color:var(--tinta)}
+.compl .sub{min-height:0;margin:4px 0 8px}
+.compl ul{list-style:none;display:grid;margin:0;padding:0}
+.compl li{display:grid;grid-template-columns:minmax(0,1fr) 136px;gap:14px;align-items:center;padding:10px 0;border-top:1px solid var(--linha-2)}
+.compl li:first-child{border-top:0}
+.ck{display:flex;gap:12px;align-items:flex-start;cursor:pointer;min-width:0}
+.ck input{flex:none;width:20px;height:20px;margin-top:3px;accent-color:var(--azul-fundo)}
+.ck span{min-width:0;white-space:normal!important}
+.ck b{display:block;font-size:16px;font-weight:600;color:var(--tinta)}
+.ck em{display:block;font-style:normal;font-size:14px;color:var(--tinta-3)}
+.compl li.off .stepper{opacity:.45}
+@media(max-width:560px){.grade4{grid-template-columns:repeat(2,minmax(0,1fr))}.compl li{grid-template-columns:minmax(0,1fr)}.compl .stepper{max-width:150px}}
 </style></head><body>
 <section class="topo-pagina">
   <div class="wrap">
@@ -367,7 +397,7 @@ select.sel:focus{border-color:var(--azul)}
       <p class="lead">De um Airbnb de um quarto a um hotel de 50&nbsp;apartamentos. Responda três perguntas e receba a lista de peças dimensionada pelo método PAR.</p>
       <div class="confia">
         <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Grátis, leva 2 minutos e não pede cadastro para ver o resultado</span>
-        <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Cama, banho, proteção e volumosos, item a item</span>
+        <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Cama e banho item a item, com complementos recomendados</span>
         <span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6L9 17l-5-5"/></svg>Método usado pela governança hoteleira</span>
       </div>
       <a class="wa-topo" href="https://wa.me/5519982117472" target="_blank" rel="noopener" data-wa><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.8 14.2c-.2.7-1.2 1.3-1.9 1.4-.5.1-1.1.2-3.2-.7-2.7-1.1-4.4-3.8-4.5-4-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9 1-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.3.3c-.1.1-.2.3 0 .5.2.3.8 1.2 1.6 1.9 1.1.9 1.9 1.2 2.2 1.3.2.1.4.1.5-.1l.8-.9c.2-.2.3-.2.5-.1l2 1c.2.1.4.2.4.3.1.2.1.7-.1 1.3Z"/></svg>Prefere falar com um especialista? Chame no WhatsApp</a>
@@ -394,30 +424,28 @@ select.sel:focus{border-color:var(--azul)}
       <!-- 2 -->
       <div class="passo" data-p="1">
         <h2>Como é a sua estrutura?</h2>
-        <p class="ajuda">São os números que definem o volume: quantos leitos existem para vestir e quantos hóspedes passam por eles.</p>
+        <p class="ajuda">Dois números definem o volume: quantas camas existem para vestir e quantos banheiros recebem toalha.</p>
         <div class="grade2">
           <div class="bloco">
-            <label class="rotulo" for="uh" id="uhLabel">Quartos</label>
-            <div class="stepper"><button type="button" data-alvo="uh" data-passo="-1" aria-label="Diminuir">−</button><input id="uh" type="number" min="1" max="2000" step="1" inputmode="numeric" value="2" class="tn"><button type="button" data-alvo="uh" data-passo="1" aria-label="Aumentar">+</button></div>
+            <label class="rotulo" for="leitos">Camas no total</label>
+            <div class="stepper"><button type="button" data-alvo="leitos" data-passo="-1" aria-label="Diminuir">−</button><input id="leitos" type="number" min="1" max="2000" step="1" inputmode="numeric" value="1" class="tn"><button type="button" data-alvo="leitos" data-passo="1" aria-label="Aumentar">+</button></div>
+            <p class="sub" id="camasAjuda"></p>
           </div>
           <div class="bloco">
-            <label class="rotulo" for="camas">Camas por quarto</label>
-            <select id="camas" class="sel"><option value="1">1 cama</option><option value="2">2 camas</option><option value="3">3 camas</option><option value="4">4 camas</option></select>
+            <label class="rotulo" for="banh">Banheiros</label>
+            <div class="stepper"><button type="button" data-alvo="banh" data-passo="-1" aria-label="Diminuir">−</button><input id="banh" type="number" min="1" max="2000" step="1" inputmode="numeric" value="1" class="tn"><button type="button" data-alvo="banh" data-passo="1" aria-label="Aumentar">+</button></div>
+            <p class="sub" id="banhAjuda"></p>
           </div>
-          <div class="bloco">
-            <label class="rotulo" for="tipoCama">Tipo de cama <em>· define as fronhas</em></label>
-            <select id="tipoCama" class="sel"><option value="solteiro">Solteiro</option><option value="casal" selected>Casal</option><option value="queen">Queen</option><option value="king">King</option></select>
-          </div>
-          <div class="bloco">
-            <label class="rotulo" for="hosp">Hóspedes por quarto <em>· define as toalhas</em></label>
-            <select id="hosp" class="sel"><option value="1">1 hóspede</option><option value="2" selected>2 hóspedes</option><option value="3">3 hóspedes</option><option value="4">4 hóspedes</option><option value="5">5 hóspedes</option><option value="6">6 hóspedes</option></select>
-          </div>
+        </div>
+        <div class="bloco">
+          <span class="rotulo">Tamanho das camas <em id="tamStatus"></em></span>
+          <div class="grade4" id="tamGrade" role="group" aria-label="Quantas camas de cada tamanho"><div class="mini"><label for="t_solteiro">Solteiro</label><div class="stepper sm"><button type="button" data-tam="solteiro" data-d="-1" aria-label="Diminuir Solteiro">−</button><input id="t_solteiro" type="number" min="0" max="2000" step="1" inputmode="numeric" value="0" class="tn"><button type="button" data-tam="solteiro" data-d="1" aria-label="Aumentar Solteiro">+</button></div></div><div class="mini"><label for="t_casal">Casal</label><div class="stepper sm"><button type="button" data-tam="casal" data-d="-1" aria-label="Diminuir Casal">−</button><input id="t_casal" type="number" min="0" max="2000" step="1" inputmode="numeric" value="0" class="tn"><button type="button" data-tam="casal" data-d="1" aria-label="Aumentar Casal">+</button></div></div><div class="mini"><label for="t_queen">Queen</label><div class="stepper sm"><button type="button" data-tam="queen" data-d="-1" aria-label="Diminuir Queen">−</button><input id="t_queen" type="number" min="0" max="2000" step="1" inputmode="numeric" value="0" class="tn"><button type="button" data-tam="queen" data-d="1" aria-label="Aumentar Queen">+</button></div></div><div class="mini"><label for="t_king">King</label><div class="stepper sm"><button type="button" data-tam="king" data-d="-1" aria-label="Diminuir King">−</button><input id="t_king" type="number" min="0" max="2000" step="1" inputmode="numeric" value="0" class="tn"><button type="button" data-tam="king" data-d="1" aria-label="Aumentar King">+</button></div></div></div>
+          <p class="sub">O tamanho define as fronhas e os lençóis de cada cama.</p>
         </div>
         <p class="nota" id="notaEstrutura"></p>
         <div class="navegar"><button class="voltar" type="button" data-vai="0" aria-label="Voltar">←</button><button class="avancar" type="button" data-vai="2">Continuar</button></div>
         <p class="wa-linha">Não sabe algum número? <a href="https://wa.me/5519982117472" target="_blank" rel="noopener" data-wa><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.8 14.2c-.2.7-1.2 1.3-1.9 1.4-.5.1-1.1.2-3.2-.7-2.7-1.1-4.4-3.8-4.5-4-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9 1-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.3.3c-.1.1-.2.3 0 .5.2.3.8 1.2 1.6 1.9 1.1.9 1.9 1.2 2.2 1.3.2.1.4.1.5-.1l.8-.9c.2-.2.3-.2.5-.1l2 1c.2.1.4.2.4.3.1.2.1.7-.1 1.3Z"/></svg>Pergunte no WhatsApp</a></p>
       </div>
-
       <!-- 3 -->
       <div class="passo" data-p="2">
         <h2>Como funciona a sua rotina?</h2>
@@ -441,7 +469,8 @@ select.sel:focus{border-color:var(--azul)}
         </div>
         <div class="bloco" id="blocoOcup">
           <label class="rotulo" for="ocup">Ocupação média <em id="ocupDica"></em></label>
-          <div class="deslize"><input id="ocup" type="range" min="20" max="100" step="5" value="65"><output for="ocup" id="ocupOut" class="tn">65%</output></div>
+          <div class="deslize"><input id="ocup" type="range" min="20" max="100" step="5" value="50"><output for="ocup" id="ocupOut" class="tn">50%</output></div>
+          <p class="sub" id="ocupAviso" hidden></p>
         </div>
         <div class="bloco" id="blocoLoc" hidden>
           <label class="rotulo" for="loc">Locações por suíte, por dia</label>
@@ -455,23 +484,27 @@ select.sel:focus{border-color:var(--azul)}
       <!-- 4 -->
       <div class="passo" data-p="3">
         <div class="res-topo" tabindex="-1" role="region" aria-label="Seu enxoval ideal">
-          <span class="selo">Seu enxoval ideal</span>
+          <span class="selo">Cama e banho</span>
           <div class="num tn"><span id="total">0</span><span>peças</span></div>
           <p class="ctx" id="contexto"></p>
+          <p class="total-compl" id="totalCompl" hidden></p>
           <dl class="res-dados">
-            <div><dt>Leitos</dt><dd id="kLeitos" class="tn">0</dd></div>
+            <div><dt>Camas</dt><dd id="kLeitos" class="tn">0</dd></div>
+            <div><dt>Banheiros</dt><dd id="kBanh" class="tn">0</dd></div>
             <div><dt>Hóspedes por dia</dt><dd id="kHosp" class="tn">0</dd></div>
             <div><dt>Ciclo da peça</dt><dd id="kCiclo" class="tn">0</dd></div>
           </dl>
         </div>
 
         <div class="grupos" id="grupos"></div>
+        <section class="compl" id="compl" aria-labelledby="complTit"></section>
         <p class="alerta ok" id="alerta"></p>
 
         <div class="acoes">
-          <a class="btn btn-loja" id="btnLoja" href="https://www.conamore.com.br/compra-rapida" target="_blank" rel="noopener">Montar meu pedido na loja</a>
+          
           <a class="btn btn-wa" id="btnWa" href="https://wa.me/5519982117472" target="_blank" rel="noopener"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2Zm5.8 14.2c-.2.7-1.2 1.3-1.9 1.4-.5.1-1.1.2-3.2-.7-2.7-1.1-4.4-3.8-4.5-4-.1-.2-1.1-1.4-1.1-2.7 0-1.3.7-1.9 1-2.2.2-.3.5-.3.7-.3h.5c.2 0 .4 0 .6.5l.8 2c.1.2.1.4 0 .5l-.3.5-.3.3c-.1.1-.2.3 0 .5.2.3.8 1.2 1.6 1.9 1.1.9 1.9 1.2 2.2 1.3.2.1.4.1.5-.1l.8-.9c.2-.2.3-.2.5-.1l2 1c.2.1.4.2.4.3.1.2.1.7-.1 1.3Z"/></svg>Enviar meu cálculo no WhatsApp</a>
           <button class="btn btn-linha" type="button" id="abrirModal">Baixar lista completa</button>
+          <a class="btn btn-loja" id="btnLoja" href="https://www.conamore.com.br/compra-rapida" target="_blank" rel="noopener">Montar meu pedido na loja</a>
         </div>
         <p class="refazer">Mudou alguma coisa na operação? <button type="button" data-vai="0">Refazer o cálculo</button></p>
       </div>
@@ -589,29 +622,31 @@ select.sel:focus{border-color:var(--azul)}
   <div class="modal-cx">
     <button class="fechar" type="button" id="fecharModal" aria-label="Fechar">×</button>
     <h3 id="modalTit">Receba a lista completa</h3>
-    <p>Enviamos a lista item a item por e-mail e você já baixa em Excel agora, com a conta de cada número e a linha recomendada para a sua operação.</p>
+    <p>Baixe agora a lista item a item em Excel, com a conta de cada número e a linha recomendada para a sua operação. Se quiser, a gente também envia por e-mail.</p>
     <form onsubmit="event.preventDefault();enviar()">
       <label class="sr" for="mNome">Seu nome</label><input id="mNome" type="text" placeholder="Seu nome" autocomplete="name" required>
       <label class="sr" for="mHosp">Nome da hospedagem</label><input id="mHosp" type="text" placeholder="Nome da hospedagem" autocomplete="organization">
       <label class="sr" for="mEmail">E-mail</label><input id="mEmail" type="email" placeholder="E-mail" autocomplete="email" required>
       <label class="sr" for="mWhats">WhatsApp com DDD</label><input id="mWhats" type="tel" placeholder="WhatsApp com DDD" autocomplete="tel" required>
+      <label class="lgpd lgpd-lista"><input type="checkbox" id="mEmailLista" checked> <span><b>Quero receber a lista por e-mail</b> (além de baixar o Excel agora).</span></label>
       <label class="lgpd"><input type="checkbox" required> Aceito receber a lista e conteúdos da Conamore Hotelaria. Você pode sair quando quiser.</label>
-      <button class="btn btn-loja" type="submit">Enviar e baixar Excel</button>
+      <button class="btn btn-loja" type="submit" id="mEnviar">Baixar Excel</button>
     </form>
   </div>
 </div>
 <div class="aviso" id="aviso"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script>
 /* ========== coeficientes ========== */
 const SEG = {
-  airbnb:     { nome:"Airbnb ou temporada", desc:"Giro por check-in e check-out, lavagem concentrada", par:4, parVol:2, margem:15, ocupacao:55, unid:"unidades", unidSing:"unidade", unidLabel:"Imóveis ou unidades", porGiro:"ocupacao" },
-  hotel:      { nome:"Hotel ou pousada", desc:"Governança diária, o hóspede fica alguns dias", par:3, parVol:2, margem:10, ocupacao:65, unid:"quartos", unidSing:"quarto", unidLabel:"Quartos", porGiro:"ocupacao" },
-  motel:      { nome:"Motel", desc:"Alta rotatividade, troca completa a cada locação", par:5, parVol:2.5, margem:20, locacoes:3, unid:"suítes", unidSing:"suíte", unidLabel:"Suítes", porGiro:"locacoes" },
-  hospitalar: { nome:"Hospitalar ou clínica", desc:"Troca diária obrigatória e exigência sanitária", par:5, parVol:2.5, margem:25, ocupacao:75, unid:"quartos", unidSing:"quarto", unidLabel:"Quartos ou enfermarias", porGiro:"ocupacao" }
+  airbnb:     { nome:"Airbnb ou temporada", desc:"Giro por check-in e check-out, lavagem concentrada", par:4, parVol:2, margem:15, ocupacao:50, unid:"unidades", unidSing:"unidade", camasAjuda:"Some as camas de todas as unidades.", banhAjuda:"Um por unidade, em geral.", dicaOcup:"Airbnb e pousada costumam ter menos giro. Se a sua ocupação média é menor que 50%, reduza aqui.", porGiro:"ocupacao" },
+  hotel:      { nome:"Hotel ou pousada", desc:"Governança diária, o hóspede fica alguns dias", par:3, parVol:2, margem:10, ocupacao:50, unid:"quartos", unidSing:"quarto", camasAjuda:"Some as camas de todos os quartos.", banhAjuda:"Um por quarto, em geral.", dicaOcup:"Pousada com pouco giro costuma ficar abaixo de 50%. Se for o seu caso, reduza aqui.", porGiro:"ocupacao" },
+  motel:      { nome:"Motel", desc:"Alta rotatividade, troca completa a cada locação", par:5, parVol:2.5, margem:20, locacoes:3, unid:"suítes", unidSing:"suíte", camasAjuda:"Some as camas de todas as suítes.", banhAjuda:"Um por suíte, em geral.", porGiro:"locacoes" },
+  hospitalar: { nome:"Hospitalar ou clínica", desc:"Troca diária obrigatória e exigência sanitária", par:5, parVol:2.5, margem:25, ocupacao:75, unid:"quartos", unidSing:"quarto", camasAjuda:"Some os leitos de todos os quartos e enfermarias.", banhAjuda:"Conte todos os banheiros de uso dos pacientes.", porGiro:"ocupacao" }
 };
-const CAMA = { solteiro:{nome:"Solteiro",trav:1}, casal:{nome:"Casal",trav:2}, queen:{nome:"Queen",trav:2}, king:{nome:"King",trav:2} };
+const CAMA = { solteiro:{nome:"Solteiro",trav:1,pess:1}, casal:{nome:"Casal",trav:2,pess:2}, queen:{nome:"Queen",trav:2,pess:2}, king:{nome:"King",trav:2,pess:2} };
+const TAM = ["solteiro","casal","queen","king"];
 const FREQ = { diaria:1, alternada:0.5, saida:0.34 };
 const TAT = { interna:1, terceirizada:2.5 };
 const DESCANSO = 1;
@@ -619,7 +654,7 @@ const LINHA = { cama:"Prime", banho:"Prime Plus" };
 const WHATS = "5519982117472";
 const MSG_GERAL = "Olá! Estou na calculadora de enxoval da Conamore e quero falar com um consultor.";
 
-const state = { segmento:"hotel", uh:2, camasUh:1, tipoCama:"casal", hospedesUh:2, ocupacao:null, locacoes:3, lavanderia:"terceirizada", trocaCama:"diaria", trocaToalha:"diaria", passo:0, visto:0 };
+const state = { segmento:"hotel", leitos:1, banheiros:1, tam:{solteiro:0,casal:1,queen:0,king:0}, ocupacao:null, locacoes:3, lavanderia:"terceirizada", trocaCama:"diaria", trocaToalha:"diaria", compl:{}, passo:0, visto:0 };
 const PASSOS = ["Operação","Estrutura","Rotina","Resultado"];
 let ultimo = null;
 
@@ -633,58 +668,75 @@ const ocupAtual = () => state.ocupacao != null ? state.ocupacao : seg().ocupacao
 const teto = x => Math.ceil(Math.round(x*1e6)/1e6);
 
 /* ========== motor ========== */
+/* camas sem tamanho escolhido contam como casal (o padrão), nunca somem do cálculo */
+function tamanhos(){
+  const t = {...state.tam};
+  const soma = TAM.reduce((a,k)=>a+t[k],0);
+  if(soma < state.leitos) t.casal += state.leitos - soma;
+  return t;
+}
 function calcular(){
   const s = seg(), m = s.margem/100;
-  const leitos = state.uh * state.camasUh;
-  const trav = CAMA[state.tipoCama].trav;
-  const travesseiros = leitos * trav;
+  const leitos = state.leitos, banheiros = state.banheiros;
+  const t = tamanhos();
+  const capacidade = TAM.reduce((a,k)=>a+t[k]*CAMA[k].pess,0);
+  const travesseiros = TAM.reduce((a,k)=>a+t[k]*CAMA[k].trav,0);
   const ciclo = TAT[state.lavanderia] + DESCANSO;
   const porLoc = s.porGiro === "locacoes";
   const ocup = ocupAtual()/100;
   const trocasCamaDia   = porLoc ? state.locacoes : FREQ[state.trocaCama]*ocup;
   const trocasToalhaDia = porLoc ? state.locacoes : FREQ[state.trocaToalha]*ocup;
-  const hospedesDia = porLoc ? state.uh*state.hospedesUh*state.locacoes : Math.round(state.uh*state.hospedesUh*ocup);
+  const hospedesDia = porLoc ? Math.round(capacidade*state.locacoes) : Math.round(capacidade*ocup);
 
-  const giro = leitos*trocasCamaDia*ciclo, piso = leitos*s.par;
-  const jogos = Math.max(piso, giro), regra = giro > piso ? "giro" : "par";
-  const lencol = teto(jogos*(1+m)), fronha = teto(jogos*trav*(1+m));
+  /* cama: jogos por leito = maior entre o PAR e o giro; cada tamanho recebe o seu */
+  const giroLeito = trocasCamaDia*ciclo;
+  const jogosLeito = Math.max(s.par, giroLeito), regra = giroLeito > s.par ? "giro" : "par";
+  const itensCama = [];
+  TAM.filter(k=>t[k]>0).forEach(k=>{
+    const n = t[k], trav = CAMA[k].trav;
+    itensCama.push([`Lençol com elástico ${CAMA[k].nome}`, `${n} ${n>1?'camas':'cama'} · linha ${LINHA.cama}`, teto(n*jogosLeito*(1+m)), 'Lençol com elástico', CAMA[k].nome]);
+  });
+  TAM.filter(k=>t[k]>0).forEach(k=>{
+    const n = t[k];
+    itensCama.push([`Lençol de cima ${CAMA[k].nome}`, `${n} ${n>1?'camas':'cama'} · linha ${LINHA.cama}`, teto(n*jogosLeito*(1+m)), 'Lençol de cima', CAMA[k].nome]);
+  });
+  TAM.filter(k=>t[k]>0).forEach(k=>{
+    const n = t[k], trav = CAMA[k].trav;
+    itensCama.push([`Fronha ${CAMA[k].nome}`, `${trav} por cama · linha ${LINHA.cama}`, teto(n*jogosLeito*trav*(1+m)), 'Fronha', CAMA[k].nome]);
+  });
+
+  /* banho: hóspedes pelo giro; piso de PAR por banheiro; toalha de piso por banheiro */
   const trocaT = porLoc ? 1 : FREQ[state.trocaToalha];
-  const banho = teto(hospedesDia*trocaT*ciclo*(1+m));
-  const pisoT = teto(state.uh*trocasToalhaDia*ciclo*(1+m));
-  const capa = teto(leitos*s.par*(1+m));
-  const colcha = teto(leitos*s.parVol*(1+m));
-  const edredom = teto(leitos*1.5);
+  const banhoGiro = teto(hospedesDia*trocaT*ciclo*(1+m));
+  const banhoPiso = teto(banheiros*s.par);
+  const banho = Math.max(banhoGiro, banhoPiso);
+  const pisoT = teto(banheiros*trocasToalhaDia*ciclo*(1+m));
 
   const grupos = [
     { id:"cama", nome:"Cama",
       conta: regra==="giro"
-        ? `${num(leitos)} leitos × ${dec(trocasCamaDia,2)} trocas por dia × ${dec(ciclo)} dias de ciclo dão ${teto(giro)} jogos em rotação, mais ${s.margem}% de margem.`
-        : `${num(leitos)} leitos × PAR ${s.par} dão ${piso} jogos, mais ${s.margem}% de margem de segurança.`,
-      itens:[
-        ["Lençol com elástico", `${CAMA[state.tipoCama].nome} · linha ${LINHA.cama}`, lencol],
-        ["Lençol de cima", `${CAMA[state.tipoCama].nome} · linha ${LINHA.cama}`, lencol],
-        ["Fronha", `${trav} por cama · linha ${LINHA.cama}`, fronha]] },
+        ? `${num(leitos)} camas × ${dec(trocasCamaDia,2)} trocas por dia × ${dec(ciclo)} dias de ciclo dão ${dec(giroLeito,2)} jogos por cama, mais ${s.margem}% de margem.`
+        : `${num(leitos)} camas × PAR ${s.par} dão ${num(leitos*s.par)} jogos, mais ${s.margem}% de margem de segurança.`,
+      itens:itensCama },
     { id:"banho", nome:"Banho",
-      conta:`Toalhas de banho e de rosto: ${num(hospedesDia)} hóspedes por dia × ${virg(trocaT)} troca × ${dec(ciclo)} dias de ciclo. Toalha de piso: ${num(state.uh)} ${s.unid} × ${dec(trocasToalhaDia,2)} trocas por dia × ${dec(ciclo)} dias de ciclo. Todas com ${s.margem}% de margem.`,
+      conta: `Toalhas de banho e de rosto: ${num(hospedesDia)} hóspedes por dia × ${virg(trocaT)} troca × ${dec(ciclo)} dias de ciclo, com piso de ${s.par} por banheiro (${num(banheiros)} ${banheiros>1?'banheiros':'banheiro'}). Toalha de piso: ${num(banheiros)} × ${dec(trocasToalhaDia,2)} trocas por dia × ${dec(ciclo)} dias de ciclo. Margem de ${s.margem}%.`,
       itens:[
         ["Toalha de banho", `1 por hóspede · linha ${LINHA.banho}`, banho],
         ["Toalha de rosto", `1 por hóspede · linha ${LINHA.banho}`, banho],
-        ["Toalha de piso", `1 por ${s.unidSing} por troca`, pisoT]] },
-    { id:"protecao", nome:"Proteção",
-      conta:"Uma peça em uso e uma de reserva. O protetor não gira a cada troca, por isso fica fora do ciclo de lavanderia.",
-      itens:[
-        ["Protetor de colchão", "impermeável, 1 em uso + 1 reserva", leitos*2],
-        ["Protetor de travesseiro", `${num(travesseiros)} travesseiros × 2`, travesseiros*2]] },
-    { id:"volumosos", nome:"Volumosos",
-      conta:`Capa de edredom: ${num(leitos)} leitos × PAR ${s.par}, porque lava junto com o lençol. Colcha: ${num(leitos)} leitos × ${virg(s.parVol)}. As duas com ${s.margem}% de margem. O enchimento do edredom fica em 1,5 por leito, porque não vai para a lavanderia a cada saída.`,
-      itens:[
-        ["Capa de edredom", "gira junto com o lençol", capa],
-        ["Edredom (enchimento)", "1,5 por leito", edredom],
-        ["Colcha ou cobreleito", "acabamento da cama", colcha]] }
+        ["Toalha de piso", `1 por banheiro por troca`, pisoT]] }
   ];
   grupos.forEach(g => g.total = g.itens.reduce((a,i)=>a+i[2],0));
   const total = grupos.reduce((a,g)=>a+g.total,0);
-  return { grupos, total, leitos, hospedesDia, ciclo, regra, giro:teto(giro), piso, ocup:ocupAtual() };
+
+  /* complementos: recomendados, fora do total principal; a pessoa escolhe e ajusta a quantidade */
+  const complementos = [
+    { id:"protColchao", nome:"Protetor de colchão", info:"impermeável, 1 em uso + 1 reserva por cama", rec:leitos*2 },
+    { id:"protTrav", nome:"Protetor de travesseiro", info:`${num(travesseiros)} travesseiros × 2`, rec:travesseiros*2 },
+    { id:"capa", nome:"Capa de edredom", info:"gira junto com o lençol", rec:teto(leitos*s.par*(1+m)) },
+    { id:"edredom", nome:"Edredom (enchimento)", info:"1,5 por cama", rec:teto(leitos*1.5) },
+    { id:"colcha", nome:"Colcha ou cobreleito", info:"acabamento da cama", rec:teto(leitos*s.parVol*(1+m)) }
+  ];
+  return { grupos, total, complementos, leitos, banheiros, tam:t, travesseiros, capacidade, hospedesDia, ciclo, regra, giro:teto(giroLeito*leitos), piso:leitos*s.par, ocup:ocupAtual(), banhoPiso:banhoPiso>banhoGiro };
 }
 
 /* ========== whatsapp: sempre com destino; mensagem do cálculo só no resultado ========== */
@@ -692,7 +744,7 @@ const linkWa = msg => `https://wa.me/${WHATS}?text=${encodeURIComponent(msg || M
 function atualizarWhats(msg){ document.querySelectorAll('[data-wa], #btnWa').forEach(a => a.href = linkWa(msg)); }
 
 /* ========== campos numéricos: inteiro, dentro do limite, campo e estado iguais ========== */
-const CAMPOS = { uh:'uh', loc:'locacoes' };
+const CAMPOS = { leitos:'leitos', banh:'banheiros', loc:'locacoes' };
 function lerInteiro(inp){
   const t = String(inp.value).trim().replace(',', '.');
   if(t === '') return null;
@@ -700,12 +752,37 @@ function lerInteiro(inp){
   if(!Number.isFinite(v)) return null;
   return Math.min(+inp.max, Math.max(+inp.min, v));
 }
+function ajustarTam(alvo){
+  const soma = TAM.reduce((a,k)=>a+state.tam[k],0);
+  if(alvo > soma){ state.tam.casal += alvo - soma; return; }
+  let sobra = soma - alvo;
+  ["casal","queen","king","solteiro"].forEach(k=>{ const t = Math.min(state.tam[k], sobra); state.tam[k] -= t; sobra -= t; });
+}
 function normalizar(){
   Object.entries(CAMPOS).forEach(([id, chave])=>{
     const inp = $(id), v = lerInteiro(inp);
     state[chave] = v ?? state[chave];
     inp.value = state[chave];
   });
+  ajustarTam(state.leitos);
+  renderTam();
+}
+const somaTam = () => TAM.reduce((a,k)=>a+state.tam[k],0);
+function renderTam(){
+  const soma = somaTam(), falta = state.leitos - soma;
+  TAM.forEach(k=>{
+    $('t_'+k).value = state.tam[k];
+    document.querySelector(`[data-tam="${k}"][data-d="1"]`).disabled = falta <= 0;
+    document.querySelector(`[data-tam="${k}"][data-d="-1"]`).disabled = state.tam[k] <= 0;
+  });
+  const st = $('tamStatus');
+  st.className = falta === 0 ? 'ok' : '';
+  st.textContent = falta === 0 ? `· ${num(soma)} de ${num(state.leitos)} distribuídas` : `· faltam ${num(falta)} para distribuir (contam como casal)`;
+}
+function mudarTam(k, valor){
+  const outros = somaTam() - state.tam[k];
+  state.tam[k] = Math.max(0, Math.min(valor, state.leitos - outros));
+  renderTam(); notas();
 }
 
 /* ========== render ========== */
@@ -723,7 +800,7 @@ function irPara(i){
   state.visto = Math.max(state.visto, i);
   document.querySelectorAll('.passo').forEach(p=>p.classList.toggle('on', +p.dataset.p === i));
   trilho();
-  if(i===3) desenharResultado(); else atualizarWhats(null);
+  if(i===3){ Object.values(state.compl).forEach(c=>c.qtd = null); desenharResultado(); } else atualizarWhats(null);
   const q = document.querySelector('.quadro');
   if(q.getBoundingClientRect().top < 0) q.scrollIntoView({behavior:'smooth',block:'start'});
   const alvo = i===3 ? document.querySelector('.res-topo') : document.querySelector(`.passo[data-p="${i}"] h2`);
@@ -741,26 +818,34 @@ function opcoesSegmento(){
 }
 function aplicarSegmento(){
   const s = seg(), porLoc = s.porGiro==="locacoes";
-  $('uhLabel').textContent = s.unidLabel;
+  $('camasAjuda').textContent = s.camasAjuda;
+  $('banhAjuda').textContent = s.banhAjuda;
   $('blocoOcup').hidden = porLoc;
   $('blocoLoc').hidden = !porLoc;
   $('blocoTroca').style.display = porLoc ? 'none' : '';
-  if(!porLoc){ $('ocup').value = ocupAtual(); $('ocupOut').textContent = ocupAtual()+'%'; $('ocupDica').textContent = `· sugerida para ${s.nome.toLowerCase()}: ${s.ocupacao}%`; }
+  if(!porLoc){
+    $('ocup').value = ocupAtual(); $('ocupOut').textContent = ocupAtual()+'%';
+    $('ocupDica').textContent = `· sugerida para ${s.nome.toLowerCase()}: ${s.ocupacao}%`;
+    $('ocupAviso').hidden = !s.dicaOcup; $('ocupAviso').textContent = s.dicaOcup || '';
+  }
 }
 function notas(){
-  const s = seg(), r = calcular();
-  $('notaEstrutura').innerHTML = `<span>São <b>${num(r.leitos)} leitos</b> para vestir e <b>${num(r.leitos*CAMA[state.tipoCama].trav)} travesseiros</b>. É sobre esse número que todo o cálculo da cama acontece.</span>`;
+  const s = seg(), r = calcular(), falta = state.leitos - somaTam();
+  const sem = falta > 0 ? ` ${num(falta)} ${falta>1?'camas sem tamanho contam':'cama sem tamanho conta'} como casal.` : '';
+  $('notaEstrutura').innerHTML = `<span>São <b>${num(r.leitos)} ${r.leitos>1?'camas':'cama'}</b> para vestir, <b>${num(r.travesseiros)} travesseiros</b> e <b>${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'}</b> para as toalhas.${sem}</span>`;
   $('notaRotina').innerHTML = `<span>Com lavanderia ${state.lavanderia}, uma peça leva <b>${dec(r.ciclo)} dias</b> para voltar ao quarto, contando o dia de descanso da fibra. Margem de segurança aplicada: <b>${s.margem}%</b>.</span>`;
 }
+const complSel = r => r.complementos.map(c=>{ const e = state.compl[c.id] || {}; return {...c, on:!!e.on, qtd: e.qtd ?? c.rec}; });
 function desenharResultado(){
   const r = calcular(), s = seg();
   ultimo = r;
   $('total').textContent = num(r.total);
   $('kLeitos').textContent = num(r.leitos);
+  $('kBanh').textContent = num(r.banheiros);
   $('kHosp').textContent = num(r.hospedesDia);
   $('kCiclo').textContent = dec(r.ciclo)+' dias';
   const giroTxt = s.porGiro==="locacoes" ? `${state.locacoes} locações por dia` : `ocupação de ${r.ocup}%`;
-  $('contexto').textContent = `${s.nome} · ${num(state.uh)} ${s.unid} · ${num(r.leitos)} leitos · ${giroTxt} · lavanderia ${state.lavanderia}`;
+  $('contexto').textContent = `${s.nome} · ${num(r.leitos)} ${r.leitos>1?'camas':'cama'} · ${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'} · ${giroTxt} · lavanderia ${state.lavanderia}`;
 
   $('grupos').innerHTML = r.grupos.map((g,i)=>`
     <details class="grupo"${i===0?' open':''}>
@@ -771,32 +856,203 @@ function desenharResultado(){
       </div>
     </details>`).join('');
 
+  desenharCompl(r);
+
   const al = $('alerta');
   if(r.regra==="par"){
     al.className = "alerta ok";
-    al.textContent = `A cama está no PAR mínimo de ${s.par} jogos por leito. O seu giro atual, de ${r.giro} jogos, cabe dentro desse estoque.`;
+    al.textContent = `A cama está no PAR mínimo de ${s.par} jogos por cama. O seu giro atual, de ${r.giro} jogos, cabe dentro desse estoque.`;
   } else {
     al.className = "alerta atencao";
     al.textContent = `O seu giro, de ${r.giro} jogos em rotação, passa do PAR mínimo de ${r.piso}. Quem manda aqui é o ciclo da lavanderia: encurtá-lo reduz o estoque necessário.`;
   }
-
-  const msg = `Olá! Usei a calculadora de enxoval da Conamore.\n${$('contexto').textContent}\n\n*Total: ${num(r.total)} peças*\n` + r.grupos.map(g=>`• ${g.nome}: ${num(g.total)}`).join('\n') + `\n\nQuero uma proposta.`;
-  atualizarWhats(msg);
+  atualizarResumo();
 }
-function baixarExcel(){
-  if(typeof XLSX === 'undefined') return;
+function desenharCompl(r){
+  const cs = complSel(r);
+  $('compl').innerHTML = `
+    <div class="compl-cab"><h3 id="complTit">Complementos recomendados</h3><span class="sub" id="complSel"></span></div>
+    <p class="sub">Não entram no total acima. Marque o que faz sentido para a sua operação e ajuste a quantidade.</p>
+    <ul>${cs.map(c=>`
+      <li class="${c.on?'':'off'}" data-id="${c.id}">
+        <label class="ck"><input type="checkbox" ${c.on?'checked':''}><span><b>${c.nome}</b><em>${c.info} · recomendado: ${num(c.rec)}</em></span></label>
+        <div class="stepper sm"><button type="button" data-cq="${c.id}" data-d="-1" aria-label="Diminuir ${c.nome}">−</button><input type="number" min="0" max="99999" step="1" inputmode="numeric" value="${c.qtd}" class="tn" aria-label="Quantidade de ${c.nome}"><button type="button" data-cq="${c.id}" data-d="1" aria-label="Aumentar ${c.nome}">+</button></div>
+      </li>`).join('')}</ul>`;
+}
+/* total principal = cama e banho; complementos marcados aparecem à parte, e a mensagem do WhatsApp segue o que está na tela */
+function atualizarResumo(){
+  const r = ultimo; if(!r) return;
+  const cs = complSel(r).filter(c=>c.on && c.qtd>0);
+  const soma = cs.reduce((a,c)=>a+c.qtd,0);
+  const tc = $('totalCompl');
+  tc.hidden = !soma;
+  if(soma) tc.innerHTML = `+ <b>${num(soma)}</b> de complementos selecionados · total geral <b>${num(r.total+soma)}</b> peças`;
+  const el = $('complSel'); if(el) el.textContent = cs.length ? `${cs.length} ${cs.length>1?'selecionados':'selecionado'} · ${num(soma)} peças` : 'nenhum selecionado';
+  atualizarWhats(montarMensagem(r, cs));
+
+}
+
+/* ========== pedido para o vendedor: perfil da operação + peças resumidas por item ========== */
+const TROCA_TXT = { diaria:"diária", alternada:"dia sim, dia não", saida:"só na saída" };
+function resumoItens(g){
+  const ordem = [], mapa = {};
+  g.itens.forEach(it=>{
+    const base = it[3] || it[0];
+    if(!mapa[base]){ mapa[base] = []; ordem.push(base); }
+    mapa[base].push(it);
+  });
+  return ordem.map(base=>{
+    const its = mapa[base];
+    if(its.length === 1 && !its[0][4]) return `• ${base}: ${num(its[0][2])}`;
+    const tot = its.reduce((a,i)=>a+i[2],0);
+    return `• ${base}: ${num(tot)} (${its.map(i=>`${num(i[2])} ${i[4].toLowerCase()}`).join(', ')})`;
+  });
+}
+function textoLista(r, cs){
+  const s = seg(), porLoc = s.porGiro === "locacoes";
+  const tam = TAM.filter(k=>r.tam[k]>0).map(k=>`${num(r.tam[k])} ${CAMA[k].nome.toLowerCase()}`).join(', ');
+  const L = [];
+  L.push('*Perfil da operação*');
+  L.push(`• Tipo: ${s.nome}`);
+  L.push(`• Camas: ${num(r.leitos)} (${tam})`);
+  L.push(`• Banheiros: ${num(r.banheiros)}`);
+  L.push(porLoc ? `• Locações por suíte, por dia: ${state.locacoes}` : `• Ocupação média: ${r.ocup}%`);
+  L.push(`• Lavanderia: ${state.lavanderia}` + (porLoc ? '' : ` · troca de cama ${TROCA_TXT[state.trocaCama]} · troca de toalha ${TROCA_TXT[state.trocaToalha]}`));
+  L.push(`• Linha: cama ${LINHA.cama}, banho ${LINHA.banho}`);
+  L.push('');
+  L.push(`*Cama e banho: ${num(r.total)} peças*`);
+  r.grupos.forEach(g=>{ L.push(`_${g.nome} · ${num(g.total)}_`); L.push(...resumoItens(g)); });
+  if(cs.length){
+    const soma = cs.reduce((a,c)=>a+c.qtd,0);
+    L.push(''); L.push(`*Complementos escolhidos: ${num(soma)} peças*`);
+    cs.forEach(c=>L.push(`• ${c.nome}: ${num(c.qtd)}`));
+    L.push(''); L.push(`*Total geral: ${num(r.total+soma)} peças*`);
+  }
+  return L.join('\n');
+}
+function montarMensagem(r, cs){
+  return `Olá! Usei a calculadora de enxoval da Conamore Hotelaria e gostaria de uma proposta com estes dados.\n\n${textoLista(r, cs)}\n\nPode me ajudar com valores e prazo?`;
+}
+
+/* ========== excel: cores e fonte da página, logo e links no cabeçalho ========== */
+const SITE = "https://www.conamore.com.br", EMAIL = "hotelaria@conamore.com.br";
+async function baixarExcel(){
+  if(typeof ExcelJS === 'undefined') throw new Error('ExcelJS indisponível');
   const r = ultimo || calcular();
-  const linhas = [['Calculadora de enxoval Conamore Hotelaria'],[$('contexto').textContent],[`Total: ${r.total} peças`],[],['Grupo','Item','Especificação','Quantidade']];
-  r.grupos.forEach(g=>g.itens.forEach(it=>linhas.push([g.nome, it[0], it[1], it[2]])));
-  const ws = XLSX.utils.aoa_to_sheet(linhas);
-  ws['!cols'] = [{wch:13},{wch:24},{wch:34},{wch:11}];
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, 'Enxoval');
-  XLSX.writeFile(wb, 'calculadora-enxoval-conamore.xlsx');
+  const cs = complSel(r).filter(c=>c.on && c.qtd>0);
+  const AZUL='FF0A478C', SUAVE='FFEAF1F8', ZEBRA='FFF5F8FA', LINHA='FFE2E9ED', TINTA='FF0A2629', TINTA2='FF54666B', LINK='FF226AA7';
+  const F = (o={}) => ({name:'Calibri', size:11, color:{argb:TINTA}, ...o});
+  const wb = new ExcelJS.Workbook();
+  wb.creator = 'Conamore Hotelaria';
+  const ws = wb.addWorksheet('Enxoval', {views:[{showGridLines:false}], pageSetup:{orientation:'portrait', fitToPage:true, fitToWidth:1, fitToHeight:0}});
+  ws.columns = [{width:26},{width:34},{width:40},{width:14}];
+  const cel = (ref, valor, o={}) => { const c = ws.getCell(ref); c.value = valor; if(o.font) c.font = o.font; if(o.fill) c.fill = {type:'pattern', pattern:'solid', fgColor:{argb:o.fill}}; if(o.al) c.alignment = o.al; if(o.border) c.border = o.border; return c; };
+
+  /* cabeçalho: logo + título, depois links */
+  ws.getRow(1).height = 46;
+  const logo = document.querySelector('.marca img');
+  if(logo && /^data:image\/png;base64,/.test(logo.src)){
+    const id = wb.addImage({base64: logo.src, extension:'png'});
+    ws.addImage(id, {tl:{col:0.05,row:0.12}, ext:{width:150,height:36}});
+  }
+  ws.mergeCells('B1:D1');
+  cel('B1', 'Calculadora de enxoval', {font:F({size:17,bold:true,color:{argb:AZUL}}), al:{horizontal:'right',vertical:'middle'}});
+  ws.getRow(2).height = 22;
+  const linkF = F({size:10.5, color:{argb:LINK}, underline:true});
+  const bAzul = {bottom:{style:'medium', color:{argb:AZUL}}};
+  cel('A2', {text:'WhatsApp (19) 98211-7472', hyperlink:linkWa()}, {font:linkF, al:{vertical:'middle'}, border:bAzul});
+  cel('B2', {text:EMAIL, hyperlink:'mailto:'+EMAIL}, {font:linkF, al:{vertical:'middle'}, border:bAzul});
+  ws.mergeCells('C2:D2');
+  cel('C2', {text:'www.conamore.com.br', hyperlink:SITE}, {font:linkF, al:{horizontal:'right',vertical:'middle'}, border:bAzul});
+  ws.getCell('D2').border = bAzul;
+  ws.getRow(3).height = 8;
+
+  /* resumo */
+  ws.mergeCells('A4:D4');
+  cel('A4', $('contexto').textContent, {font:F({size:11,color:{argb:TINTA2}}), al:{wrapText:true,vertical:'middle'}});
+  ws.getRow(4).height = 34;
+  ws.mergeCells('A5:C5');
+  cel('A5', 'Total de cama e banho', {font:F({size:13,bold:true,color:{argb:AZUL}}), fill:SUAVE, al:{vertical:'middle',indent:1}});
+  cel('D5', r.total, {font:F({size:16,bold:true,color:{argb:AZUL}}), fill:SUAVE, al:{horizontal:'right',vertical:'middle'}}).numFmt = '#,##0';
+  ws.getRow(5).height = 30;
+  ws.getRow(6).height = 10;
+
+  /* tabela */
+  let n = 7;
+  ['Grupo','Item','Especificação','Quantidade'].forEach((t,i)=>{
+    cel(String.fromCharCode(65+i)+n, t, {font:F({bold:true,color:{argb:'FFFFFFFF'}}), fill:AZUL, al:{horizontal:i===3?'right':'left',vertical:'middle',indent:i===3?0:1}});
+  });
+  ws.getRow(n).height = 24;
+  const bLinha = {bottom:{style:'thin', color:{argb:LINHA}}};
+  let z = 0;
+  const linha = (g, item, esp, q) => {
+    n++; const fill = (z++ % 2) ? ZEBRA : 'FFFFFFFF';
+    [g,item,esp,q].forEach((v,i)=>{
+      const c = cel(String.fromCharCode(65+i)+n, v, {font:F({color:{argb:i===2?TINTA2:TINTA}, bold:i===3}), fill, border:bLinha, al:{horizontal:i===3?'right':'left',vertical:'middle',indent:i===3?0:1,wrapText:i===2}});
+      if(i===3) c.numFmt = '#,##0';
+    });
+    ws.getRow(n).height = 21;
+  };
+  const subtotal = (rot, q) => {
+    n++;
+    ws.mergeCells(`A${n}:C${n}`);
+    cel('A'+n, rot, {font:F({bold:true,color:{argb:AZUL}}), fill:SUAVE, al:{horizontal:'right',vertical:'middle',indent:1}});
+    cel('D'+n, q, {font:F({bold:true,color:{argb:AZUL}}), fill:SUAVE, al:{horizontal:'right',vertical:'middle'}}).numFmt = '#,##0';
+    ws.getRow(n).height = 23;
+  };
+  r.grupos.forEach(g=>{ g.itens.forEach(it=>linha(g.nome, it[0], it[1], it[2])); subtotal('Total de '+g.nome.toLowerCase(), g.total); });
+  if(cs.length){
+    n++; ws.getRow(n).height = 10;
+    cs.forEach(c=>linha('Complementos', c.nome, c.info, c.qtd));
+    const sc = cs.reduce((a,c)=>a+c.qtd,0);
+    subtotal('Total de complementos', sc);
+    n++; ws.getRow(n).height = 6;
+    n++; ws.mergeCells(`A${n}:C${n}`);
+    cel('A'+n, 'Total geral', {font:F({size:13,bold:true,color:{argb:'FFFFFFFF'}}), fill:AZUL, al:{horizontal:'right',vertical:'middle',indent:1}});
+    cel('D'+n, r.total+sc, {font:F({size:14,bold:true,color:{argb:'FFFFFFFF'}}), fill:AZUL, al:{horizontal:'right',vertical:'middle'}}).numFmt = '#,##0';
+    ws.getRow(n).height = 28;
+  }
+  n += 2; ws.mergeCells(`A${n}:D${n}`);
+  cel('A'+n, 'Estimativa baseada no método PAR e no ciclo de lavanderia informado. Sazonalidade, política de governança e estado atual do enxoval podem alterar a recomendação final.', {font:F({size:9.5,color:{argb:TINTA2}}), al:{wrapText:true,vertical:'top'}});
+  ws.getRow(n).height = 28;
+  n++; ws.mergeCells(`A${n}:D${n}`);
+  cel('A'+n, 'Gerado em '+new Date().toLocaleDateString('pt-BR')+' · Conamore Hotelaria', {font:F({size:9.5,color:{argb:TINTA2}})});
+
+  const buf = await wb.xlsx.writeBuffer();
+  const url = URL.createObjectURL(new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  const a = document.createElement('a'); a.href = url; a.download = 'calculadora-enxoval-conamore.xlsx';
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 4000);
+}
+
+/* ========== RD Station: conversão com campos e tags de segmentação ========== */
+/* chave = chave PÚBLICA da conta (RD Station Marketing > Integrações > Chaves de API). Vazia, o envio fica desligado. */
+const RD = { chave:"", identificador:"calculadora-enxoval", url:"https://api.rd.services/platform/conversions" };
+const PORTE = l => l <= 10 ? "Até 10 camas" : (l <= 50 ? "11 a 50 camas" : "Mais de 50 camas");
+function enviarRD(dados){
+  if(!RD.chave){ console.warn('RD Station: chave pública não configurada, conversão não enviada.'); return Promise.resolve(false); }
+  const r = ultimo || calcular(), s = seg();
+  const cs = complSel(r).filter(c=>c.on && c.qtd>0);
+  const email = !!dados.receberEmail;
+  const payload = {
+    conversion_identifier: RD.identificador,
+    name: dados.nome, email: dados.email, personal_phone: dados.whats, company_name: dados.hospedagem || undefined,
+    cf_calc_segmento: s.nome, cf_calc_camas: r.leitos, cf_calc_banheiros: r.banheiros,
+    cf_calc_ocupacao: s.porGiro==="locacoes" ? undefined : r.ocup, cf_calc_locacoes: s.porGiro==="locacoes" ? state.locacoes : undefined,
+    cf_calc_lavanderia: state.lavanderia, cf_calc_total_pecas: r.total, cf_calc_porte: PORTE(r.leitos),
+    cf_calc_complementos: cs.map(c=>`${c.nome}: ${c.qtd}`).join('; ') || undefined,
+    cf_calc_receber_lista: email ? 'Sim' : 'Não',
+    cf_calc_lista: textoLista(r, cs).replace(/[*_]/g,''),
+    tags: ['calculadora-enxoval', ...(email ? ['calculadora-enviar-lista'] : []), 'segmento-'+state.segmento, 'porte-'+PORTE(r.leitos).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')],
+    legal_bases: [{category:'communications', type:'consent', status:'granted'}]
+  };
+  return fetch(`${RD.url}?api_key=${encodeURIComponent(RD.chave)}`, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({event_type:'CONVERSION', event_family:'CDP', payload})
+  }).then(res=>res.ok).catch(()=>false);
 }
 
 /* ========== eventos ========== */
-document.querySelectorAll('.stepper button').forEach(b=>b.addEventListener('click',()=>{
+document.querySelectorAll('.stepper button[data-alvo]').forEach(b=>b.addEventListener('click',()=>{
   const inp = $(b.dataset.alvo);
   const atual = lerInteiro(inp) ?? state[CAMPOS[inp.id]];
   inp.value = Math.min(+inp.max, Math.max(+inp.min, atual + (+b.dataset.passo)));
@@ -804,12 +1060,35 @@ document.querySelectorAll('.stepper button').forEach(b=>b.addEventListener('clic
   inp.dispatchEvent(new Event('change'));
 }));
 Object.entries(CAMPOS).forEach(([id, chave])=>{
-  $(id).addEventListener('input', e=>{ const v = lerInteiro(e.target); if(v != null){ state[chave] = v; notas(); } });
-  $(id).addEventListener('change', e=>{ e.target.value = state[chave] = lerInteiro(e.target) ?? state[chave]; notas(); });
+  const aplicar = () => { if(chave==='leitos'){ ajustarTam(state.leitos); renderTam(); } notas(); };
+  $(id).addEventListener('input', e=>{ const v = lerInteiro(e.target); if(v != null){ state[chave] = v; aplicar(); } });
+  $(id).addEventListener('change', e=>{ e.target.value = state[chave] = lerInteiro(e.target) ?? state[chave]; aplicar(); });
 });
-$('camas').addEventListener('change', e=>{ state.camasUh = +e.target.value; notas(); });
-$('tipoCama').addEventListener('change', e=>{ state.tipoCama = e.target.value; notas(); });
-$('hosp').addEventListener('change', e=>{ state.hospedesUh = +e.target.value; notas(); });
+document.querySelectorAll('[data-tam]').forEach(b=>b.addEventListener('click',()=>mudarTam(b.dataset.tam, state.tam[b.dataset.tam] + (+b.dataset.d))));
+TAM.forEach(k=>{
+  $('t_'+k).addEventListener('change', e=>{ const v = Math.round(Number(String(e.target.value).replace(',','.'))); mudarTam(k, Number.isFinite(v) ? v : state.tam[k]); });
+});
+/* complementos: marcar, ajustar a quantidade; tudo por delegação porque a lista é redesenhada */
+$('compl').addEventListener('change', e=>{
+  const li = e.target.closest('li[data-id]'); if(!li) return;
+  const id = li.dataset.id, c = complSel(ultimo).find(x=>x.id===id);
+  if(e.target.type === 'checkbox'){
+    state.compl[id] = {...(state.compl[id]||{}), on:e.target.checked};
+    li.classList.toggle('off', !e.target.checked);
+  } else {
+    const v = Math.max(0, Math.min(99999, Math.round(Number(String(e.target.value).replace(',','.')))));
+    const q = Number.isFinite(v) ? v : c.qtd;
+    state.compl[id] = {...(state.compl[id]||{}), qtd:q}; e.target.value = q;
+  }
+  atualizarResumo();
+});
+$('compl').addEventListener('click', e=>{
+  const b = e.target.closest('button[data-cq]'); if(!b) return;
+  const id = b.dataset.cq, li = b.closest('li'), inp = li.querySelector('input[type=number]');
+  const q = Math.max(0, Math.min(99999, (Math.round(Number(inp.value))||0) + (+b.dataset.d)));
+  inp.value = q; state.compl[id] = {...(state.compl[id]||{}), qtd:q};
+  atualizarResumo();
+});
 $('ocup').addEventListener('input', e=>{ state.ocupacao = +e.target.value; $('ocupOut').textContent = e.target.value+'%'; notas(); });
 $('trocaCama').addEventListener('change', e=>{ state.trocaCama = e.target.value; notas(); });
 $('trocaToalha').addEventListener('change', e=>{ state.trocaToalha = e.target.value; notas(); });
@@ -839,10 +1118,15 @@ $('modal').addEventListener('keydown', e=>{
   else if(!e.shiftKey && document.activeElement === z){ e.preventDefault(); a.focus(); }
 });
 document.addEventListener('keydown', e=>{ if(e.key === 'Escape') fecharModal(); });
-function enviar(){
+async function enviar(){
+  const dados = { nome:$('mNome').value.trim(), hospedagem:$('mHosp').value.trim(), email:$('mEmail').value.trim(), whats:$('mWhats').value.trim(), receberEmail:$('mEmailLista').checked };
+  const bt = $('mEnviar'); bt.disabled = true; bt.textContent = 'Gerando...';
+  let ok = true;
+  try{ await baixarExcel(); }catch(e){ ok = false; console.warn(e); }
+  const enviado = await enviarRD(dados);
+  bt.disabled = false; bt.textContent = 'Baixar Excel';
   fecharModal();
-  try{ baixarExcel(); }catch(e){}
-  avisar('Lista enviada. Confira o seu e-mail e o Excel baixado agora.');
+  avisar(!ok ? 'Não foi possível gerar o Excel agora. Fale com a gente pelo WhatsApp.' : (dados.receberEmail && enviado ? 'Pronto! O Excel foi baixado e a lista segue para o seu e-mail.' : 'Pronto! O Excel foi baixado.'));
 }
 function avisar(t){ const el = $('aviso'); el.textContent = t; el.classList.add('on'); clearTimeout(avisar.t); avisar.t = setTimeout(()=>el.classList.remove('on'), 2800); }
 
