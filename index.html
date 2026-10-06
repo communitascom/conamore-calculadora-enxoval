@@ -91,6 +91,10 @@ button{white-space:normal!important}
 .fechar:hover{color:var(--tinta)!important;background:var(--linha-2)!important}
 .opcoes button:focus{border-color:var(--linha)!important;background:var(--card)!important}
 .par-btn button:focus{background:var(--card)!important}
+.sel-btn,.sel-btn:hover,.sel-btn:focus{border-color:var(--linha)!important;background:var(--card)!important;color:var(--tinta)!important}
+.sel-linha:hover .sel-btn,.sel-linha:focus-within .sel-btn{border-color:var(--azul-borda)!important}
+.sel-menu button,.sel-menu button:focus{border-color:transparent!important;background:var(--card)!important;color:var(--tinta)!important}
+.sel-menu button:hover,.sel-menu button:focus-visible,.sel-menu button[aria-selected="true"]{background:var(--azul-suave)!important}
 .margem-cmp button,.margem-cmp button:hover,.margem-cmp button:focus{color:#fff!important;background:none!important;border:0!important}
 .refazer button,.refazer button:hover,.refazer button:focus{color:var(--azul-link)!important;background:none!important}
 .stepper,.stepper:focus-within{border-color:var(--linha)!important}
@@ -378,11 +382,22 @@ select.sel:focus{border-color:var(--azul)}
 .margem-cmp{font-size:14.5px;color:#C9DDF1;margin:6px 0 0;line-height:1.45}
 .margem-cmp b{color:#fff}
 .margem-cmp button{background:none;border:0;padding:0;font:inherit;color:#fff;text-decoration:underline;text-underline-offset:2px;cursor:pointer;white-space:normal}
-.linha-ent{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:14px;font-size:14px;color:var(--tinta-2)}
-.linha-ent .chip{border:1px solid var(--linha);background:var(--card);border-radius:999px;padding:3px 11px;line-height:1.35}
-.linha-ent .chip:first-child{background:var(--azul-suave);border-color:var(--azul-borda)}
-.linha-ent .chip b{color:var(--azul);font-weight:600}
-.linha-ent em{font-style:normal;color:var(--tinta-3);flex-basis:100%}
+.linha-ent{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.sel-linha{position:relative;min-width:0}
+.sel-btn{display:flex;align-items:center;gap:8px;border:1px solid var(--linha);background:var(--card);border-radius:var(--r-sm);padding:7px 10px 7px 12px;font-size:14.5px;color:var(--tinta);text-align:left;line-height:1.3}
+.sel-btn .sel-rot{font-size:12px;letter-spacing:.05em;text-transform:uppercase;color:var(--tinta-3);font-weight:600}
+.sel-btn b{font-weight:600;color:var(--azul)}
+.sel-btn svg{width:16px;height:16px;flex:none;stroke:var(--tinta-3);stroke-width:2.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+.sel-menu{display:none;position:absolute;left:0;top:100%;z-index:20;min-width:100%;width:max-content;max-width:min(320px,86vw);max-height:300px;overflow-y:auto;margin-top:2px;background:var(--card);border:1px solid var(--linha);border-radius:var(--r-sm);box-shadow:var(--sombra);padding:4px}
+.sel-menu::before{content:"";position:absolute;left:0;right:0;top:-8px;height:8px}
+.sel-linha:hover .sel-menu,.sel-linha:focus-within .sel-menu{display:block}
+.sel-linha:hover .sel-btn,.sel-linha:focus-within .sel-btn{border-color:var(--azul-borda)}
+.sel-menu button{display:flex;justify-content:space-between;align-items:baseline;gap:14px;width:100%;border:0;background:var(--card);border-radius:6px;padding:8px 10px;font-size:14.5px;text-align:left;color:var(--tinta)}
+.sel-menu button em{font-style:normal;font-size:12.5px;color:var(--tinta-3);white-space:nowrap}
+.sel-menu button b{font-weight:500}
+.sel-menu button:hover,.sel-menu button:focus-visible{background:var(--azul-suave)}
+.sel-menu button[aria-selected="true"]{background:var(--azul-suave)}
+.sel-menu button[aria-selected="true"] b{color:var(--azul);font-weight:700}
 .compl{margin-top:14px;border:1px solid var(--linha);border-radius:var(--r-sm);background:var(--card);padding:14px 18px 6px}
 .compl-cab{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 .compl h3{font-size:18px;font-weight:600;color:var(--tinta)}
@@ -514,7 +529,7 @@ select.sel:focus{border-color:var(--azul)}
           </dl>
         </div>
 
-        <p class="linha-ent" id="linhaEnt"></p>
+        <div class="linha-ent" id="linhaEnt"></div>
         <div class="grupos" id="grupos"></div>
         <section class="compl" id="compl" aria-labelledby="complTit"></section>
         <p class="alerta ok" id="alerta"></p>
@@ -669,11 +684,25 @@ const TAM = ["solteiro","casal","queen","king"];
 const FREQ = { diaria:1, alternada:0.5, saida:0.34 };
 const TAT = { interna:1, terceirizada:2.5 };
 const DESCANSO = 1;
-const LINHA = { cama:"Confort", banho:"Smart" };  /* linha de entrada: lençol e fronha Confort, toalhas Smart */
+/* linhas do catálogo do site (conamore.com.br). A linha muda o produto, nunca a quantidade. */
+const LENCOIS = [
+  {id:"harmony", nome:"Harmony", fios:160, mat:"100% algodão"}, {id:"confort", nome:"Confort", fios:180, mat:"mista"},
+  {id:"essence", nome:"Essence", fios:180, mat:"100% algodão"}, {id:"classic", nome:"Classic", fios:200, mat:"mista"},
+  {id:"prime", nome:"Prime", fios:200, mat:"100% algodão"}, {id:"supreme", nome:"Supreme", fios:300, mat:"100% algodão"},
+  {id:"serenity", nome:"Serenity", fios:400, mat:"100% algodão"} ];
+const TOALHAS = [
+  {id:"smart", nome:"Smart", g:340}, {id:"fit", nome:"Fit", g:350}, {id:"sense", nome:"Sense", g:380}, {id:"suit", nome:"Suit", g:408},
+  {id:"quality", nome:"Quality", g:410}, {id:"select", nome:"Select", g:440}, {id:"lined", nome:"Lined", g:445}, {id:"frame", nome:"Frame", g:450},
+  {id:"confort", nome:"Confort", g:500}, {id:"prime", nome:"Prime", g:500}, {id:"giant", nome:"Giant", g:580}, {id:"imperial", nome:"Imperial", g:600} ];
+const rotLencol = l => `${l.fios} fios | ${l.nome}`;
+const rotToalha = t => `${t.g} g/m² | ${t.nome}`;
+const lencolAtual = () => LENCOIS.find(l=>l.id===state.lencol) || LENCOIS[1];
+const toalhaAtual = () => TOALHAS.find(t=>t.id===state.toalha) || TOALHAS[4];
+const LINHA = { get cama(){ return rotLencol(lencolAtual()); }, get banho(){ return rotToalha(toalhaAtual()); } };
 const WHATS = "5519982117472";
 const MSG_GERAL = "Olá! Estou na calculadora de enxoval da Conamore e quero falar com um consultor.";
 
-const state = { segmento:"hotel", leitos:1, banheiros:1, tam:{solteiro:0,casal:1,queen:0,king:0}, ocupacao:null, locacoes:3, lavanderia:"terceirizada", trocaCama:"diaria", trocaToalha:"diaria", margem:"com", compl:{}, passo:0, visto:0 };
+const state = { segmento:"hotel", leitos:1, banheiros:1, tam:{solteiro:0,casal:1,queen:0,king:0}, ocupacao:null, locacoes:3, lavanderia:"terceirizada", trocaCama:"diaria", trocaToalha:"diaria", margem:"com", lencol:"confort", toalha:"quality", compl:{}, passo:0, visto:0 };
 const PASSOS = ["Operação","Estrutura","Rotina","Resultado"];
 let ultimo = null;
 
@@ -716,15 +745,15 @@ function calcular(comMargem = state.margem === "com"){
   const itensCama = [];
   TAM.filter(k=>t[k]>0).forEach(k=>{
     const n = t[k], trav = CAMA[k].trav;
-    itensCama.push([`Lençol com elástico ${CAMA[k].nome}`, `${n} ${n>1?'camas':'cama'} · linha ${LINHA.cama}`, teto(n*jogosLeito*(1+m)), 'Lençol com elástico', CAMA[k].nome]);
+    itensCama.push([`Lençol com elástico ${CAMA[k].nome}`, `${n} ${n>1?'camas':'cama'} · ${LINHA.cama}`, teto(n*jogosLeito*(1+m)), 'Lençol com elástico', CAMA[k].nome]);
   });
   TAM.filter(k=>t[k]>0).forEach(k=>{
     const n = t[k];
-    itensCama.push([`Lençol de cima ${CAMA[k].nome}`, `${n} ${n>1?'camas':'cama'} · linha ${LINHA.cama}`, teto(n*jogosLeito*(1+m)), 'Lençol de cima', CAMA[k].nome]);
+    itensCama.push([`Lençol de cima ${CAMA[k].nome}`, `${n} ${n>1?'camas':'cama'} · ${LINHA.cama}`, teto(n*jogosLeito*(1+m)), 'Lençol de cima', CAMA[k].nome]);
   });
   TAM.filter(k=>t[k]>0).forEach(k=>{
     const n = t[k], trav = CAMA[k].trav;
-    itensCama.push([`Fronha ${CAMA[k].nome}`, `${trav} por cama · linha ${LINHA.cama}`, teto(n*jogosLeito*trav*(1+m)), 'Fronha', CAMA[k].nome]);
+    itensCama.push([`Fronha ${CAMA[k].nome}`, `${trav} por cama · ${LINHA.cama}`, teto(n*jogosLeito*trav*(1+m)), 'Fronha', CAMA[k].nome]);
   });
 
   /* banho: hóspedes pelo giro; piso de PAR por banheiro; toalha de piso por banheiro */
@@ -743,9 +772,9 @@ function calcular(comMargem = state.margem === "com"){
     { id:"banho", nome:"Banho",
       conta: `Toalhas de banho e de rosto: ${num(hospedesDia)} hóspedes por dia × ${virg(trocaT)} troca × ${dec(ciclo)} dias de ciclo, com piso de ${s.par} por banheiro (${num(banheiros)} ${banheiros>1?'banheiros':'banheiro'}). Toalha de piso: ${num(banheiros)} × ${dec(trocasToalhaDia,2)} trocas por dia × ${dec(ciclo)} dias de ciclo. ${comMargem ? `Margem de ${mPct}%.` : "Sem margem (mínimo)."}`,
       itens:[
-        ["Toalha de banho", `1 por hóspede · linha ${LINHA.banho}`, banho],
-        ["Toalha de rosto", `1 por hóspede · linha ${LINHA.banho}`, banho],
-        ["Toalha de piso", `1 por banheiro por troca · linha ${LINHA.banho}`, pisoT]] }
+        ["Toalha de banho", `1 por hóspede · ${LINHA.banho}`, banho],
+        ["Toalha de rosto", `1 por hóspede · ${LINHA.banho}`, banho],
+        ["Toalha de piso", `1 por banheiro por troca · ${LINHA.banho}`, pisoT]] }
   ];
   grupos.forEach(g => g.total = g.itens.reduce((a,i)=>a+i[2],0));
   const total = grupos.reduce((a,g)=>a+g.total,0);
@@ -865,6 +894,29 @@ function notas(){
   $('notaRotina').innerHTML = `<span>Com lavanderia ${state.lavanderia}, uma peça leva <b>${dec(r.ciclo)} dias</b> para voltar ao quarto, contando o dia de descanso da fibra. ${state.margem==='com' ? `Margem de segurança aplicada: <b>${s.margem}%</b>.` : '<b>Sem margem</b>: o resultado é o mínimo, sem folga para pico ou descarte.'}</span>`;
 }
 const complSel = r => r.complementos.map(c=>{ const e = state.compl[c.id] || {}; return {...c, on:!!e.on, qtd: e.qtd ?? c.rec}; });
+/* seletores de linha: pelo dado técnico (fios e g/m²); o menu abre ao passar o mouse, ao focar ou ao tocar */
+function desenharLinhas(){
+  const mk = (tipo, rotulo, atual, itens, rot, det) => `
+    <div class="sel-linha" data-tipo="${tipo}">
+      <button type="button" class="sel-btn" aria-haspopup="listbox" aria-label="${rotulo}: ${rot(atual)}. Trocar">
+        <span class="sel-rot">${rotulo}</span><b>${rot(atual)}</b>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+      </button>
+      <div class="sel-menu" role="listbox" aria-label="${rotulo}">
+        ${itens.map(i=>`<button type="button" role="option" data-id="${i.id}" aria-selected="${i.id===atual.id}"><b>${rot(i)}</b><em>${det(i)}</em></button>`).join('')}
+      </div>
+    </div>`;
+  $('linhaEnt').innerHTML =
+    mk('lencol','Lençol e fronha', lencolAtual(), LENCOIS, rotLencol, l=>l.mat) +
+    mk('toalha','Toalhas', toalhaAtual(), TOALHAS, rotToalha, t=>'gramatura '+t.g+' g/m²');
+  $('linhaEnt').style.display = '';
+}
+function trocarLinha(tipo, id){
+  state[tipo] = id;
+  const abertos = [...document.querySelectorAll('#grupos details[open]')].map(d=>d.dataset.g);
+  desenharResultado();
+  document.querySelectorAll('#grupos details').forEach(d=>{ d.open = abertos.includes(d.dataset.g); });
+}
 function desenharResultado(){
   const r = calcular(), s = seg();
   ultimo = r;
@@ -877,7 +929,7 @@ function desenharResultado(){
   $('contexto').textContent = `${s.nome} · ${num(r.leitos)} ${r.leitos>1?'camas':'cama'} · ${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'} · ${giroTxt} · lavanderia ${state.lavanderia}`;
 
   $('grupos').innerHTML = r.grupos.map((g,i)=>`
-    <details class="grupo"${i===0?' open':''}>
+    <details class="grupo" data-g="${g.id}"${i===0?' open':''}>
       <summary><h3>${g.nome}</h3><span class="qtd tn">${num(g.total)}<em>peças</em></span><span class="seta" aria-hidden="true"><svg viewBox=\"0 0 24 24\"><path d=\"M6 9l6 6 6-6\"/></svg></span></summary>
       <div class="corpo">
         <p class="conta">${g.conta}</p>
@@ -891,7 +943,7 @@ function desenharResultado(){
   $('margemCmp').innerHTML = r.comMargem
     ? `Com ${r.margemPct}% de margem (metodologia). Só o mínimo, sem margem: <b>${num(outra)}</b> peças. <button type="button" data-margem="sem">Ver sem margem</button>`
     : `Só o mínimo, sem margem. Com os ${s.margem}% da metodologia: <b>${num(outra)}</b> peças. <button type="button" data-margem="com">Ver com margem</button>`;
-  $('linhaEnt').innerHTML = `<span class="chip"><b>Linha de entrada</b></span><span class="chip">Lençol e fronha <b>${LINHA.cama}</b></span><span class="chip">Toalhas <b>${LINHA.banho}</b></span><em>A linha muda o produto, não a quantidade.</em>`;
+  desenharLinhas();
 
   desenharCompl(r);
 
@@ -955,7 +1007,8 @@ function textoLista(r, cs){
   L.push(`• Banheiros: ${num(r.banheiros)}`);
   L.push(porLoc ? `• Locações por suíte, por dia: ${state.locacoes}` : `• Ocupação média: ${r.ocup}%`);
   L.push(`• Lavanderia: ${state.lavanderia}` + (porLoc ? '' : ` · troca de cama ${TROCA_TXT[state.trocaCama]} · troca de toalha ${TROCA_TXT[state.trocaToalha]}`));
-  L.push(`• Linha de entrada: lençol ${LINHA.cama}, toalhas ${LINHA.banho}`);
+  L.push(`• Lençol: ${LINHA.cama}`);
+  L.push(`• Toalhas: ${LINHA.banho}`);
   L.push(`• Margem: ${r.margemPct ? r.margemPct+'% (metodologia Conamore)' : 'sem margem (mínimo)'}`);
   L.push('');
   L.push(`*Cama e banho: ${num(r.total)} peças*`);
@@ -1127,6 +1180,11 @@ $('compl').addEventListener('click', e=>{
   inp.value = q; state.compl[id] = {...(state.compl[id]||{}), qtd:q};
   atualizarResumo();
 });
+$('linhaEnt').addEventListener('click', e=>{
+  const o = e.target.closest('.sel-menu button'); if(!o) return;
+  trocarLinha(o.closest('.sel-linha').dataset.tipo, o.dataset.id);
+});
+$('linhaEnt').addEventListener('keydown', e=>{ if(e.key==='Escape' && document.activeElement) document.activeElement.blur(); });
 $('margemCmp').addEventListener('click', e=>{ const b = e.target.closest('button[data-margem]'); if(b) setMargem(b.dataset.margem, true); });
 $('ocup').addEventListener('input', e=>{ state.ocupacao = +e.target.value; $('ocupOut').textContent = e.target.value+'%'; notas(); });
 $('trocaCama').addEventListener('change', e=>{ state.trocaCama = e.target.value; notas(); });

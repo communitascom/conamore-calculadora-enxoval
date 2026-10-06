@@ -36,7 +36,7 @@ Fora da metodologia original (decisão de 30/09/2026): piso de toalhas de banho 
 
 **Troca diária.** O PAR é o piso e vale para qualquer frequência de troca. A frequência só empurra a cama acima do PAR quando `trocas/dia × ciclo` passa de 3 (ocupação alta com lavanderia terceirizada, por exemplo 100% e troca diária dá 3,5 jogos por cama). Já nas toalhas a frequência muda o número direto, porque o piso é por banheiro e o giro é por hóspede.
 
-**Linha de entrada no resultado:** lençol e fronha Confort, toalhas Smart (constante `LINHA`). A linha muda o produto, não a quantidade.
+**Linha no resultado (seletor por dado técnico).** Acima da lista há dois seletores, lençol e fronha por fios (padrão 180 fios | Confort) e toalhas por gramatura (padrão 410 g/m² | Quality). O menu abre ao passar o mouse, focar ou tocar, e lista as linhas do site: lençol Harmony 160, Confort 180, Essence 180, Classic 200, Prime 200, Supreme 300, Serenity 400; toalha Smart 340, Fit 350, Sense 380, Suit 408, Quality 410, Select 440, Lined 445, Frame 450, Confort 500, Prime 500, Giant 580, Imperial 600. A linha muda o produto, não a quantidade, e acompanha o WhatsApp e o Excel (`LENCOIS`, `TOALHAS`).
 
 Quando o giro supera o PAR, a tela avisa qual das duas regras mandou no número.
 
@@ -72,7 +72,7 @@ Tudo em `index.html`, num bloco isolado no topo do script:
 
 - `SEG` | coeficientes por segmento
 - `CAMA` | tipos de cama e travesseiros por cama
-- `LINHA` | linha de entrada mostrada no resultado (lençol e fronha Confort, toalhas Smart)
+- `LENCOIS`, `TOALHAS` | linhas do catálogo no seletor do resultado (padrões em `state.lencol` e `state.toalha`)
 - `FREQ`, `TAT`, `DESCANSO` | política de troca e ciclo de lavanderia
 - `WHATS` | número de WhatsApp usado em todos os CTAs
 
@@ -82,7 +82,7 @@ A interface (CSS, HTML) não precisa ser tocada para ajustar número nenhum.
 
 - Estado do cálculo não vive mais na URL (o protótipo anterior tinha; esta versão ainda não).
 - Sem seleção de grupos nem ajuste manual de item no resultado (quem só precisa repor toalhas recebe a lista completa).
-- Escolha de linha do catálogo ainda não existe; todo resultado mostra a linha de entrada (Confort e Smart). A tabela de lençóis do artigo ainda lista Classic, Prime e Supreme.
+- Escolha de linha do catálogo ainda não existe; o seletor do resultado só muda o texto, sem preço. A tabela de lençóis do artigo ainda lista só Classic, Prime e Supreme.
 - Coeficientes da tabela acima seguem pendentes de validação final com o comercial.
 - Integração do formulário de captação (modal "Receber por e-mail") com CRM ainda não existe; é só simulação.
 - A página "Montar meu pedido na loja" (compra-rapida) ainda não recebe os produtos calculados via URL; é para decidir numa segunda fase.
