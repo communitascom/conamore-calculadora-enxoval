@@ -91,6 +91,7 @@ button{white-space:normal!important}
 .fechar:hover{color:var(--tinta)!important;background:var(--linha-2)!important}
 .opcoes button:focus{border-color:var(--linha)!important;background:var(--card)!important}
 .par-btn button:focus{background:var(--card)!important}
+.margem-cmp button,.margem-cmp button:hover,.margem-cmp button:focus{color:#fff!important;background:none!important;border:0!important}
 .refazer button,.refazer button:hover,.refazer button:focus{color:var(--azul-link)!important;background:none!important}
 .stepper,.stepper:focus-within{border-color:var(--linha)!important}
 .stepper:focus-within{border-color:var(--azul)!important}
@@ -174,6 +175,7 @@ input, textarea{caret-color:var(--azul-fundo)}
 .bloco{margin-top:22px}
 .bloco:first-child{margin-top:0}
 .grade2 .bloco{margin-top:0}
+#blocoTroca{margin-top:22px}
 .stepper{display:flex;align-items:stretch;height:60px;border:1.5px solid var(--linha);border-radius:var(--r-sm);overflow:hidden;background:var(--card)}
 .stepper:focus-within{border-color:var(--azul)}
 .stepper input{flex:1;min-width:0;border:0;background:none;text-align:center;font-size:26px;font-weight:600;outline:none;-moz-appearance:textfield;color:var(--tinta)}
@@ -373,6 +375,14 @@ select.sel:focus{border-color:var(--azul)}
 #tamStatus.ok{color:var(--wa-escuro)}
 .total-compl{font-size:15px;color:#C9DDF1;margin:2px 0 0}
 .total-compl b{color:#fff}
+.margem-cmp{font-size:14.5px;color:#C9DDF1;margin:6px 0 0;line-height:1.45}
+.margem-cmp b{color:#fff}
+.margem-cmp button{background:none;border:0;padding:0;font:inherit;color:#fff;text-decoration:underline;text-underline-offset:2px;cursor:pointer;white-space:normal}
+.linha-ent{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin-top:14px;font-size:14px;color:var(--tinta-2)}
+.linha-ent .chip{border:1px solid var(--linha);background:var(--card);border-radius:999px;padding:3px 11px;line-height:1.35}
+.linha-ent .chip:first-child{background:var(--azul-suave);border-color:var(--azul-borda)}
+.linha-ent .chip b{color:var(--azul);font-weight:600}
+.linha-ent em{font-style:normal;color:var(--tinta-3);flex-basis:100%}
 .compl{margin-top:14px;border:1px solid var(--linha);border-radius:var(--r-sm);background:var(--card);padding:14px 18px 6px}
 .compl-cab{display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap}
 .compl h3{font-size:18px;font-weight:600;color:var(--tinta)}
@@ -457,6 +467,13 @@ select.sel:focus{border-color:var(--azul)}
             <button type="button" data-v="terceirizada" aria-pressed="true"><strong>Terceirizada</strong><span>a peça volta em 48h a 72h</span></button>
           </div>
         </div>
+        <div class="bloco">
+          <span class="rotulo">Margem de segurança</span>
+          <div class="par-btn" id="opMargem" role="group" aria-label="Margem de segurança">
+            <button type="button" data-v="com" aria-pressed="true"><strong>Com margem</strong><span id="txtMargemCom">metodologia Conamore, folga para alta temporada e descarte</span></button>
+            <button type="button" data-v="sem" aria-pressed="false"><strong>Sem margem</strong><span>só o mínimo, sem folga nenhuma</span></button>
+          </div>
+        </div>
         <div class="grade2" id="blocoTroca">
           <div class="bloco">
             <label class="rotulo" for="trocaCama">Troca de roupa de cama</label>
@@ -488,6 +505,7 @@ select.sel:focus{border-color:var(--azul)}
           <div class="num tn"><span id="total">0</span><span>peças</span></div>
           <p class="ctx" id="contexto"></p>
           <p class="total-compl" id="totalCompl" hidden></p>
+          <p class="margem-cmp" id="margemCmp"></p>
           <dl class="res-dados">
             <div><dt>Camas</dt><dd id="kLeitos" class="tn">0</dd></div>
             <div><dt>Banheiros</dt><dd id="kBanh" class="tn">0</dd></div>
@@ -496,6 +514,7 @@ select.sel:focus{border-color:var(--azul)}
           </dl>
         </div>
 
+        <p class="linha-ent" id="linhaEnt"></p>
         <div class="grupos" id="grupos"></div>
         <section class="compl" id="compl" aria-labelledby="complTit"></section>
         <p class="alerta ok" id="alerta"></p>
@@ -520,7 +539,7 @@ select.sel:focus{border-color:var(--azul)}
   <div class="wrap">
   <h2 class="rotulo-secao">Como a conta é feita</h2>
   <div class="metodo">
-    <div><span class="metodo-icone"><svg viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg></span><b>PAR mínimo</b><p>Três jogos por leito: um em uso, um na lavanderia e um em descanso. Motel e hospitalar sobem para cinco; Airbnb, para quatro.</p></div>
+    <div><span class="metodo-icone"><svg viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg></span><b>PAR mínimo</b><p>Três jogos por leito: um em uso, um na lavanderia e um em descanso. Hotel, pousada e Airbnb ficam nos três; motel e hospitalar sobem para cinco.</p></div>
     <div><span class="metodo-icone"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.8-3.4M4 13a8 8 0 0 0 14.8 3.4"/><path d="M4 4v4.6h4.6M20 20v-4.6h-4.6"/></svg></span><b>Ciclo da peça</b><p>Tempo até a peça voltar ao quarto. Lavanderia própria em cerca de um dia, terceirizada em 2,5, mais um dia de descanso da fibra.</p></div>
     <div><span class="metodo-icone"><svg viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M19 9l-5 5-3-3-5 5"/></svg></span><b>Giro real</b><p>Quando leitos × trocas por dia × ciclo passa do PAR, quem manda é o giro. A margem cobre alta temporada e descarte.</p></div>
   </div>
@@ -564,7 +583,7 @@ select.sel:focus{border-color:var(--azul)}
     <details open><summary>Por que três jogos por leito é o mínimo?</summary><p>Porque a peça precisa existir em triplicata para o ciclo nunca parar: uma no quarto, uma em lavagem e uma de reserva. Abaixo disso, qualquer atraso na lavanderia ou pico de ocupação vira falta de enxoval.</p></details>
     <details><summary>Como calcular a ocupação média de verdade?</summary><p>Quartos ocupados divididos pelos quartos disponíveis no mesmo período. Com 10 quartos num mês de 30 dias, são 300 diárias disponíveis; se 195 foram vendidas, a ocupação é de 65%. O número do Booking reflete só aquele canal, não a operação inteira, e engana quem dimensiona estoque a partir dele.</p></details>
     <details><summary>O que é o ciclo de lavagem?</summary><p>É o tempo que a peça leva desde que sai suja do quarto até voltar limpa e pronta para uso. Quase ninguém mede, mas é ele que define quantos jogos extras a operação precisa manter enquanto o enxoval está na lavanderia.</p></details>
-    <details><summary>Airbnb, motel e hospitalar seguem a mesma régua do hotel?</summary><p>Não. Cada segmento tem um giro diferente: o motel troca várias vezes ao dia, o Airbnb uma vez por estadia, e o hospitalar tem exigência sanitária própria. Por isso a calculadora muda o PAR e a margem conforme o tipo de operação.</p></details>
+    <details><summary>Airbnb, motel e hospitalar seguem a mesma régua do hotel?</summary><p>Não. Cada segmento tem um giro diferente: o motel troca várias vezes ao dia, o Airbnb uma vez por estadia, e o hospitalar tem exigência sanitária própria. Por isso a calculadora muda o PAR, a margem e o giro conforme o tipo de operação.</p></details>
   </div>
 
   <div class="volta-calc">
@@ -640,7 +659,7 @@ select.sel:focus{border-color:var(--azul)}
 <script>
 /* ========== coeficientes ========== */
 const SEG = {
-  airbnb:     { nome:"Airbnb ou temporada", desc:"Giro por check-in e check-out, lavagem concentrada", par:4, parVol:2, margem:15, ocupacao:50, unid:"unidades", unidSing:"unidade", camasAjuda:"Some as camas de todas as unidades.", banhAjuda:"Um por unidade, em geral.", dicaOcup:"Airbnb e pousada costumam ter menos giro. Se a sua ocupação média é menor que 50%, reduza aqui.", porGiro:"ocupacao" },
+  airbnb:     { nome:"Airbnb ou temporada", desc:"Giro por check-in e check-out, lavagem concentrada", par:3, parVol:2, margem:15, ocupacao:50, unid:"unidades", unidSing:"unidade", camasAjuda:"Some as camas de todas as unidades.", banhAjuda:"Um por unidade, em geral.", dicaOcup:"Airbnb e pousada costumam ter menos giro. Se a sua ocupação média é menor que 50%, reduza aqui.", porGiro:"ocupacao" },
   hotel:      { nome:"Hotel ou pousada", desc:"Governança diária, o hóspede fica alguns dias", par:3, parVol:2, margem:10, ocupacao:50, unid:"quartos", unidSing:"quarto", camasAjuda:"Some as camas de todos os quartos.", banhAjuda:"Um por quarto, em geral.", dicaOcup:"Pousada com pouco giro costuma ficar abaixo de 50%. Se for o seu caso, reduza aqui.", porGiro:"ocupacao" },
   motel:      { nome:"Motel", desc:"Alta rotatividade, troca completa a cada locação", par:5, parVol:2.5, margem:20, locacoes:3, unid:"suítes", unidSing:"suíte", camasAjuda:"Some as camas de todas as suítes.", banhAjuda:"Um por suíte, em geral.", porGiro:"locacoes" },
   hospitalar: { nome:"Hospitalar ou clínica", desc:"Troca diária obrigatória e exigência sanitária", par:5, parVol:2.5, margem:25, ocupacao:75, unid:"quartos", unidSing:"quarto", camasAjuda:"Some os leitos de todos os quartos e enfermarias.", banhAjuda:"Conte todos os banheiros de uso dos pacientes.", porGiro:"ocupacao" }
@@ -650,11 +669,11 @@ const TAM = ["solteiro","casal","queen","king"];
 const FREQ = { diaria:1, alternada:0.5, saida:0.34 };
 const TAT = { interna:1, terceirizada:2.5 };
 const DESCANSO = 1;
-const LINHA = { cama:"Prime", banho:"Prime Plus" };
+const LINHA = { cama:"Confort", banho:"Smart" };  /* linha de entrada: lençol e fronha Confort, toalhas Smart */
 const WHATS = "5519982117472";
 const MSG_GERAL = "Olá! Estou na calculadora de enxoval da Conamore e quero falar com um consultor.";
 
-const state = { segmento:"hotel", leitos:1, banheiros:1, tam:{solteiro:0,casal:1,queen:0,king:0}, ocupacao:null, locacoes:3, lavanderia:"terceirizada", trocaCama:"diaria", trocaToalha:"diaria", compl:{}, passo:0, visto:0 };
+const state = { segmento:"hotel", leitos:1, banheiros:1, tam:{solteiro:0,casal:1,queen:0,king:0}, ocupacao:null, locacoes:3, lavanderia:"terceirizada", trocaCama:"diaria", trocaToalha:"diaria", margem:"com", compl:{}, passo:0, visto:0 };
 const PASSOS = ["Operação","Estrutura","Rotina","Resultado"];
 let ultimo = null;
 
@@ -675,8 +694,11 @@ function tamanhos(){
   if(soma < state.leitos) t.casal += state.leitos - soma;
   return t;
 }
-function calcular(){
-  const s = seg(), m = s.margem/100;
+/* margem: "com" aplica a margem do segmento (metodologia); "sem" entrega só o mínimo, PAR ou giro sem folga.
+   O parâmetro permite calcular o outro cenário só para comparar, sem mexer no estado. */
+function calcular(comMargem = state.margem === "com"){
+  const s = seg(), m = comMargem ? s.margem/100 : 0, mPct = comMargem ? s.margem : 0;
+  const txtM = comMargem ? `mais ${mPct}% de margem de segurança` : 'sem margem (mínimo)';
   const leitos = state.leitos, banheiros = state.banheiros;
   const t = tamanhos();
   const capacidade = TAM.reduce((a,k)=>a+t[k]*CAMA[k].pess,0);
@@ -715,15 +737,15 @@ function calcular(){
   const grupos = [
     { id:"cama", nome:"Cama",
       conta: regra==="giro"
-        ? `${num(leitos)} camas × ${dec(trocasCamaDia,2)} trocas por dia × ${dec(ciclo)} dias de ciclo dão ${dec(giroLeito,2)} jogos por cama, mais ${s.margem}% de margem.`
-        : `${num(leitos)} camas × PAR ${s.par} dão ${num(leitos*s.par)} jogos, mais ${s.margem}% de margem de segurança.`,
+        ? `${num(leitos)} camas × ${dec(trocasCamaDia,2)} trocas por dia × ${dec(ciclo)} dias de ciclo dão ${dec(giroLeito,2)} jogos por cama, ${txtM}.`
+        : `${num(leitos)} camas × PAR ${s.par} dão ${num(leitos*s.par)} jogos, ${txtM}.`,
       itens:itensCama },
     { id:"banho", nome:"Banho",
-      conta: `Toalhas de banho e de rosto: ${num(hospedesDia)} hóspedes por dia × ${virg(trocaT)} troca × ${dec(ciclo)} dias de ciclo, com piso de ${s.par} por banheiro (${num(banheiros)} ${banheiros>1?'banheiros':'banheiro'}). Toalha de piso: ${num(banheiros)} × ${dec(trocasToalhaDia,2)} trocas por dia × ${dec(ciclo)} dias de ciclo. Margem de ${s.margem}%.`,
+      conta: `Toalhas de banho e de rosto: ${num(hospedesDia)} hóspedes por dia × ${virg(trocaT)} troca × ${dec(ciclo)} dias de ciclo, com piso de ${s.par} por banheiro (${num(banheiros)} ${banheiros>1?'banheiros':'banheiro'}). Toalha de piso: ${num(banheiros)} × ${dec(trocasToalhaDia,2)} trocas por dia × ${dec(ciclo)} dias de ciclo. ${comMargem ? `Margem de ${mPct}%.` : "Sem margem (mínimo)."}`,
       itens:[
         ["Toalha de banho", `1 por hóspede · linha ${LINHA.banho}`, banho],
         ["Toalha de rosto", `1 por hóspede · linha ${LINHA.banho}`, banho],
-        ["Toalha de piso", `1 por banheiro por troca`, pisoT]] }
+        ["Toalha de piso", `1 por banheiro por troca · linha ${LINHA.banho}`, pisoT]] }
   ];
   grupos.forEach(g => g.total = g.itens.reduce((a,i)=>a+i[2],0));
   const total = grupos.reduce((a,g)=>a+g.total,0);
@@ -736,7 +758,7 @@ function calcular(){
     { id:"edredom", nome:"Edredom (enchimento)", info:"1,5 por cama", rec:teto(leitos*1.5) },
     { id:"colcha", nome:"Colcha ou cobreleito", info:"acabamento da cama", rec:teto(leitos*s.parVol*(1+m)) }
   ];
-  return { grupos, total, complementos, leitos, banheiros, tam:t, travesseiros, capacidade, hospedesDia, ciclo, regra, giro:teto(giroLeito*leitos), piso:leitos*s.par, ocup:ocupAtual(), banhoPiso:banhoPiso>banhoGiro };
+  return { grupos, total, complementos, leitos, banheiros, tam:t, travesseiros, capacidade, hospedesDia, ciclo, regra, giro:teto(giroLeito*leitos), piso:leitos*s.par, ocup:ocupAtual(), banhoPiso:banhoPiso>banhoGiro, comMargem, margemPct:mPct };
 }
 
 /* ========== whatsapp: sempre com destino; mensagem do cálculo só no resultado ========== */
@@ -819,6 +841,7 @@ function opcoesSegmento(){
 function aplicarSegmento(){
   const s = seg(), porLoc = s.porGiro==="locacoes";
   $('camasAjuda').textContent = s.camasAjuda;
+  $('txtMargemCom').textContent = `+${s.margem}%, a folga da metodologia para alta temporada e descarte`;
   $('banhAjuda').textContent = s.banhAjuda;
   $('blocoOcup').hidden = porLoc;
   $('blocoLoc').hidden = !porLoc;
@@ -829,11 +852,17 @@ function aplicarSegmento(){
     $('ocupAviso').hidden = !s.dicaOcup; $('ocupAviso').textContent = s.dicaOcup || '';
   }
 }
+function setMargem(v, noResultado){
+  state.margem = v;
+  $('opMargem').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed', String(x.dataset.v === v)));
+  notas();
+  if(noResultado){ Object.values(state.compl).forEach(c=>c.qtd = null); desenharResultado(); }
+}
 function notas(){
   const s = seg(), r = calcular(), falta = state.leitos - somaTam();
   const sem = falta > 0 ? ` ${num(falta)} ${falta>1?'camas sem tamanho contam':'cama sem tamanho conta'} como casal.` : '';
   $('notaEstrutura').innerHTML = `<span>São <b>${num(r.leitos)} ${r.leitos>1?'camas':'cama'}</b> para vestir, <b>${num(r.travesseiros)} travesseiros</b> e <b>${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'}</b> para as toalhas.${sem}</span>`;
-  $('notaRotina').innerHTML = `<span>Com lavanderia ${state.lavanderia}, uma peça leva <b>${dec(r.ciclo)} dias</b> para voltar ao quarto, contando o dia de descanso da fibra. Margem de segurança aplicada: <b>${s.margem}%</b>.</span>`;
+  $('notaRotina').innerHTML = `<span>Com lavanderia ${state.lavanderia}, uma peça leva <b>${dec(r.ciclo)} dias</b> para voltar ao quarto, contando o dia de descanso da fibra. ${state.margem==='com' ? `Margem de segurança aplicada: <b>${s.margem}%</b>.` : '<b>Sem margem</b>: o resultado é o mínimo, sem folga para pico ou descarte.'}</span>`;
 }
 const complSel = r => r.complementos.map(c=>{ const e = state.compl[c.id] || {}; return {...c, on:!!e.on, qtd: e.qtd ?? c.rec}; });
 function desenharResultado(){
@@ -855,6 +884,14 @@ function desenharResultado(){
         <ul>${g.itens.map(it=>`<li><span>${it[0]}<em>${it[1]}</em></span><b class="tn">${num(it[2])}</b></li>`).join('')}</ul>
       </div>
     </details>`).join('');
+
+  const outra = calcular(!r.comMargem).total;
+  /* a varredura de <p> vazio do fim da página esconde estes dois no carregamento; ao preencher, voltam a aparecer */
+  $('margemCmp').style.display = $('linhaEnt').style.display = '';
+  $('margemCmp').innerHTML = r.comMargem
+    ? `Com ${r.margemPct}% de margem (metodologia). Só o mínimo, sem margem: <b>${num(outra)}</b> peças. <button type="button" data-margem="sem">Ver sem margem</button>`
+    : `Só o mínimo, sem margem. Com os ${s.margem}% da metodologia: <b>${num(outra)}</b> peças. <button type="button" data-margem="com">Ver com margem</button>`;
+  $('linhaEnt').innerHTML = `<span class="chip"><b>Linha de entrada</b></span><span class="chip">Lençol e fronha <b>${LINHA.cama}</b></span><span class="chip">Toalhas <b>${LINHA.banho}</b></span><em>A linha muda o produto, não a quantidade.</em>`;
 
   desenharCompl(r);
 
@@ -918,7 +955,8 @@ function textoLista(r, cs){
   L.push(`• Banheiros: ${num(r.banheiros)}`);
   L.push(porLoc ? `• Locações por suíte, por dia: ${state.locacoes}` : `• Ocupação média: ${r.ocup}%`);
   L.push(`• Lavanderia: ${state.lavanderia}` + (porLoc ? '' : ` · troca de cama ${TROCA_TXT[state.trocaCama]} · troca de toalha ${TROCA_TXT[state.trocaToalha]}`));
-  L.push(`• Linha: cama ${LINHA.cama}, banho ${LINHA.banho}`);
+  L.push(`• Linha de entrada: lençol ${LINHA.cama}, toalhas ${LINHA.banho}`);
+  L.push(`• Margem: ${r.margemPct ? r.margemPct+'% (metodologia Conamore)' : 'sem margem (mínimo)'}`);
   L.push('');
   L.push(`*Cama e banho: ${num(r.total)} peças*`);
   r.grupos.forEach(g=>{ L.push(`_${g.nome} · ${num(g.total)}_`); L.push(...resumoItens(g)); });
@@ -1089,9 +1127,11 @@ $('compl').addEventListener('click', e=>{
   inp.value = q; state.compl[id] = {...(state.compl[id]||{}), qtd:q};
   atualizarResumo();
 });
+$('margemCmp').addEventListener('click', e=>{ const b = e.target.closest('button[data-margem]'); if(b) setMargem(b.dataset.margem, true); });
 $('ocup').addEventListener('input', e=>{ state.ocupacao = +e.target.value; $('ocupOut').textContent = e.target.value+'%'; notas(); });
 $('trocaCama').addEventListener('change', e=>{ state.trocaCama = e.target.value; notas(); });
 $('trocaToalha').addEventListener('change', e=>{ state.trocaToalha = e.target.value; notas(); });
+$('opMargem').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>setMargem(b.dataset.v, false)));
 $('opLav').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
   $('opLav').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed','false'));
   b.setAttribute('aria-pressed','true'); state.lavanderia = b.dataset.v; notas();

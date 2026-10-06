@@ -15,7 +15,7 @@ Arquivo único, sem dependência de build ou servidor de aplicação.
 
 ## Como funciona o cálculo
 
-O piso é o **PAR**: cada leito precisa de N jogos para a operação nunca parar (1 em uso, 1 na lavanderia, 1 em descanso). Sobre esse piso entram o giro real, o ciclo da lavanderia e uma margem de segurança.
+O piso é o **PAR**: cada leito precisa de N jogos para a operação nunca parar (1 em uso, 1 na lavanderia, 1 em descanso). Sobre esse piso entram o giro real, o ciclo da lavanderia e uma margem de segurança, que a pessoa liga ou desliga no passo 3.
 
 ```
 Cama       jogos por cama = máx( PAR ,  trocas/dia × dias de ciclo );  por tamanho: camas × jogos por cama × (1 + margem)
@@ -30,6 +30,14 @@ Fora da metodologia original (decisão de 30/09/2026): piso de toalhas de banho 
 
 `dias de ciclo = TAT da lavanderia + 1 dia de descanso`
 
+**Margem (decisão de 06/10/2026).** O passo 3 tem duas opções: *com margem* (metodologia: 10% hotel e pousada, 15% Airbnb, 20% motel, 25% hospitalar) e *sem margem* (mínimo: PAR ou giro, sem folga). O resultado mostra o outro cenário ao lado ("Só o mínimo, sem margem: N peças") com um botão para alternar. Padrão: com margem.
+
+**PAR 3 para hotel, pousada e Airbnb** (um em uso, um na lavanderia, um em reposição). Motel e hospitalar seguem em 5.
+
+**Troca diária.** O PAR é o piso e vale para qualquer frequência de troca. A frequência só empurra a cama acima do PAR quando `trocas/dia × ciclo` passa de 3 (ocupação alta com lavanderia terceirizada, por exemplo 100% e troca diária dá 3,5 jogos por cama). Já nas toalhas a frequência muda o número direto, porque o piso é por banheiro e o giro é por hóspede.
+
+**Linha de entrada no resultado:** lençol e fronha Confort, toalhas Smart (constante `LINHA`). A linha muda o produto, não a quantidade.
+
 Quando o giro supera o PAR, a tela avisa qual das duas regras mandou no número.
 
 ## Coeficientes por segmento
@@ -37,7 +45,7 @@ Quando o giro supera o PAR, a tela avisa qual das duas regras mandou no número.
 | Segmento | PAR | Volumosos | Margem | Motor do giro |
 |---|---|---|---|---|
 | Hotel / Pousada | 3 | 2 | 10% | ocupação média (padrão 50%) |
-| Airbnb / Temporada | 4 | 2 | 15% | ocupação média (padrão 50%) |
+| Airbnb / Temporada | 3 | 2 | 15% | ocupação média (padrão 50%) |
 | Motel | 5 | 2,5 | 20% | locações por dia |
 | Hospitalar / Clínica | 5 | 2,5 | 25% | ocupação média |
 
@@ -45,18 +53,18 @@ Motel não usa ocupação: o giro vem do número de locações por suíte por di
 
 ## Casos de regressão
 
-Camas de casal, lavanderia terceirizada, troca diária, ocupação padrão do segmento (50%), salvo indicação:
+Camas de casal, lavanderia terceirizada, troca diária, ocupação padrão do segmento (50%), salvo indicação. Total com margem (padrão) e sem margem (mínimo):
 
-| Cenário | Total |
-|---|---|
-| Hotel, 1 cama, 1 banheiro (padrão inicial da tela) | 25 |
-| Hotel, 2 camas, 1 banheiro | 46 |
-| Hotel, 20 camas, 20 banheiros | 457 |
-| Airbnb, 1 cama, 1 banheiro, só na saída | 29 |
-| Hotel, 50 camas queen, 50 banheiros, 80%, lavanderia própria | 1.100 |
-| Motel, 10 suítes (10 camas, 10 banheiros), 3 locações/dia | 1.134 |
+| Cenário | Com margem | Sem margem |
+|---|---|---|
+| Hotel, 1 cama, 1 banheiro (padrão inicial da tela) | 25 | 22 |
+| Hotel, 2 camas, 1 banheiro | 46 | 40 |
+| Hotel, 20 camas, 20 banheiros | 457 | 415 |
+| Airbnb, 1 cama, 1 banheiro, só na saída (55% de ocupação) | 22 | 19 |
+| Hotel, 50 camas queen, 50 banheiros, 80%, lavanderia própria | 1.100 | 1.000 |
+| Motel, 10 suítes (10 camas, 10 banheiros), 3 locações/dia | 1.134 | 945 |
 
-Rodar esses seis cenários contra o motor (bloco `<script>`, coeficientes no topo) antes de publicar qualquer mudança de fórmula.
+Rodar esses seis cenários, com e sem margem, contra o motor (bloco `<script>`, coeficientes no topo) antes de publicar qualquer mudança de fórmula.
 
 ## Onde mexer
 
@@ -64,7 +72,7 @@ Tudo em `index.html`, num bloco isolado no topo do script:
 
 - `SEG` | coeficientes por segmento
 - `CAMA` | tipos de cama e travesseiros por cama
-- `LINHA` | linha de catálogo recomendada (hoje fixa em Prime / Prime Plus para todos os segmentos)
+- `LINHA` | linha de entrada mostrada no resultado (lençol e fronha Confort, toalhas Smart)
 - `FREQ`, `TAT`, `DESCANSO` | política de troca e ciclo de lavanderia
 - `WHATS` | número de WhatsApp usado em todos os CTAs
 
@@ -74,7 +82,7 @@ A interface (CSS, HTML) não precisa ser tocada para ajustar número nenhum.
 
 - Estado do cálculo não vive mais na URL (o protótipo anterior tinha; esta versão ainda não).
 - Sem seleção de grupos nem ajuste manual de item no resultado (quem só precisa repor toalhas recebe a lista completa).
-- Escolha de linha do catálogo (Essencial/Conforto/Premium) ainda não existe; todo resultado recomenda Prime.
+- Escolha de linha do catálogo ainda não existe; todo resultado mostra a linha de entrada (Confort e Smart). A tabela de lençóis do artigo ainda lista Classic, Prime e Supreme.
 - Coeficientes da tabela acima seguem pendentes de validação final com o comercial.
 - Integração do formulário de captação (modal "Receber por e-mail") com CRM ainda não existe; é só simulação.
 - A página "Montar meu pedido na loja" (compra-rapida) ainda não recebe os produtos calculados via URL; é para decidir numa segunda fase.
