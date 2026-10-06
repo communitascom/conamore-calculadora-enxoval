@@ -851,7 +851,7 @@ function irPara(i){
   state.visto = Math.max(state.visto, i);
   document.querySelectorAll('.passo').forEach(p=>p.classList.toggle('on', +p.dataset.p === i));
   trilho();
-  if(i===3){ Object.values(state.compl).forEach(c=>c.qtd = null); desenharResultado(); } else atualizarWhats(null);
+  if(i===3){ Object.values(state.compl).forEach(c=>c.qtd = null); desenharResultado(); REG.calculo(ultimo, calcular(false).total, calcular(true).total); atualizarWhats(montarMensagem(ultimo, complSel(ultimo).filter(c=>c.on && c.qtd>0))); } else atualizarWhats(null);
   const q = document.querySelector('.quadro');
   if(q.getBoundingClientRect().top < 0) q.scrollIntoView({behavior:'smooth',block:'start'});
   const alvo = i===3 ? document.querySelector('.res-topo') : document.querySelector(`.passo[data-p="${i}"] h2`);
@@ -882,7 +882,7 @@ function aplicarSegmento(){
   }
 }
 function setMargem(v, noResultado){
-  state.margem = v;
+  state.margem = v; if(noResultado) REG.evento('trocar_margem', {margem:v});
   $('opMargem').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed', String(x.dataset.v === v)));
   notas();
   if(noResultado){ Object.values(state.compl).forEach(c=>c.qtd = null); desenharResultado(); }
@@ -912,7 +912,7 @@ function desenharLinhas(){
   $('linhaEnt').style.display = '';
 }
 function trocarLinha(tipo, id){
-  state[tipo] = id;
+  state[tipo] = id; REG.evento('trocar_linha', {tipo, linha:id});
   const abertos = [...document.querySelectorAll('#grupos details[open]')].map(d=>d.dataset.g);
   desenharResultado();
   document.querySelectorAll('#grupos details').forEach(d=>{ d.open = abertos.includes(d.dataset.g); });
@@ -1022,7 +1022,7 @@ function textoLista(r, cs){
   return L.join('\n');
 }
 function montarMensagem(r, cs){
-  return `Olá! Usei a calculadora de enxoval da Conamore Hotelaria e gostaria de uma proposta com estes dados.\n\n${textoLista(r, cs)}\n\nPode me ajudar com valores e prazo?`;
+  return `Olá! Usei a calculadora de enxoval da Conamore Hotelaria e gostaria de uma proposta com estes dados.\n\n${textoLista(r, cs)}\n\nPode me ajudar com valores e prazo?\n\nCódigo do cálculo: ${REG.codigo()}`;
 }
 
 /* ========== excel: cores e fonte da página, logo e links no cabeçalho ========== */
@@ -1117,7 +1117,7 @@ async function baixarExcel(){
 
 /* ========== RD Station: conversão com campos e tags de segmentação ========== */
 /* chave = chave PÚBLICA da conta (RD Station Marketing > Integrações > Chaves de API). Vazia, o envio fica desligado. */
-const RD = { chave:"", identificador:"calculadora-enxoval", url:"https://api.rd.services/platform/conversions" };
+const RD = { chave:"5c6543e148c47703d38aebac8bab6345", identificador:"calculadora-enxoval", url:"https://api.rd.services/platform/conversions" };
 const PORTE = l => l <= 10 ? "Até 10 camas" : (l <= 50 ? "11 a 50 camas" : "Mais de 50 camas");
 function enviarRD(dados){
   if(!RD.chave){ console.warn('RD Station: chave pública não configurada, conversão não enviada.'); return Promise.resolve(false); }
@@ -1131,7 +1131,8 @@ function enviarRD(dados){
     cf_calc_ocupacao: s.porGiro==="locacoes" ? undefined : r.ocup, cf_calc_locacoes: s.porGiro==="locacoes" ? state.locacoes : undefined,
     cf_calc_lavanderia: state.lavanderia, cf_calc_total_pecas: r.total, cf_calc_porte: PORTE(r.leitos),
     cf_calc_complementos: cs.map(c=>`${c.nome}: ${c.qtd}`).join('; ') || undefined,
-    cf_calc_receber_lista: email ? 'Sim' : 'Não',
+    cf_calc_receber_lista: email ? 'Sim' : 'Não', cf_calc_id: REG.codigo(),
+    traffic_source: REG.origem.utm_source || undefined, traffic_medium: REG.origem.utm_medium || undefined, traffic_campaign: REG.origem.utm_campaign || undefined,
     cf_calc_lista: textoLista(r, cs).replace(/[*_]/g,''),
     tags: ['calculadora-enxoval', ...(email ? ['calculadora-enviar-lista'] : []), 'segmento-'+state.segmento, 'porte-'+PORTE(r.leitos).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')],
     legal_bases: [{category:'communications', type:'consent', status:'granted'}]
@@ -1141,6 +1142,62 @@ function enviarRD(dados){
     body: JSON.stringify({event_type:'CONVERSION', event_family:'CDP', payload})
   }).then(res=>res.ok).catch(()=>false);
 }
+
+/* ========== registro: toda consulta, cliques e leads vão para o banco (anônimo; só o lead leva e-mail) ========== */
+const REG = (() => {
+  const URL_REG = "https://ltasijrhkotyyrxnavab.supabase.co/functions/v1/calculadora-registrar";
+  const desligado = /[?&]teste=1\b/.test(location.search);   /* ?teste=1 não grava nada: para QA */
+  const guarda = {
+    ler(k){ try{ return localStorage.getItem(k); }catch(e){ return null; } },
+    gravar(k,v){ try{ localStorage.setItem(k,v); }catch(e){} }
+  };
+  const uuid = () => (crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{ const r=Math.random()*16|0; return (c==='x'?r:(r&3|8)).toString(16); }));
+  const sessao = (() => { let s = null; try{ s = sessionStorage.getItem('calc_sessao'); }catch(e){} if(!s){ s = uuid(); try{ sessionStorage.setItem('calc_sessao', s); }catch(e){} } return s; })();
+  const q = new URLSearchParams(location.search);
+  const utm = k => (q.get(k) || '').trim().slice(0,150) || null;
+  const idClique = ['gclid','gbraid','wbraid','fbclid','msclkid'].map(k=>[k,q.get(k)]).find(x=>x[1]);
+  /* origem: a desta visita (se tiver UTM ou clique de anúncio) vira a "última"; a primeira nunca é sobrescrita */
+  const daVisita = { utm_source:utm('utm_source'), utm_medium:utm('utm_medium'), utm_campaign:utm('utm_campaign'), utm_content:utm('utm_content'), utm_term:utm('utm_term'),
+    click_id_tipo: idClique ? idClique[0] : null, click_id: idClique ? idClique[1].slice(0,300) : null };
+  const temOrigem = !!(daVisita.utm_source || daVisita.utm_medium || daVisita.utm_campaign || daVisita.click_id);
+  let ultima = null, primeira = null;
+  try{ ultima = JSON.parse(guarda.ler('calc_origem_ultima')||'null'); primeira = JSON.parse(guarda.ler('calc_origem_primeira')||'null'); }catch(e){}
+  const refHost = (() => { try{ return document.referrer ? new URL(document.referrer).hostname : null; }catch(e){ return null; } })();
+  if(temOrigem){ ultima = daVisita; guarda.gravar('calc_origem_ultima', JSON.stringify(ultima)); }
+  else if(!ultima && refHost && refHost !== location.hostname){ ultima = { utm_source:refHost, utm_medium:'referral' }; }
+  if(!primeira){ primeira = ultima || { utm_source:'(direto)', utm_medium:'(none)' }; guarda.gravar('calc_origem_primeira', JSON.stringify(primeira)); }
+  const origem = Object.assign({}, ultima || { utm_source:'(direto)', utm_medium:'(none)' }, {
+    primeira_source:primeira.utm_source||null, primeira_medium:primeira.utm_medium||null, primeira_campaign:primeira.utm_campaign||null,
+    referrer: document.referrer ? document.referrer.slice(0,300) : null, url_entrada: (location.origin+location.pathname).slice(0,400) });
+  const aparelho = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'celular' : (/iPad|Tablet/i.test(navigator.userAgent) ? 'tablet' : 'desktop');
+  let calculoId = null, n = 0;
+
+  function enviar(corpo){
+    const dados = Object.assign({ sessao_id:sessao, origem, aparelho, host:location.hostname }, corpo);
+    try{ (window.dataLayer = window.dataLayer || []).push({ event:'calc_'+(corpo.evento || corpo.tipo), calculo_id:calculoId, segmento:corpo.segmento }); }catch(e){}
+    if(desligado) return Promise.resolve(false);
+    return fetch(URL_REG, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(dados), keepalive:true, mode:'cors' }).then(r=>r.ok).catch(()=>false);
+  }
+  return {
+    origem, calculoId: () => calculoId,
+    codigo: () => calculoId ? calculoId.slice(0,6).toUpperCase() : '----',
+    visita(){ enviar({ tipo:'evento', evento:'visita' }); },
+    evento(nome, detalhe){ enviar({ tipo:'evento', evento:nome, calculo_id:calculoId, detalhe }); },
+    calculo(r, comSem, comCom){
+      calculoId = uuid(); n++;
+      const s = seg(), porte = PORTE(r.leitos);
+      enviar({ tipo:'calculo', calculo_id:calculoId, n, segmento:state.segmento, camas:r.leitos, banheiros:r.banheiros, tamanhos:r.tam,
+        ocupacao: s.porGiro==='locacoes' ? null : r.ocup, locacoes: s.porGiro==='locacoes' ? state.locacoes : null,
+        lavanderia:state.lavanderia, troca_cama:state.trocaCama, troca_toalha:state.trocaToalha, margem:state.margem,
+        total_pecas:r.total, total_sem_margem:comSem, total_com_margem:comCom, porte, linha_lencol:state.lencol, linha_toalha:state.toalha, complementos:[] });
+    },
+    lead(dados, rdEnviado){
+      if(!calculoId) return Promise.resolve(false);
+      return enviar({ tipo:'lead', calculo_id:calculoId, nome:dados.nome, email:dados.email, whats:dados.whats, hospedagem:dados.hospedagem, receber_lista:!!dados.receberEmail, rd_enviado:!!rdEnviado });
+    }
+  };
+})();
+REG.visita();
 
 /* ========== eventos ========== */
 document.querySelectorAll('.stepper button[data-alvo]').forEach(b=>b.addEventListener('click',()=>{
@@ -1206,6 +1263,7 @@ function fecharModal(){
   if(abridor && document.contains(abridor)) abridor.focus();
 }
 $('abrirModal').addEventListener('click', abrirModal);
+$('abrirModal').addEventListener('click', ()=>REG.evento('abrir_modal'));
 $('fecharModal').addEventListener('click', fecharModal);
 $('modal').addEventListener('click', e=>{ if(e.target === $('modal')) fecharModal(); });
 $('modal').addEventListener('keydown', e=>{
@@ -1221,13 +1279,20 @@ async function enviar(){
   const bt = $('mEnviar'); bt.disabled = true; bt.textContent = 'Gerando...';
   let ok = true;
   try{ await baixarExcel(); }catch(e){ ok = false; console.warn(e); }
+  REG.evento('baixar_lista', {email: !!dados.receberEmail});
   const enviado = await enviarRD(dados);
+  REG.lead(dados, enviado);
   bt.disabled = false; bt.textContent = 'Baixar Excel';
   fecharModal();
   avisar(!ok ? 'Não foi possível gerar o Excel agora. Fale com a gente pelo WhatsApp.' : (dados.receberEmail && enviado ? 'Pronto! O Excel foi baixado e a lista segue para o seu e-mail.' : 'Pronto! O Excel foi baixado.'));
 }
 function avisar(t){ const el = $('aviso'); el.textContent = t; el.classList.add('on'); clearTimeout(avisar.t); avisar.t = setTimeout(()=>el.classList.remove('on'), 2800); }
 
+document.addEventListener('click', e=>{
+  if(e.target.closest('[data-wa], #btnWa')) REG.evento('whatsapp', {onde: e.target.closest('#btnWa') ? 'resultado' : (state.passo===3 ? 'resultado_outro' : 'passo_'+(state.passo+1))});
+  else if(e.target.closest('#btnLoja')) REG.evento('loja');
+  else if(e.target.closest('.refazer button')) REG.evento('refazer');
+});
 document.querySelectorAll('.passo h2').forEach(h=>h.tabIndex = -1);
 opcoesSegmento(); aplicarSegmento(); notas(); trilho(); atualizarWhats(null);
 document.querySelectorAll("p").forEach(p=>{ if(!p.textContent.trim() && !p.querySelector("img,svg,a,button,input")) p.style.display="none"; });
