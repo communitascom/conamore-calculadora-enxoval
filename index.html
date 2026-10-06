@@ -1127,9 +1127,9 @@ function enviarRD(dados){
   const payload = {
     conversion_identifier: RD.identificador,
     name: dados.nome, email: dados.email, personal_phone: dados.whats, company_name: dados.hospedagem || undefined,
-    cf_calc_segmento: s.nome, cf_calc_camas: r.leitos, cf_calc_banheiros: r.banheiros,
-    cf_calc_ocupacao: s.porGiro==="locacoes" ? undefined : r.ocup, cf_calc_locacoes: s.porGiro==="locacoes" ? state.locacoes : undefined,
-    cf_calc_lavanderia: state.lavanderia, cf_calc_total_pecas: r.total, cf_calc_porte: PORTE(r.leitos),
+    cf_calc_segmento: s.nome, cf_calc_camas: String(r.leitos), cf_calc_banheiros: String(r.banheiros),
+    cf_calc_ocupacao: s.porGiro==="locacoes" ? undefined : String(r.ocup), cf_calc_locacoes: s.porGiro==="locacoes" ? String(state.locacoes) : undefined,
+    cf_calc_lavanderia: state.lavanderia, cf_calc_total_pecas: String(r.total), cf_calc_porte: PORTE(r.leitos),
     cf_calc_complementos: cs.map(c=>`${c.nome}: ${c.qtd}`).join('; ') || undefined,
     cf_calc_receber_lista: email ? 'Sim' : 'Não', cf_calc_id: REG.codigo(),
     traffic_source: REG.origem.utm_source || undefined, traffic_medium: REG.origem.utm_medium || undefined, traffic_campaign: REG.origem.utm_campaign || undefined,
