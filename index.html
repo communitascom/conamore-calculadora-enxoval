@@ -557,7 +557,7 @@ select.sel:focus{border-color:var(--azul)}
   <div class="metodo">
     <div><span class="metodo-icone"><svg viewBox="0 0 24 24"><path d="M12 3 3 8l9 5 9-5-9-5Z"/><path d="M3 13l9 5 9-5"/></svg></span><b>PAR mínimo</b><p>Três jogos por leito: um em uso, um na lavanderia e um em descanso. Hotel, pousada e Airbnb ficam nos três; motel e hospitalar sobem para cinco.</p></div>
     <div><span class="metodo-icone"><svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 0 0-14.8-3.4M4 13a8 8 0 0 0 14.8 3.4"/><path d="M4 4v4.6h4.6M20 20v-4.6h-4.6"/></svg></span><b>Ciclo da peça</b><p>Tempo até a peça voltar ao quarto. Lavanderia própria em cerca de um dia, terceirizada em 2,5, mais um dia de descanso da fibra.</p></div>
-    <div><span class="metodo-icone"><svg viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M19 9l-5 5-3-3-5 5"/></svg></span><b>Giro real</b><p>Quando leitos × trocas por dia × ciclo passa do PAR, quem manda é o giro. A margem cobre alta temporada e descarte.</p></div>
+    <div><span class="metodo-icone"><svg viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M19 9l-5 5-3-3-5 5"/></svg></span><b>Giro real</b><p>Quando trocas por dia × dias de ciclo passam do PAR por cama, quem manda é o giro. A margem cobre alta temporada e descarte.</p></div>
   </div>
   <p class="legal">Estimativa baseada no método PAR e no ciclo de lavanderia informado. A recomendação final deve considerar sazonalidade, política de governança e o estado atual do enxoval.</p>
   </div>
@@ -714,6 +714,7 @@ const dec = (v,d=1) => Number(v).toFixed(d).replace('.',',');
 const virg = v => String(v).replace('.',',');
 /* fator impresso com a precisão que o motor usa (0,255 e não 0,26), para a conta da tela reproduzir o número */
 const fat = v => Math.abs(v*100-Math.round(v*100))<1e-9 ? dec(v,2) : dec(v,3);
+const hf = v => Number.isInteger(v) ? num(v) : String(Math.round(v*100)/100).replace('.',',');
 const plu = (n,s_,p_) => `${num(n)} ${n===1?s_:p_}`;
 const seg = () => SEG[state.segmento];
 const ocupAtual = () => state.ocupacao != null ? state.ocupacao : seg().ocupacao;
@@ -770,7 +771,7 @@ function calcular(comMargem = state.margem === "com"){
   const banho = Math.max(banhoGiro, banhoPiso, banhoHosp);
   const pisoForm = teto(banheiros*trocasToalhaDia*ciclo*(1+m)), pisoMinVale = banheiros > pisoForm;
   const pisoT = Math.max(banheiros, pisoForm);  /* todo banheiro precisa de ao menos 1 toalha de piso */
-  const minVale = banho > banhoGiro && banhoPiso >= banhoHosp, hospVale = banho > banhoGiro && !minVale, nBanh = `${num(banheiros)} ${banheiros>1?'banheiros':'banheiro'}`, nHosp = `${Number.isInteger(hospedesDia)?num(hospedesDia):dec(hospedesDia,1)} ${hospedesDia===1?'hóspede':'hóspedes'}`;
+  const minVale = banho > banhoGiro && banhoPiso >= banhoHosp, hospVale = banho > banhoGiro && !minVale, nBanh = `${num(banheiros)} ${banheiros>1?'banheiros':'banheiro'}`, nHosp = `${hf(hospedesDia)} ${hospedesDia===1?'hóspede':'hóspedes'}`;
   const baseHosp = porLoc ? `${plu(state.locacoes,'locação','locações')} por dia × ${plu(capacidade,'pessoa','pessoas')}` : `${nHosp} por dia × ${virg(trocaT)} troca`;
   const contaBanho = (minVale
       ? `Toalhas de banho e de rosto: o giro de ${baseHosp} × ${dec(ciclo)} dias de ciclo dá ${num(banhoGiro)}, abaixo do mínimo de ${num(banhoPiso)} (${s.par} por banheiro × ${nBanh}). Vale o mínimo.`
@@ -911,7 +912,7 @@ function setMargem(v, noResultado){
 function notas(){
   const s = seg(), r = calcular(), falta = state.leitos - somaTam();
   const sem = falta > 0 ? ` ${num(falta)} ${falta>1?'camas sem tamanho contam':'cama sem tamanho conta'} como casal.` : '';
-  $('notaEstrutura').innerHTML = `<span>São <b>${num(r.leitos)} ${r.leitos>1?'camas':'cama'}</b> para vestir, <b>${num(r.travesseiros)} travesseiros</b> e <b>${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'}</b> para as toalhas.${sem}</span>`;
+  $('notaEstrutura').innerHTML = `<span>São <b>${num(r.leitos)} ${r.leitos>1?'camas':'cama'}</b> para vestir, <b>${plu(r.travesseiros,'travesseiro','travesseiros')}</b> e <b>${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'}</b> para as toalhas.${sem}</span>`;
   $('notaRotina').innerHTML = `<span>Com lavanderia ${state.lavanderia}, uma peça leva <b>${dec(r.ciclo)} dias</b> para voltar ao quarto, contando o dia de descanso da fibra. ${state.margem==='com' ? `Margem de segurança aplicada: <b>${s.margem}%</b>.` : '<b>Sem margem</b>: o resultado é o mínimo, sem folga para pico ou descarte.'}</span>`;
 }
 const complSel = r => r.complementos.map(c=>{ const e = state.compl[c.id] || {}; return {...c, on:!!e.on, qtd: e.qtd ?? c.rec}; });
@@ -944,9 +945,9 @@ function desenharResultado(){
   $('total').textContent = num(r.total);
   $('kLeitos').textContent = num(r.leitos);
   $('kBanh').textContent = num(r.banheiros);
-  $('kHosp').textContent = Number.isInteger(r.hospedesDia) ? num(r.hospedesDia) : dec(r.hospedesDia,1);
+  $('kHosp').textContent = hf(r.hospedesDia);
   $('kCiclo').textContent = dec(r.ciclo)+' dias';
-  const giroTxt = s.porGiro==="locacoes" ? `${state.locacoes} locações por dia` : `ocupação de ${r.ocup}%`;
+  const giroTxt = s.porGiro==="locacoes" ? `${plu(state.locacoes,'locação','locações')} por dia` : `ocupação de ${r.ocup}%`;
   $('contexto').textContent = `${s.nome} · ${num(r.leitos)} ${r.leitos>1?'camas':'cama'} · ${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'} · ${giroTxt} · lavanderia ${state.lavanderia}`;
 
   $('grupos').innerHTML = r.grupos.map((g,i)=>`
@@ -1105,6 +1106,11 @@ async function baixarExcel(){
     });
     ws.getRow(n).height = 21;
   };
+  const explica = t => {
+    n++; ws.mergeCells(`A${n}:D${n}`);
+    cel('A'+n, 'Como chegamos: '+String(t).replace(/<[^>]+>/g,''), {font:F({size:9.5,color:{argb:TINTA2}}), al:{wrapText:true,vertical:'top',indent:1}});
+    ws.getRow(n).height = 62;
+  };
   const subtotal = (rot, q) => {
     n++;
     ws.mergeCells(`A${n}:C${n}`);
@@ -1112,7 +1118,7 @@ async function baixarExcel(){
     cel('D'+n, q, {font:F({bold:true,color:{argb:AZUL}}), fill:SUAVE, al:{horizontal:'right',vertical:'middle'}}).numFmt = '#,##0';
     ws.getRow(n).height = 23;
   };
-  r.grupos.forEach(g=>{ g.itens.forEach(it=>linha(g.nome, it[0], it[1], it[2])); subtotal('Total de '+g.nome.toLowerCase(), g.total); });
+  r.grupos.forEach(g=>{ g.itens.forEach(it=>linha(g.nome, it[0], it[1], it[2])); explica(g.conta); subtotal('Total de '+g.nome.toLowerCase(), g.total); });
   if(cs.length){
     n++; ws.getRow(n).height = 10;
     cs.forEach(c=>linha('Complementos', c.nome, c.info, c.qtd));

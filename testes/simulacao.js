@@ -58,6 +58,14 @@ for(const x of rows){
   // cama: nunca menos que PAR por cama
   const par=E.SEG[x.segmento].par; if(x.cama<x.leitos*par*3) v('I13 cama abaixo do PAR×camas (3 peças por jogo)',x,`cama=${x.cama}`);
 }
+// I16: a conta impressa reproduz o número (hóspedes × troca × ciclo, como aparece no texto)
+for(const x of rows){ if(x.segmento==='motel') continue;
+  const m=x.conta.match(/(?:giro de |: )([\d,]+) hóspedes? por dia × ([\d,]+) troca × ([\d,]+) dias de ciclo(?: dá ([\d.]+))?/);
+  if(!m) continue; const f=t=>parseFloat(t.replace(',','.'));
+  const mg=x.conta.match(/Margem de (\d+)%/); const base=f(m[1])*f(m[2])*f(m[3])*(1+(mg?parseInt(mg[1],10)/100:0));
+  if(m[4]){ if(Math.ceil(base-1e-9)!==parseInt(m[4].replace(/\./g,''),10)) v('I16 conta impressa não reproduz o giro',x,x.conta.slice(0,160)); }
+  else if(Math.ceil(base-1e-9)!==x.toalhaBanho) v('I16 conta impressa não reproduz o número',x,`${m[0]} -> ${x.toalhaBanho}`);
+}
 // monotonicidade: varia uma dimensão por vez e compara
 function vizinho(x,campo,lista,nome,cmp){ const i=lista.indexOf(x[campo]); if(i<0||i+1>=lista.length) return; const y=mapa.get(key({...x,[campo]:lista[i+1]})); if(!y) return; const bad=cmp(x,y); if(bad) v(nome,x,bad+` | ${campo}: ${x[campo]} -> ${lista[i+1]}`); }
 let planoBanh=0, totalBanh=0, planoPiso=0;

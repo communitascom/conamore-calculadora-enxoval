@@ -89,7 +89,7 @@ A interface (CSS, HTML) não precisa ser tocada para ajustar número nenhum.
 
 - Estado do cálculo não vive mais na URL (o protótipo anterior tinha; esta versão ainda não).
 - Sem seleção de grupos nem ajuste manual de item no resultado (quem só precisa repor toalhas recebe a lista completa).
-- Escolha de linha do catálogo ainda não existe; o seletor do resultado só muda o texto, sem preço. A tabela de lençóis do artigo ainda lista só Classic, Prime e Supreme.
+- A escolha de linha existe (seletores de lençol por fios e de toalha por gramatura no resultado), mas só muda o texto, sem preço. A tabela de lençóis do artigo ainda lista só Classic, Prime e Supreme.
 - Coeficientes da tabela acima seguem pendentes de validação final com o comercial.
 - Integração do formulário de captação (modal "Receber por e-mail") com CRM ainda não existe; é só simulação.
 - A página "Montar meu pedido na loja" (compra-rapida) ainda não recebe os produtos calculados via URL; é para decidir numa segunda fase.
@@ -105,7 +105,7 @@ A interface (CSS, HTML) não precisa ser tocada para ajustar número nenhum.
 
 **Container do artigo mais estreito que o do topo.** O bloco de texto (800px) é intencionalmente mais estreito que o grid da calculadora (1120px), para não sobrar vazio ao lado do texto em telas largas.
 
-**"Copiar resumo" virou "Baixar lista completa".** Em vez de copiar texto para a área de transferência, o botão abre o mesmo modal de captação; ao enviar, a pessoa baixa a lista em Excel na hora (via SheetJS, carregado do cdnjs) além de "receber por e-mail" (simulado). Consolida em 1 CTA em vez de 2, e transforma uma ação de baixo valor (copiar) numa de captação de lead.
+**"Copiar resumo" virou "Baixar lista completa".** Em vez de copiar texto para a área de transferência, o botão abre o mesmo modal de captação; ao enviar, a pessoa baixa a lista em Excel na hora (via ExcelJS, carregado do cdnjs, com a conta de cada grupo escrita abaixo dos itens) além de "receber por e-mail". Consolida em 1 CTA em vez de 2, e transforma uma ação de baixo valor (copiar) numa de captação de lead.
 
 **Grades com `minmax(0,1fr)`, nunca `1fr` puro.** Toda `grid-template-columns` da página usa `minmax(0,1fr)` em vez de `1fr` sozinho, porque uma coluna `1fr` sem `minmax` não encolhe abaixo do conteúdo mínimo (min-content) — se o texto de um botão não couber, a grade força a página a ficar mais larga que o container e o `overflow:hidden` do card corta o texto. Foi exatamente esse bug que cortou "Hospitalar ou clínica" nos cards de opção.
 
@@ -117,5 +117,5 @@ HTML, CSS e JavaScript puros num arquivo. Varta via Google Fonts. Logo e as imag
 
 ## Pendências (30/09/2026)
 
-- RD Station: o formulário já monta a conversão (campos `cf_calc_*` e tags `calculadora-enxoval`, `segmento-*`, `porte-*`, `calculadora-enviar-lista`), mas `RD.chave` está vazia. Falta a chave pública da conta e criar os campos personalizados no RD.
+- RD Station: o formulário já monta a conversão (campos `cf_calc_*` e tags `calculadora-enxoval`, `segmento-*`, `porte-*`, `calculadora-enviar-lista`), e `RD.chave` já está preenchida com a chave pública da conta. O modo `?teste=1` desliga só o registro no banco; o envio ao RD continua ativo.
 - Republicar no WordPress (página 3303) e no artifact público.
