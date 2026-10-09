@@ -499,6 +499,7 @@ select.sel:focus{border-color:var(--azul)}
             <select id="trocaToalha" class="sel"><option value="diaria">Diária</option><option value="alternada">Dia sim, dia não</option><option value="saida">Só na saída</option></select>
           </div>
         </div>
+        <p class="sub" id="avisoTroca" hidden>Em hospital e clínica a troca de roupa de cama e de toalhas é diária. É uma exigência sanitária, então não há opção de troca menos frequente.</p>
         <div class="bloco" id="blocoOcup">
           <label class="rotulo" for="ocup">Ocupação média <em id="ocupDica"></em></label>
           <div class="deslize"><input id="ocup" type="range" min="20" max="100" step="5" value="50"><output for="ocup" id="ocupOut" class="tn">50%</output></div>
@@ -677,13 +678,14 @@ const SEG = {
   airbnb:     { nome:"Airbnb ou temporada", desc:"Giro por check-in e check-out, lavagem concentrada", par:3, parVol:2, margem:15, ocupacao:50, unid:"unidades", unidSing:"unidade", camasAjuda:"Some as camas de todas as unidades.", banhAjuda:"Um por unidade, em geral.", dicaOcup:"Airbnb e pousada costumam ter menos giro. Se a sua ocupação média é menor que 50%, reduza aqui.", porGiro:"ocupacao" },
   hotel:      { nome:"Hotel ou pousada", desc:"Governança diária, o hóspede fica alguns dias", par:3, parVol:2, margem:10, ocupacao:50, unid:"quartos", unidSing:"quarto", camasAjuda:"Some as camas de todos os quartos.", banhAjuda:"Um por quarto, em geral.", dicaOcup:"Pousada com pouco giro costuma ficar abaixo de 50%. Se for o seu caso, reduza aqui.", porGiro:"ocupacao" },
   motel:      { nome:"Motel", desc:"Alta rotatividade, troca completa a cada locação", par:5, parVol:2.5, margem:20, locacoes:3, unid:"suítes", unidSing:"suíte", camasAjuda:"Some as camas de todas as suítes.", banhAjuda:"Um por suíte, em geral.", porGiro:"locacoes" },
-  hospitalar: { nome:"Hospitalar ou clínica", desc:"Troca diária obrigatória e exigência sanitária", par:5, parVol:2.5, margem:25, ocupacao:75, unid:"quartos", unidSing:"quarto", camasAjuda:"Some os leitos de todos os quartos e enfermarias.", banhAjuda:"Conte todos os banheiros de uso dos pacientes.", porGiro:"ocupacao" }
+  hospitalar: { nome:"Hospitalar ou clínica", desc:"Troca diária obrigatória e exigência sanitária", trocaDiaria:true, par:5, parVol:2.5, margem:25, ocupacao:75, unid:"quartos", unidSing:"quarto", camasAjuda:"Some os leitos de todos os quartos e enfermarias.", banhAjuda:"Conte todos os banheiros de uso dos pacientes.", porGiro:"ocupacao" }
 };
 const CAMA = { solteiro:{nome:"Solteiro",trav:1,pess:1}, casal:{nome:"Casal",trav:2,pess:2}, queen:{nome:"Queen",trav:2,pess:2}, king:{nome:"King",trav:2,pess:2} };
 const TAM = ["solteiro","casal","queen","king"];
 const FREQ = { diaria:1, alternada:0.5, saida:0.34 };
 const TAT = { interna:1, terceirizada:2.5 };
 const DESCANSO = 1;
+const PAR_CAPA = 3;  /* a capa não troca a cada locação como o lençol: vale o PAR de 3 (em uso, lavanderia, reposição) em todos os segmentos */
 /* linhas do catálogo do site (conamore.com.br). A linha muda o produto, nunca a quantidade. */
 const LENCOIS = [
   {id:"harmony", nome:"Harmony", fios:160, mat:"100% algodão"}, {id:"confort", nome:"Confort", fios:180, mat:"mista"},
@@ -691,7 +693,7 @@ const LENCOIS = [
   {id:"prime", nome:"Prime", fios:200, mat:"100% algodão"}, {id:"supreme", nome:"Supreme", fios:300, mat:"100% algodão"},
   {id:"serenity", nome:"Serenity", fios:400, mat:"100% algodão"} ];
 const TOALHAS = [
-  {id:"smart", nome:"Smart", g:340}, {id:"fit", nome:"Fit", g:350}, {id:"sense", nome:"Sense", g:380}, {id:"suit", nome:"Suit", g:408},
+  {id:"smart", nome:"Smart", g:340}, {id:"fit", nome:"Fit", g:350}, {id:"sense", nome:"Sense", g:380},
   {id:"quality", nome:"Quality", g:410}, {id:"select", nome:"Select", g:440}, {id:"lined", nome:"Lined", g:445}, {id:"frame", nome:"Frame", g:450},
   {id:"confort", nome:"Confort", g:500}, {id:"prime", nome:"Prime", g:500}, {id:"giant", nome:"Giant", g:580}, {id:"imperial", nome:"Imperial", g:600} ];
 const rotLencol = l => `${l.fios} fios | ${l.nome}`;
@@ -710,6 +712,9 @@ const $ = id => document.getElementById(id);
 const num = v => Number(v).toLocaleString('pt-BR');
 const dec = (v,d=1) => Number(v).toFixed(d).replace('.',',');
 const virg = v => String(v).replace('.',',');
+/* fator impresso com a precisão que o motor usa (0,255 e não 0,26), para a conta da tela reproduzir o número */
+const fat = v => Math.abs(v*100-Math.round(v*100))<1e-9 ? dec(v,2) : dec(v,3);
+const plu = (n,s_,p_) => `${num(n)} ${n===1?s_:p_}`;
 const seg = () => SEG[state.segmento];
 const ocupAtual = () => state.ocupacao != null ? state.ocupacao : seg().ocupacao;
 /* arredonda para cima sem que o resíduo do ponto flutuante vire uma peça a mais (50 × 2 × 1,1 dava 111) */
@@ -735,9 +740,10 @@ function calcular(comMargem = state.margem === "com"){
   const ciclo = TAT[state.lavanderia] + DESCANSO;
   const porLoc = s.porGiro === "locacoes";
   const ocup = ocupAtual()/100;
-  const trocasCamaDia   = porLoc ? state.locacoes : FREQ[state.trocaCama]*ocup;
-  const trocasToalhaDia = porLoc ? state.locacoes : FREQ[state.trocaToalha]*ocup;
-  const hospedesDia = porLoc ? Math.round(capacidade*state.locacoes) : Math.round(capacidade*ocup);
+  const fCama = s.trocaDiaria ? FREQ.diaria : FREQ[state.trocaCama], fToalha = s.trocaDiaria ? FREQ.diaria : FREQ[state.trocaToalha];
+  const trocasCamaDia   = porLoc ? state.locacoes : fCama*ocup;
+  const trocasToalhaDia = porLoc ? state.locacoes : fToalha*ocup;
+  const hospedesDia = porLoc ? capacidade*state.locacoes : capacidade*ocup;  /* média exata: só as peças finais arredondam */
 
   /* cama: jogos por leito = maior entre o PAR e o giro; cada tamanho recebe o seu */
   const giroLeito = trocasCamaDia*ciclo;
@@ -757,24 +763,35 @@ function calcular(comMargem = state.margem === "com"){
   });
 
   /* banho: hóspedes pelo giro; piso de PAR por banheiro; toalha de piso por banheiro */
-  const trocaT = porLoc ? 1 : FREQ[state.trocaToalha];
+  const trocaT = porLoc ? 1 : fToalha;
   const banhoGiro = teto(hospedesDia*trocaT*ciclo*(1+m));
   const banhoPiso = teto(banheiros*s.par);
-  const banho = Math.max(banhoGiro, banhoPiso);
-  const pisoT = teto(banheiros*trocasToalhaDia*ciclo*(1+m));
+  const banhoHosp = teto(hospedesDia);  /* no mínimo 1 toalha por hóspede médio */
+  const banho = Math.max(banhoGiro, banhoPiso, banhoHosp);
+  const pisoForm = teto(banheiros*trocasToalhaDia*ciclo*(1+m)), pisoMinVale = banheiros > pisoForm;
+  const pisoT = Math.max(banheiros, pisoForm);  /* todo banheiro precisa de ao menos 1 toalha de piso */
+  const minVale = banho > banhoGiro && banhoPiso >= banhoHosp, hospVale = banho > banhoGiro && !minVale, nBanh = `${num(banheiros)} ${banheiros>1?'banheiros':'banheiro'}`, nHosp = `${Number.isInteger(hospedesDia)?num(hospedesDia):dec(hospedesDia,1)} ${hospedesDia===1?'hóspede':'hóspedes'}`;
+  const baseHosp = porLoc ? `${plu(state.locacoes,'locação','locações')} por dia × ${plu(capacidade,'pessoa','pessoas')}` : `${nHosp} por dia × ${virg(trocaT)} troca`;
+  const contaBanho = (minVale
+      ? `Toalhas de banho e de rosto: o giro de ${baseHosp} × ${dec(ciclo)} dias de ciclo dá ${num(banhoGiro)}, abaixo do mínimo de ${num(banhoPiso)} (${s.par} por banheiro × ${nBanh}). Vale o mínimo.`
+      : hospVale
+      ? `Toalhas de banho e de rosto: o giro de ${baseHosp} × ${dec(ciclo)} dias de ciclo dá ${num(banhoGiro)}, abaixo de 1 por hóspede (${nHosp} por dia, arredondado para cima: ${num(banhoHosp)}). Vale 1 por hóspede.`
+      : `Toalhas de banho e de rosto: ${baseHosp} × ${dec(ciclo)} dias de ciclo.`)
+    + ` Toalha de piso: ${nBanh} × ${fat(trocasToalhaDia)} ${trocasToalhaDia===1?'troca':'trocas'} por dia × ${dec(ciclo)} dias de ciclo. ${comMargem ? `Margem de ${mPct}%.` : "Sem margem (mínimo)."}${pisoMinVale ? ` Vale o mínimo de 1 toalha de piso por banheiro (${num(banheiros)}), porque a conta deu ${num(pisoForm)}.` : ''} Tudo arredondado para cima.`;
+  const subBanho = minVale ? `mínimo de ${s.par} por banheiro · ${LINHA.banho}` : `${porLoc?'1 por pessoa por locação':'1 por hóspede'} · ${LINHA.banho}`;
 
   const grupos = [
     { id:"cama", nome:"Cama",
       conta: regra==="giro"
-        ? `${num(leitos)} camas × ${dec(trocasCamaDia,2)} trocas por dia × ${dec(ciclo)} dias de ciclo dão ${dec(giroLeito,2)} jogos por cama, ${txtM}.`
-        : `${num(leitos)} camas × PAR ${s.par} dão ${num(leitos*s.par)} jogos, ${txtM}.`,
+        ? `${fat(trocasCamaDia)} ${trocasCamaDia===1?'troca':'trocas'} por dia × ${dec(ciclo)} dias de ciclo dão ${fat(giroLeito)} jogos por cama; para ${plu(leitos,'cama','camas')}, ${fat(giroLeito*leitos)} jogos, ${txtM}.`
+        : `PAR de ${s.par} jogos por cama; para ${plu(leitos,'cama','camas')}, ${num(leitos*s.par)} jogos, ${txtM}.`,
       itens:itensCama },
     { id:"banho", nome:"Banho",
-      conta: `Toalhas de banho e de rosto: ${num(hospedesDia)} hóspedes por dia × ${virg(trocaT)} troca × ${dec(ciclo)} dias de ciclo, com piso de ${s.par} por banheiro (${num(banheiros)} ${banheiros>1?'banheiros':'banheiro'}). Toalha de piso: ${num(banheiros)} × ${dec(trocasToalhaDia,2)} trocas por dia × ${dec(ciclo)} dias de ciclo. ${comMargem ? `Margem de ${mPct}%.` : "Sem margem (mínimo)."}`,
+      conta: contaBanho,
       itens:[
-        ["Toalha de banho", `1 por hóspede · ${LINHA.banho}`, banho],
-        ["Toalha de rosto", `1 por hóspede · ${LINHA.banho}`, banho],
-        ["Toalha de piso", `1 por banheiro por troca · ${LINHA.banho}`, pisoT]] }
+        ["Toalha de banho", subBanho, banho],
+        ["Toalha de rosto", subBanho, banho],
+        ["Toalha de piso", `${pisoMinVale ? 'mínimo de 1 por banheiro' : '1 por banheiro por troca'} · ${LINHA.banho}`, pisoT]] }
   ];
   grupos.forEach(g => g.total = g.itens.reduce((a,i)=>a+i[2],0));
   const total = grupos.reduce((a,g)=>a+g.total,0);
@@ -783,11 +800,11 @@ function calcular(comMargem = state.margem === "com"){
   const complementos = [
     { id:"protColchao", nome:"Protetor de colchão", info:"impermeável, 1 em uso + 1 reserva por cama", rec:leitos*2 },
     { id:"protTrav", nome:"Protetor de travesseiro", info:`${num(travesseiros)} travesseiros × 2`, rec:travesseiros*2 },
-    { id:"capa", nome:"Capa de edredom", info:"gira junto com o lençol", rec:teto(leitos*s.par*(1+m)) },
+    { id:"capa", nome:"Capa de edredom", info:"1 em uso, 1 na lavanderia, 1 de reposição por cama", rec:teto(leitos*PAR_CAPA*(1+m)) },
     { id:"edredom", nome:"Edredom (enchimento)", info:"1,5 por cama", rec:teto(leitos*1.5) },
     { id:"colcha", nome:"Colcha ou cobreleito", info:"acabamento da cama", rec:teto(leitos*s.parVol*(1+m)) }
   ];
-  return { grupos, total, complementos, leitos, banheiros, tam:t, travesseiros, capacidade, hospedesDia, ciclo, regra, giro:teto(giroLeito*leitos), piso:leitos*s.par, ocup:ocupAtual(), banhoPiso:banhoPiso>banhoGiro, comMargem, margemPct:mPct };
+  return { grupos, total, complementos, leitos, banheiros, tam:t, travesseiros, capacidade, hospedesDia, ciclo, regra, giro:teto(giroLeito*leitos), piso:leitos*s.par, ocup:ocupAtual(), banhoPiso:minVale, comMargem, margemPct:mPct };
 }
 
 /* ========== whatsapp: sempre com destino; mensagem do cálculo só no resultado ========== */
@@ -803,6 +820,7 @@ function lerInteiro(inp){
   if(!Number.isFinite(v)) return null;
   return Math.min(+inp.max, Math.max(+inp.min, v));
 }
+let tamBase = null;  /* distribuição de antes da digitação: 20 → 2 → 20 volta aos 20 originais */
 function ajustarTam(alvo){
   const soma = TAM.reduce((a,k)=>a+state.tam[k],0);
   if(alvo > soma){ state.tam.casal += alvo - soma; return; }
@@ -831,6 +849,7 @@ function renderTam(){
   st.textContent = falta === 0 ? `· ${num(soma)} de ${num(state.leitos)} distribuídas` : `· faltam ${num(falta)} para distribuir (contam como casal)`;
 }
 function mudarTam(k, valor){
+  tamBase = null;
   const outros = somaTam() - state.tam[k];
   state.tam[k] = Math.max(0, Math.min(valor, state.leitos - outros));
   renderTam(); notas();
@@ -874,7 +893,9 @@ function aplicarSegmento(){
   $('banhAjuda').textContent = s.banhAjuda;
   $('blocoOcup').hidden = porLoc;
   $('blocoLoc').hidden = !porLoc;
-  $('blocoTroca').style.display = porLoc ? 'none' : '';
+  $('blocoTroca').style.display = (porLoc || s.trocaDiaria) ? 'none' : '';
+  $('avisoTroca').hidden = !s.trocaDiaria;
+  if(s.trocaDiaria){ state.trocaCama = state.trocaToalha = 'diaria'; $('trocaCama').value = $('trocaToalha').value = 'diaria'; }
   if(!porLoc){
     $('ocup').value = ocupAtual(); $('ocupOut').textContent = ocupAtual()+'%';
     $('ocupDica').textContent = `· sugerida para ${s.nome.toLowerCase()}: ${s.ocupacao}%`;
@@ -923,7 +944,7 @@ function desenharResultado(){
   $('total').textContent = num(r.total);
   $('kLeitos').textContent = num(r.leitos);
   $('kBanh').textContent = num(r.banheiros);
-  $('kHosp').textContent = num(r.hospedesDia);
+  $('kHosp').textContent = Number.isInteger(r.hospedesDia) ? num(r.hospedesDia) : dec(r.hospedesDia,1);
   $('kCiclo').textContent = dec(r.ciclo)+' dias';
   const giroTxt = s.porGiro==="locacoes" ? `${state.locacoes} locações por dia` : `ocupação de ${r.ocup}%`;
   $('contexto').textContent = `${s.nome} · ${num(r.leitos)} ${r.leitos>1?'camas':'cama'} · ${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'} · ${giroTxt} · lavanderia ${state.lavanderia}`;
@@ -1209,8 +1230,10 @@ document.querySelectorAll('.stepper button[data-alvo]').forEach(b=>b.addEventLis
 }));
 Object.entries(CAMPOS).forEach(([id, chave])=>{
   const aplicar = () => { if(chave==='leitos'){ ajustarTam(state.leitos); renderTam(); } notas(); };
-  $(id).addEventListener('input', e=>{ const v = lerInteiro(e.target); if(v != null){ state[chave] = v; aplicar(); } });
-  $(id).addEventListener('change', e=>{ e.target.value = state[chave] = lerInteiro(e.target) ?? state[chave]; aplicar(); });
+  $(id).addEventListener('input', e=>{ const v = lerInteiro(e.target); if(v != null){
+    if(chave==='leitos'){ if(!tamBase) tamBase = {...state.tam}; state.tam = {...tamBase}; }
+    state[chave] = v; aplicar(); } });
+  $(id).addEventListener('change', e=>{ e.target.value = state[chave] = lerInteiro(e.target) ?? state[chave]; aplicar(); if(chave==='leitos') tamBase = null; });
 });
 document.querySelectorAll('[data-tam]').forEach(b=>b.addEventListener('click',()=>mudarTam(b.dataset.tam, state.tam[b.dataset.tam] + (+b.dataset.d))));
 TAM.forEach(k=>{

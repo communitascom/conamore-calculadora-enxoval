@@ -19,16 +19,18 @@ O piso é o **PAR**: cada leito precisa de N jogos para a operação nunca parar
 
 ```
 Cama       jogos por cama = máx( PAR ,  trocas/dia × dias de ciclo );  por tamanho: camas × jogos por cama × (1 + margem)
-Banho      peças = máx( hóspedes/dia × trocas/dia × dias de ciclo × (1 + margem) ,  banheiros × PAR )
-Piso       toalha de piso = banheiros × trocas/dia × dias de ciclo × (1 + margem)
-Complementos (fora do total)  protetores = camas (ou travesseiros) × 2;  capa = camas × PAR × (1 + margem);  enchimento = camas × 1,5
+Banho      peças = máx( hóspedes/dia × trocas/dia × dias de ciclo × (1 + margem) ,  banheiros × PAR ,  ⌈hóspedes/dia⌉ )   (mínimo de 1 toalha por hóspede, decisão de 09/10/2026)
+Piso       toalha de piso = máx( banheiros ,  banheiros × trocas/dia × dias de ciclo × (1 + margem) )   (mínimo de 1 por banheiro, decisão de 09/10/2026)
+Complementos (fora do total)  protetores = camas (ou travesseiros) × 2;  capa = camas × 3 × (1 + margem)  (PAR 3 em todos os segmentos: a capa não troca a cada locação; decisão de 09/10/2026);  enchimento = camas × 1,5
 ```
 
 Entradas da etapa 2: camas no total, banheiros e a distribuição das camas por tamanho (solteiro 1 pessoa e 1 travesseiro; casal, queen e king 2 e 2). Camas sem tamanho escolhido contam como casal. Hóspedes por dia = capacidade das camas × ocupação. O total do topo é só cama e banho; os complementos são recomendados, marcados e editados pela pessoa, e entram à parte.
 
-Fora da metodologia original (decisão de 30/09/2026): piso de toalhas de banho e rosto por banheiro (banheiros × PAR) e ocupação padrão de 50% para hotel, pousada e Airbnb.
+Fora da metodologia original (decisão de 30/09/2026): mínimo de toalhas de banho e rosto por banheiro (banheiros × PAR) e ocupação padrão de 50% para hotel, pousada e Airbnb. Na explicação do resultado esse mínimo só aparece quando ele passa o giro ("Vale o mínimo"); quando o giro é maior, o texto fala só de hóspedes × trocas × ciclo. A palavra "piso" fica reservada à toalha de piso (tapete de banheiro), para não confundir com o mínimo.
 
 `dias de ciclo = TAT da lavanderia + 1 dia de descanso`
+
+**Hóspedes por dia não é arredondado na conta** (capacidade × ocupação, ex.: 1 casal a 70% = 1,4). Só as peças finais arredondam para cima. **"Só na saída" vale 0,34 troca por dia ocupado**, hipótese equivalente a uma estadia de cerca de 3 noites; a tela não pergunta a duração da estadia e o valor não foi validado com o cliente.
 
 **Margem (decisão de 06/10/2026).** O passo 3 tem duas opções: *com margem* (metodologia: 10% hotel e pousada, 15% Airbnb, 20% motel, 25% hospitalar) e *sem margem* (mínimo: PAR ou giro, sem folga). O resultado mostra o outro cenário ao lado ("Só o mínimo, sem margem: N peças") com um botão para alternar. Padrão: com margem.
 
@@ -36,7 +38,7 @@ Fora da metodologia original (decisão de 30/09/2026): piso de toalhas de banho 
 
 **Troca diária.** O PAR é o piso e vale para qualquer frequência de troca. A frequência só empurra a cama acima do PAR quando `trocas/dia × ciclo` passa de 3 (ocupação alta com lavanderia terceirizada, por exemplo 100% e troca diária dá 3,5 jogos por cama). Já nas toalhas a frequência muda o número direto, porque o piso é por banheiro e o giro é por hóspede.
 
-**Linha no resultado (seletor por dado técnico).** Acima da lista há dois seletores, lençol e fronha por fios (padrão 180 fios | Confort) e toalhas por gramatura (padrão 410 g/m² | Quality). O menu abre ao passar o mouse, focar ou tocar, e lista as linhas do site: lençol Harmony 160, Confort 180, Essence 180, Classic 200, Prime 200, Supreme 300, Serenity 400; toalha Smart 340, Fit 350, Sense 380, Suit 408, Quality 410, Select 440, Lined 445, Frame 450, Confort 500, Prime 500, Giant 580, Imperial 600. A linha muda o produto, não a quantidade, e acompanha o WhatsApp e o Excel (`LENCOIS`, `TOALHAS`).
+**Linha no resultado (seletor por dado técnico).** Acima da lista há dois seletores, lençol e fronha por fios (padrão 180 fios | Confort) e toalhas por gramatura (padrão 410 g/m² | Quality). O menu abre ao passar o mouse, focar ou tocar, e lista as linhas do site: lençol Harmony 160, Confort 180, Essence 180, Classic 200, Prime 200, Supreme 300, Serenity 400; toalha Smart 340, Fit 350, Sense 380, Quality 410, Select 440, Lined 445, Frame 450, Confort 500, Prime 500, Giant 580, Imperial 600. A linha muda o produto, não a quantidade, e acompanha o WhatsApp e o Excel (`LENCOIS`, `TOALHAS`).
 
 Quando o giro supera o PAR, a tela avisa qual das duas regras mandou no número.
 
@@ -65,6 +67,11 @@ Camas de casal, lavanderia terceirizada, troca diária, ocupação padrão do se
 | Motel, 10 suítes (10 camas, 10 banheiros), 3 locações/dia | 1.134 | 945 |
 
 Rodar esses seis cenários, com e sem margem, contra o motor (bloco `<script>`, coeficientes no topo) antes de publicar qualquer mudança de fórmula.
+
+**Hospitalar** não tem opção de frequência de troca: a troca de cama e de toalhas é sempre diária (exigência sanitária), com legenda na tela (decisão de 09/10/2026).
+
+## Simulação
+`node testes/simulacao.js` roda o motor do `index.html` em ~900 mil combinações (grade amostrada, não todos os inteiros) e confere invariantes: totais inteiros, soma, monotonicidade, textos sem NaN, plural e "0 hóspedes". Sem falhas abertas em 09/10/2026. O teste não cobre interface, Excel nem WhatsApp.
 
 ## Onde mexer
 
