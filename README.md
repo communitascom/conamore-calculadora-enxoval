@@ -30,6 +30,8 @@ Fora da metodologia original (decisão de 30/09/2026): mínimo de toalhas de ban
 
 `dias de ciclo = TAT da lavanderia + 1 dia de descanso`
 
+TAT: lavanderia própria 1 dia, terceirizada 2,5 dias (ciclo 2 e 3,5). Frequência de troca por dia ocupado: diária 1, alternada 0,5, só na saída 0,34. Piso aplica a ocupação às trocas. Colcha (volumoso): `⌈camas × volumosos por cama × (1 + margem)⌉`, com volumosos por cama 2 (hotel e Airbnb) e 2,5 (motel e hospitalar). No motel as locações por dia substituem a ocupação na conta de hóspedes (capacidade × locações), sem multiplicar de novo no banho.
+
 **Hóspedes por dia não é arredondado na conta** (capacidade × ocupação, ex.: 1 casal a 70% = 1,4). Só as peças finais arredondam para cima. **"Só na saída" vale 0,34 troca por dia ocupado**, hipótese equivalente a uma estadia de cerca de 3 noites; a tela não pergunta a duração da estadia e o valor não foi validado com o cliente.
 
 **Margem (decisão de 06/10/2026).** O passo 3 tem duas opções: *com margem* (metodologia: 10% hotel e pousada, 15% Airbnb, 20% motel, 25% hospitalar) e *sem margem* (mínimo: PAR ou giro, sem folga). O resultado mostra o outro cenário ao lado ("Só o mínimo, sem margem: N peças") com um botão para alternar. Padrão: com margem.

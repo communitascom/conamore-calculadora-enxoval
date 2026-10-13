@@ -780,7 +780,7 @@ function calcular(comMargem = state.margem === "com"){
       : hospVale
       ? `Toalhas de banho e de rosto: o giro de ${baseHosp} × ${dec(ciclo)} dias de ciclo dá ${num(banhoGiro)}, abaixo de 1 por hóspede (${nHosp} por dia, arredondado para cima: ${num(banhoHosp)}). Vale 1 por hóspede.`
       : `Toalhas de banho e de rosto: ${baseHosp} × ${dec(ciclo)} dias de ciclo.`)
-    + ` Toalha de piso: ${nBanh} × ${fat(trocasToalhaDia)} ${trocasToalhaDia===1?'troca':'trocas'} por dia × ${dec(ciclo)} dias de ciclo. ${comMargem ? `Margem de ${mPct}%.` : "Sem margem (mínimo)."}${pisoMinVale ? ` Vale o mínimo de 1 toalha de piso por banheiro (${num(banheiros)}), porque a conta deu ${num(pisoForm)}.` : ''} Tudo arredondado para cima.${banheiros>2*leitos ? ' Atenção: são mais de 2 banheiros por cama, e são os banheiros que definem este total. Confira se os números estão certos.' : ''}`;
+    + ` Toalha de piso: ${nBanh} × ${fat(trocasToalhaDia)} ${trocasToalhaDia===1?'troca':'trocas'} por dia × ${dec(ciclo)} dias de ciclo. ${comMargem ? `Margem de ${mPct}%.` : "Sem margem (mínimo)."}${pisoMinVale ? ` Vale o mínimo de 1 toalha de piso por banheiro (${num(banheiros)}), porque a conta deu ${num(pisoForm)}.` : ''} Tudo arredondado para cima.${banheiros>2*leitos ? ' Atenção: são mais de 2 banheiros por cama, uma proporção incomum. Confira se os números estão certos.' : ''}`;
   const subBanho = minVale ? `mínimo de ${s.par} por banheiro · ${LINHA.banho}` : `${porLoc?'1 por pessoa por locação':'1 por hóspede'} · ${LINHA.banho}`;
 
   const grupos = [
@@ -914,10 +914,10 @@ function setMargem(v, noResultado){
 function notas(){
   const s = seg(), r = calcular(), falta = state.leitos - somaTam();
   const sem = falta > 0 ? ` ${num(falta)} ${falta>1?'camas sem tamanho contam':'cama sem tamanho conta'} como casal.` : '';
-  $('notaEstrutura').innerHTML = `<span>São <b>${num(r.leitos)} ${r.leitos>1?'camas':'cama'}</b> para vestir, <b>${plu(r.travesseiros,'travesseiro','travesseiros')}</b> e <b>${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'}</b> para as toalhas.${sem}${r.banheiros>2*r.leitos ? ' <b>Atenção:</b> são mais de 2 banheiros por cama, e os banheiros é que definem o total de toalhas. Confira se os números estão certos.' : ''}</span>`;
+  $('notaEstrutura').innerHTML = `<span>São <b>${num(r.leitos)} ${r.leitos>1?'camas':'cama'}</b> para vestir, <b>${plu(r.travesseiros,'travesseiro','travesseiros')}</b> e <b>${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'}</b> para as toalhas.${sem}${r.banheiros>2*r.leitos ? ' <b>Atenção:</b> são mais de 2 banheiros por cama, uma proporção incomum. Confira se os números estão certos.' : ''}</span>`;
   $('notaRotina').innerHTML = `<span>Com lavanderia ${state.lavanderia}, uma peça leva <b>${dec(r.ciclo)} dias</b> para voltar ao quarto, contando o dia de descanso da fibra. ${state.margem==='com' ? `Margem de segurança aplicada: <b>${s.margem}%</b>.` : '<b>Sem margem</b>: o resultado é o mínimo, sem folga para pico ou descarte.'}</span>`;
 }
-const complSel = r => r.complementos.map(c=>{ const e = state.compl[c.id] || {}; return {...c, on:!!e.on, qtd: (e.qtd != null && e.base === c.rec) ? e.qtd : c.rec}; });  /* quantidade editada vale enquanto a recomendação não muda; se camas ou tamanhos mudarem, volta à recomendada */
+const complSel = r => r.complementos.map(c=>{ const e = state.compl[c.id] || {}; if(e.qtd != null && e.base !== c.rec){ e.qtd = null; e.base = null; } return {...c, on:!!e.on, qtd: (e.qtd != null && e.base === c.rec) ? e.qtd : c.rec}; });  /* quantidade editada vale enquanto a recomendação não muda; se camas ou tamanhos mudarem, volta à recomendada */
 /* seletores de linha: pelo dado técnico (fios e g/m²); o menu abre ao passar o mouse, ao focar ou ao tocar */
 function desenharLinhas(){
   const mk = (tipo, rotulo, atual, itens, rot, det) => `
@@ -974,10 +974,10 @@ function desenharResultado(){
   const al = $('alerta');
   if(r.regra==="par"){
     al.className = "alerta ok";
-    al.textContent = `A cama está no PAR mínimo de ${s.par} jogos por cama. O seu giro atual, de ${r.giro} jogos, cabe dentro desse estoque.`;
+    al.textContent = `A cama está no PAR mínimo de ${s.par} jogos por cama. O seu giro atual, de ${plu(r.giro,'jogo','jogos')}, cabe dentro desse estoque.`;
   } else {
     al.className = "alerta atencao";
-    al.textContent = `O seu giro, de ${r.giro} jogos em rotação, passa do PAR mínimo de ${r.piso}. Quem manda aqui é o ciclo da lavanderia: encurtá-lo reduz o estoque necessário.`;
+    al.textContent = `O seu giro, de ${plu(r.giro,'jogo','jogos')} em rotação, passa do PAR mínimo de ${r.piso}. Quem manda aqui é o ciclo da lavanderia: encurtá-lo reduz o estoque necessário.`;
   }
   atualizarResumo();
 }
@@ -1000,7 +1000,7 @@ function atualizarResumo(){
   const tc = $('totalCompl');
   tc.hidden = !soma;
   if(soma) tc.innerHTML = `+ <b>${num(soma)}</b> de complementos selecionados · total geral <b>${num(r.total+soma)}</b> peças`;
-  const el = $('complSel'); if(el) el.textContent = cs.length ? `${cs.length} ${cs.length>1?'selecionados':'selecionado'} · ${num(soma)} peças` : 'nenhum selecionado';
+  const el = $('complSel'); if(el) el.textContent = cs.length ? `${cs.length} ${cs.length>1?'selecionados':'selecionado'} · ${plu(soma,'peça','peças')}` : 'nenhum selecionado';
   atualizarWhats(montarMensagem(r, cs));
 
 }
@@ -1039,7 +1039,7 @@ function textoLista(r, cs){
   r.grupos.forEach(g=>{ L.push(`_${g.nome} · ${num(g.total)}_`); L.push(...resumoItens(g)); });
   if(cs.length){
     const soma = cs.reduce((a,c)=>a+c.qtd,0);
-    L.push(''); L.push(`*Complementos escolhidos: ${num(soma)} peças*`);
+    L.push(''); L.push(`*Complementos escolhidos: ${plu(soma,'peça','peças')}*`);
     cs.forEach(c=>L.push(`• ${c.nome}: ${num(c.qtd)}`));
     L.push(''); L.push(`*Total geral: ${num(r.total+soma)} peças*`);
   }
