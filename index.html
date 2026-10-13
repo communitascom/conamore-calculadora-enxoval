@@ -778,7 +778,7 @@ function calcular(comMargem = state.margem === "com"){
       : hospVale
       ? `Toalhas de banho e de rosto: o giro de ${baseHosp} × ${dec(ciclo)} dias de ciclo dá ${num(banhoGiro)}, abaixo de 1 por hóspede (${nHosp} por dia, arredondado para cima: ${num(banhoHosp)}). Vale 1 por hóspede.`
       : `Toalhas de banho e de rosto: ${baseHosp} × ${dec(ciclo)} dias de ciclo.`)
-    + ` Toalha de piso: ${nBanh} × ${fat(trocasToalhaDia)} ${trocasToalhaDia===1?'troca':'trocas'} por dia × ${dec(ciclo)} dias de ciclo. ${comMargem ? `Margem de ${mPct}%.` : "Sem margem (mínimo)."}${pisoMinVale ? ` Vale o mínimo de 1 toalha de piso por banheiro (${num(banheiros)}), porque a conta deu ${num(pisoForm)}.` : ''} Tudo arredondado para cima.`;
+    + ` Toalha de piso: ${nBanh} × ${fat(trocasToalhaDia)} ${trocasToalhaDia===1?'troca':'trocas'} por dia × ${dec(ciclo)} dias de ciclo. ${comMargem ? `Margem de ${mPct}%.` : "Sem margem (mínimo)."}${pisoMinVale ? ` Vale o mínimo de 1 toalha de piso por banheiro (${num(banheiros)}), porque a conta deu ${num(pisoForm)}.` : ''} Tudo arredondado para cima.${banheiros>2*leitos ? ' Atenção: são mais de 2 banheiros por cama, e são os banheiros que definem este total. Confira se os números estão certos.' : ''}`;
   const subBanho = minVale ? `mínimo de ${s.par} por banheiro · ${LINHA.banho}` : `${porLoc?'1 por pessoa por locação':'1 por hóspede'} · ${LINHA.banho}`;
 
   const grupos = [
@@ -871,7 +871,7 @@ function irPara(i){
   state.visto = Math.max(state.visto, i);
   document.querySelectorAll('.passo').forEach(p=>p.classList.toggle('on', +p.dataset.p === i));
   trilho();
-  if(i===3){ Object.values(state.compl).forEach(c=>c.qtd = null); desenharResultado(); REG.calculo(ultimo, calcular(false).total, calcular(true).total); atualizarWhats(montarMensagem(ultimo, complSel(ultimo).filter(c=>c.on && c.qtd>0))); } else atualizarWhats(null);
+  if(i===3){ desenharResultado(); REG.calculo(ultimo, calcular(false).total, calcular(true).total); atualizarWhats(montarMensagem(ultimo, complSel(ultimo).filter(c=>c.on && c.qtd>0))); } else atualizarWhats(null);
   const q = document.querySelector('.quadro');
   if(q.getBoundingClientRect().top < 0) q.scrollIntoView({behavior:'smooth',block:'start'});
   const alvo = i===3 ? document.querySelector('.res-topo') : document.querySelector(`.passo[data-p="${i}"] h2`);
@@ -907,15 +907,15 @@ function setMargem(v, noResultado){
   state.margem = v; if(noResultado) REG.evento('trocar_margem', {margem:v});
   $('opMargem').querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed', String(x.dataset.v === v)));
   notas();
-  if(noResultado){ Object.values(state.compl).forEach(c=>c.qtd = null); desenharResultado(); }
+  if(noResultado) desenharResultado();
 }
 function notas(){
   const s = seg(), r = calcular(), falta = state.leitos - somaTam();
   const sem = falta > 0 ? ` ${num(falta)} ${falta>1?'camas sem tamanho contam':'cama sem tamanho conta'} como casal.` : '';
-  $('notaEstrutura').innerHTML = `<span>São <b>${num(r.leitos)} ${r.leitos>1?'camas':'cama'}</b> para vestir, <b>${plu(r.travesseiros,'travesseiro','travesseiros')}</b> e <b>${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'}</b> para as toalhas.${sem}</span>`;
+  $('notaEstrutura').innerHTML = `<span>São <b>${num(r.leitos)} ${r.leitos>1?'camas':'cama'}</b> para vestir, <b>${plu(r.travesseiros,'travesseiro','travesseiros')}</b> e <b>${num(r.banheiros)} ${r.banheiros>1?'banheiros':'banheiro'}</b> para as toalhas.${sem}${r.banheiros>2*r.leitos ? ' <b>Atenção:</b> são mais de 2 banheiros por cama, e os banheiros é que definem o total de toalhas. Confira se os números estão certos.' : ''}</span>`;
   $('notaRotina').innerHTML = `<span>Com lavanderia ${state.lavanderia}, uma peça leva <b>${dec(r.ciclo)} dias</b> para voltar ao quarto, contando o dia de descanso da fibra. ${state.margem==='com' ? `Margem de segurança aplicada: <b>${s.margem}%</b>.` : '<b>Sem margem</b>: o resultado é o mínimo, sem folga para pico ou descarte.'}</span>`;
 }
-const complSel = r => r.complementos.map(c=>{ const e = state.compl[c.id] || {}; return {...c, on:!!e.on, qtd: e.qtd ?? c.rec}; });
+const complSel = r => r.complementos.map(c=>{ const e = state.compl[c.id] || {}; return {...c, on:!!e.on, qtd: (e.qtd != null && e.base === c.rec) ? e.qtd : c.rec}; });  /* quantidade editada vale enquanto a recomendação não muda; se camas ou tamanhos mudarem, volta à recomendada */
 /* seletores de linha: pelo dado técnico (fios e g/m²); o menu abre ao passar o mouse, ao focar ou ao tocar */
 function desenharLinhas(){
   const mk = (tipo, rotulo, atual, itens, rot, det) => `
@@ -1255,7 +1255,7 @@ $('compl').addEventListener('change', e=>{
   } else {
     const v = Math.max(0, Math.min(99999, Math.round(Number(String(e.target.value).replace(',','.')))));
     const q = Number.isFinite(v) ? v : c.qtd;
-    state.compl[id] = {...(state.compl[id]||{}), qtd:q}; e.target.value = q;
+    state.compl[id] = {...(state.compl[id]||{}), qtd:q, base:c.rec}; e.target.value = q;
   }
   atualizarResumo();
 });
@@ -1263,7 +1263,7 @@ $('compl').addEventListener('click', e=>{
   const b = e.target.closest('button[data-cq]'); if(!b) return;
   const id = b.dataset.cq, li = b.closest('li'), inp = li.querySelector('input[type=number]');
   const q = Math.max(0, Math.min(99999, (Math.round(Number(inp.value))||0) + (+b.dataset.d)));
-  inp.value = q; state.compl[id] = {...(state.compl[id]||{}), qtd:q};
+  inp.value = q; state.compl[id] = {...(state.compl[id]||{}), qtd:q, base:(complSel(ultimo).find(x=>x.id===id)||{}).rec};
   atualizarResumo();
 });
 $('linhaEnt').addEventListener('click', e=>{
