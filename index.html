@@ -698,6 +698,8 @@ const TOALHAS = [
   {id:"confort", nome:"Confort", g:500}, {id:"prime", nome:"Prime", g:500}, {id:"giant", nome:"Giant", g:580}, {id:"imperial", nome:"Imperial", g:600} ];
 const rotLencol = l => `${l.fios} fios | ${l.nome}`;
 const rotToalha = t => `${t.g} g/m² | ${t.nome}`;
+const descLencol = l => `${l.nome} (${l.fios} fios, ${l.mat})`;
+const descToalha = t => `${t.nome} (${t.g} g/m²)`;
 const lencolAtual = () => LENCOIS.find(l=>l.id===state.lencol) || LENCOIS[1];
 const toalhaAtual = () => TOALHAS.find(t=>t.id===state.toalha) || TOALHAS[4];
 const LINHA = { get cama(){ return rotLencol(lencolAtual()); }, get banho(){ return rotToalha(toalhaAtual()); } };
@@ -1029,8 +1031,8 @@ function textoLista(r, cs){
   L.push(`• Banheiros: ${num(r.banheiros)}`);
   L.push(porLoc ? `• Locações por suíte, por dia: ${state.locacoes}` : `• Ocupação média: ${r.ocup}%`);
   L.push(`• Lavanderia: ${state.lavanderia}` + (porLoc ? '' : ` · troca de cama ${TROCA_TXT[state.trocaCama]} · troca de toalha ${TROCA_TXT[state.trocaToalha]}`));
-  L.push(`• Lençol: ${LINHA.cama}`);
-  L.push(`• Toalhas: ${LINHA.banho}`);
+  L.push(`• Linha de lençol escolhida: ${descLencol(lencolAtual())}`);
+  L.push(`• Linha de toalha escolhida: ${descToalha(toalhaAtual())}`);
   L.push(`• Margem: ${r.margemPct ? r.margemPct+'% (metodologia Conamore)' : 'sem margem (mínimo)'}`);
   L.push('');
   L.push(`*Cama e banho: ${num(r.total)} peças*`);
@@ -1082,8 +1084,8 @@ async function baixarExcel(){
 
   /* resumo */
   ws.mergeCells('A4:D4');
-  cel('A4', $('contexto').textContent, {font:F({size:11,color:{argb:TINTA2}}), al:{wrapText:true,vertical:'middle'}});
-  ws.getRow(4).height = 34;
+  cel('A4', $('contexto').textContent + '\nLinha de lençol escolhida: ' + descLencol(lencolAtual()) + ' · Linha de toalha escolhida: ' + descToalha(toalhaAtual()), {font:F({size:11,color:{argb:TINTA2}}), al:{wrapText:true,vertical:'middle'}});
+  ws.getRow(4).height = 50;
   ws.mergeCells('A5:C5');
   cel('A5', 'Total de cama e banho', {font:F({size:13,bold:true,color:{argb:AZUL}}), fill:SUAVE, al:{vertical:'middle',indent:1}});
   cel('D5', r.total, {font:F({size:16,bold:true,color:{argb:AZUL}}), fill:SUAVE, al:{horizontal:'right',vertical:'middle'}}).numFmt = '#,##0';
