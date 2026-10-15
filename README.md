@@ -93,7 +93,7 @@ A interface (CSS, HTML) não precisa ser tocada para ajustar número nenhum.
 - Sem seleção de grupos nem ajuste manual de item no resultado (quem só precisa repor toalhas recebe a lista completa).
 - A escolha de linha existe (seletores de lençol por fios e de toalha por gramatura no resultado), mas só muda o texto, sem preço. A tabela de lençóis do artigo ainda lista só Classic, Prime e Supreme.
 - Coeficientes da tabela acima seguem pendentes de validação final com o comercial.
-- Integração do formulário de captação (modal "Receber por e-mail") com CRM ainda não existe; é só simulação.
+- Automação no RD para a tag `calculadora-enviar-lista` ainda não existe: o modal promete o e-mail, mas nada é enviado até ela ser criada (modelo em `proposta-email/email-lista-rd.html` no Drive).
 - A página "Montar meu pedido na loja" (compra-rapida) ainda não recebe os produtos calculados via URL; é para decidir numa segunda fase.
 - Popup condicional (mensagem diferente se a pessoa clicou em loja/WhatsApp/e-mail vs. não fez nada) ainda não existe; ideia registrada, sem data.
 
@@ -108,6 +108,14 @@ A interface (CSS, HTML) não precisa ser tocada para ajustar número nenhum.
 **Container do artigo mais estreito que o do topo.** O bloco de texto (800px) é intencionalmente mais estreito que o grid da calculadora (1120px), para não sobrar vazio ao lado do texto em telas largas.
 
 **"Copiar resumo" virou "Baixar lista completa".** Em vez de copiar texto para a área de transferência, o botão abre o mesmo modal de captação; ao enviar, a pessoa baixa a lista em Excel na hora (via ExcelJS, carregado do cdnjs, com a conta de cada grupo escrita abaixo dos itens) além de "receber por e-mail". Consolida em 1 CTA em vez de 2, e transforma uma ação de baixo valor (copiar) numa de captação de lead.
+
+**Lista em PDF ou Excel, escolhida no modal (15/10/2026).** O botão continua um só ("Baixar lista completa"). No modal a pessoa escolhe o formato: PDF já vem marcado (a maior parte do tráfego da campanha é celular, onde o Excel abre mal) e Excel fica como segunda opção, "para ajustar quantidades e montar orçamento". A caixa de e-mail vale para os dois formatos: quem marca recebe o PDF e o Excel. O PDF é gerado no navegador (jsPDF 2.5.1 do cdnjs, fonte Helvetica padrão, só Latin-1) em páginas de 360×640 pt, proporção de tela de celular: capa com o total e o perfil, uma página por grupo com a conta, complementos escolhidos e uma página final com WhatsApp, loja e e-mail clicáveis. ExcelJS e jsPDF carregam sob demanda (`carregar()`), ao abrir o modal ou trocar de formato, e não mais com a página.
+
+**Link da lista.** `linkLista(formato, origem)` põe o cálculo inteiro na URL, sem dado pessoal: `?lista=segmento.camas.banheiros.solteiro-casal-queen-king.ocupacao.locacoes.lavanderia(i|t).trocas(d|a|s ×2).margem(c|s).lencol.toalha.complementos(indice_qtd-...)&c=CODIGO&f=pdf|excel`. Ao abrir, `abrirListaDoLink()` restaura o estado, vai direto ao resultado com o painel "Sua lista está pronta" (o formato do link em destaque) e não grava cálculo novo; o código do cálculo original segue no WhatsApp e no PDF. Na conversão do RD vão `cf_calc_link_pdf` e `cf_calc_link_excel` (com UTM `rd-station / email / calculadora-lista`) e `cf_calc_formato`. O e-mail da automação leva esses links, não anexos, porque o RD não anexa arquivo por contato. Se o motor mudar, um link antigo recalcula com o motor novo.
+
+**Navegador interno de app.** Instagram, Facebook, TikTok e afins (`IN_APP`, pelo user agent) costumam bloquear download. Nesses casos o modal mostra um aviso e deixa o envio por e-mail marcado.
+
+**Registro do formato.** O evento `baixar_lista` leva `{formato, email, in_app, ok}`; no link do e-mail, `{formato, via:'link', codigo, ok}`. O lead também manda `formato`, que a edge function atual ignora até a migração `proposta-design/sql/leads-formato.sql` ser aplicada.
 
 **Grades com `minmax(0,1fr)`, nunca `1fr` puro.** Toda `grid-template-columns` da página usa `minmax(0,1fr)` em vez de `1fr` sozinho, porque uma coluna `1fr` sem `minmax` não encolhe abaixo do conteúdo mínimo (min-content) — se o texto de um botão não couber, a grade força a página a ficar mais larga que o container e o `overflow:hidden` do card corta o texto. Foi exatamente esse bug que cortou "Hospitalar ou clínica" nos cards de opção.
 

@@ -293,6 +293,25 @@ select.sel:focus{border-color:var(--azul)}
 .modal .lgpd-lista{padding:12px 14px;background:var(--azul-suave);border-radius:var(--r-sm);color:var(--tinta-2);font-size:14.5px}
 .modal .lgpd-lista b{color:var(--azul)}
 .modal .lgpd input{accent-color:var(--azul);margin-top:3px;flex:none}
+.modal .formatos{border:0;padding:0;margin:4px 0 0;min-width:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.modal .formatos legend{font-size:14.5px;font-weight:600;color:var(--tinta-2);margin-bottom:7px;padding:0}
+.modal .fmt{position:relative;display:block;border:1.5px solid var(--linha);border-radius:var(--r-sm);padding:11px 12px 11px 37px;cursor:pointer;background:var(--card);line-height:1.3;transition:.15s}
+.modal .fmt:hover{border-color:var(--azul-borda)}
+.modal .fmt input{position:absolute;left:13px;top:14px;margin:0;accent-color:var(--azul)}
+.modal .fmt b{display:block;font-size:16px;color:var(--tinta)}
+.modal .fmt span{display:block;font-size:13px;color:var(--tinta-3);margin-top:2px}
+.modal .fmt.sel{border-color:var(--azul);background:var(--azul-suave)}
+.modal .fmt.sel b{color:var(--azul)}
+.modal .fmt:focus-within{outline:2px solid var(--azul);outline-offset:2px}
+.modal .inapp{font-size:13.5px;line-height:1.4;color:var(--alerta);background:var(--alerta-bg);border-radius:var(--r-sm);padding:10px 12px}
+@media (max-width:380px){.modal .formatos{grid-template-columns:1fr}}
+/* ---------- lista aberta pelo link do e-mail ---------- */
+.pronto{margin-top:14px;border:1.5px solid var(--azul);background:var(--azul-suave);border-radius:var(--r-sm);padding:16px 16px 14px}
+.pronto b.t{display:block;font-size:18px;color:var(--azul);line-height:1.3}
+.pronto p{font-size:15px;color:var(--tinta-2);margin:3px 0 12px;line-height:1.45}
+.pronto .btns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.pronto .btn{height:50px;font-size:16px}
+@media (max-width:380px){.pronto .btns{grid-template-columns:1fr}}
 
 /* ---------- whatsapp flutuante: botão compacto no topo, aparece ao rolar ---------- */
 .wa-flut{position:fixed;top:16px;right:20px;z-index:55;display:flex;align-items:center;gap:9px;background:var(--wa);color:#05391C;border-radius:99px;padding:12px 18px;font-size:15px;font-weight:600;text-decoration:none;box-shadow:0 6px 18px rgba(0,0,0,.22);opacity:0;transform:translateY(-14px);visibility:hidden;pointer-events:none;transition:opacity .2s,transform .2s,visibility .2s}
@@ -530,6 +549,11 @@ select.sel:focus{border-color:var(--azul)}
           </dl>
         </div>
 
+        <div class="pronto" id="pronto" hidden>
+          <b class="t">Sua lista está pronta</b>
+          <p>É o mesmo cálculo que você fez na calculadora. Baixe no formato que preferir.</p>
+          <div class="btns"><button class="btn btn-loja" type="button" data-baixar="pdf">Baixar PDF</button><button class="btn btn-linha" type="button" data-baixar="excel">Baixar Excel</button></div>
+        </div>
         <div class="linha-ent" id="linhaEnt"></div>
         <div class="grupos" id="grupos"></div>
         <section class="compl" id="compl" aria-labelledby="complTit"></section>
@@ -657,21 +681,26 @@ select.sel:focus{border-color:var(--azul)}
   <div class="modal-cx">
     <button class="fechar" type="button" id="fecharModal" aria-label="Fechar">×</button>
     <h3 id="modalTit">Receba a lista completa</h3>
-    <p>Baixe agora a lista item a item em Excel, com a conta de cada número e a linha recomendada para a sua operação. Se quiser, a gente também envia por e-mail.</p>
+    <p>Item a item, com a conta de cada número e a linha recomendada para a sua operação.</p>
     <form onsubmit="event.preventDefault();enviar()">
       <label class="sr" for="mNome">Seu nome</label><input id="mNome" type="text" placeholder="Seu nome" autocomplete="name" required>
       <label class="sr" for="mHosp">Nome da hospedagem</label><input id="mHosp" type="text" placeholder="Nome da hospedagem" autocomplete="organization">
       <label class="sr" for="mEmail">E-mail</label><input id="mEmail" type="email" placeholder="E-mail" autocomplete="email" required>
       <label class="sr" for="mWhats">WhatsApp com DDD</label><input id="mWhats" type="tel" placeholder="WhatsApp com DDD" autocomplete="tel" required>
-      <label class="lgpd lgpd-lista"><input type="checkbox" id="mEmailLista" checked> <span><b>Quero receber a lista por e-mail</b> (além de baixar o Excel agora).</span></label>
+      <fieldset class="formatos" id="mFormatos">
+        <legend>Como você quer a lista agora?</legend>
+        <label class="fmt sel"><input type="radio" name="mFmt" value="pdf" checked><b>PDF</b><span>Para ver no celular e compartilhar</span></label>
+        <label class="fmt"><input type="radio" name="mFmt" value="excel"><b>Excel</b><span>Para ajustar quantidades e montar orçamento</span></label>
+      </fieldset>
+      <p class="inapp" id="mInApp" hidden>Você está no navegador do Instagram ou do Facebook, que às vezes bloqueia downloads. Deixamos marcado o envio por e-mail para garantir que a lista chegue.</p>
+      <label class="lgpd lgpd-lista"><input type="checkbox" id="mEmailLista" checked> <span><b>Quero receber também por e-mail</b> (PDF e Excel).</span></label>
       <label class="lgpd"><input type="checkbox" required> Aceito receber a lista e conteúdos da Conamore Hotelaria. Você pode sair quando quiser.</label>
-      <button class="btn btn-loja" type="submit" id="mEnviar">Baixar Excel</button>
+      <button class="btn btn-loja" type="submit" id="mEnviar">Baixar PDF</button>
     </form>
   </div>
 </div>
 <div class="aviso" id="aviso"></div>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js"></script>
 <script>
 /* ========== coeficientes ========== */
 const SEG = {
@@ -867,13 +896,13 @@ function trilho(){
   }).join('');
   $('trilho').querySelectorAll('button:not(:disabled)').forEach(b=>b.addEventListener('click',()=>irPara(+b.dataset.vai)));
 }
-function irPara(i){
+function irPara(i, semRegistro){
   normalizar();
   state.passo = i;
   state.visto = Math.max(state.visto, i);
   document.querySelectorAll('.passo').forEach(p=>p.classList.toggle('on', +p.dataset.p === i));
   trilho();
-  if(i===3){ desenharResultado(); REG.calculo(ultimo, calcular(false).total, calcular(true).total); atualizarWhats(montarMensagem(ultimo, complSel(ultimo).filter(c=>c.on && c.qtd>0))); } else atualizarWhats(null);
+  if(i===3){ desenharResultado(); if(!semRegistro) REG.calculo(ultimo, calcular(false).total, calcular(true).total); atualizarWhats(montarMensagem(ultimo, complSel(ultimo).filter(c=>c.on && c.qtd>0))); } else atualizarWhats(null);
   const q = document.querySelector('.quadro');
   if(q.getBoundingClientRect().top < 0) q.scrollIntoView({behavior:'smooth',block:'start'});
   const alvo = i===3 ? document.querySelector('.res-topo') : document.querySelector(`.passo[data-p="${i}"] h2`);
@@ -1052,7 +1081,7 @@ function montarMensagem(r, cs){
 /* ========== excel: cores e fonte da página, logo e links no cabeçalho ========== */
 const SITE = "https://www.conamore.com.br", EMAIL = "hotelaria@conamore.com.br";
 async function baixarExcel(){
-  if(typeof ExcelJS === 'undefined') throw new Error('ExcelJS indisponível');
+  await carregar('excel');
   const r = ultimo || calcular();
   const cs = complSel(r).filter(c=>c.on && c.qtd>0);
   const AZUL='FF0A478C', SUAVE='FFEAF1F8', ZEBRA='FFF5F8FA', LINHA='FFE2E9ED', TINTA='FF0A2629', TINTA2='FF54666B', LINK='FF226AA7';
@@ -1139,10 +1168,238 @@ async function baixarExcel(){
   cel('A'+n, 'Gerado em '+new Date().toLocaleDateString('pt-BR')+' · Conamore Hotelaria', {font:F({size:9.5,color:{argb:TINTA2}})});
 
   const buf = await wb.xlsx.writeBuffer();
-  const url = URL.createObjectURL(new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
-  const a = document.createElement('a'); a.href = url; a.download = 'calculadora-enxoval-conamore.xlsx';
-  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  salvar(new Blob([buf], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}), nomeArquivo('xlsx'));
 }
+
+/* ========== bibliotecas sob demanda: PDF e Excel só carregam quando alguém vai baixar ========== */
+const LIBS = {
+  excel: { src:"https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js", ok:()=>typeof ExcelJS !== 'undefined' },
+  pdf:   { src:"https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js", ok:()=>!!(window.jspdf && window.jspdf.jsPDF) }
+};
+const carregando = {};
+function carregar(k){
+  const L = LIBS[k];
+  if(L.ok()) return Promise.resolve();
+  return carregando[k] = carregando[k] || new Promise((res, rej)=>{
+    const sc = document.createElement('script'); sc.src = L.src; sc.async = true;
+    sc.onload = () => L.ok() ? res() : rej(new Error(k+' indisponível'));
+    sc.onerror = () => { delete carregando[k]; sc.remove(); rej(new Error(k+' não carregou')); };
+    document.head.appendChild(sc);
+  });
+}
+function salvar(blob, nome){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = nome;
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url), 30000);
+}
+const nomeArquivo = ext => `lista-enxoval-conamore-${REG.codigo().replace(/-/g,'') || 'calculo'}.${ext}`;
+const baixar = f => f === 'excel' ? baixarExcel() : baixarPDF();
+/* navegador interno de app (Instagram, Facebook, TikTok...): costuma bloquear ou esconder download */
+const IN_APP = /FBAN|FBAV|FB_IAB|FBIOS|Instagram|Line\/|TikTok|musical_ly|BytedanceWebview|LinkedInApp|Snapchat|Pinterest/i.test(navigator.userAgent);
+
+/* ========== link da lista: o cálculo cabe na URL, sem dado pessoal. O e-mail e o PDF apontam para ele ========== */
+const URL_PUBLICA = "https://hotelaria.conamore.com.br/calculadora-roupa-de-cama-de-hotel/";
+const LAV_COD = { interna:'i', terceirizada:'t' }, TROCA_COD = { diaria:'d', alternada:'a', saida:'s' };
+const inverte = o => Object.fromEntries(Object.entries(o).map(([k,v])=>[v,k]));
+function codificarLista(){
+  const r = ultimo || calcular();
+  const cs = complSel(r).map((c,i)=>c.on && c.qtd>0 ? `${i}_${c.qtd}` : null).filter(Boolean);
+  return [state.segmento, state.leitos, state.banheiros, TAM.map(k=>state.tam[k]).join('-'), state.ocupacao ?? '', state.locacoes,
+    LAV_COD[state.lavanderia], TROCA_COD[state.trocaCama] + TROCA_COD[state.trocaToalha], state.margem === 'com' ? 'c' : 's',
+    state.lencol, state.toalha, cs.join('-')].join('.');
+}
+function linkLista(f, origem){
+  const h = location.hostname;
+  const base = (h === 'hotelaria.conamore.com.br' || h === 'communitascom.github.io') ? location.origin + location.pathname : URL_PUBLICA;
+  const q = new URLSearchParams({ lista:codificarLista(), c:REG.codigo().replace(/-/g,''), f });
+  if(origem === 'email'){ q.set('utm_source','rd-station'); q.set('utm_medium','email'); q.set('utm_campaign','calculadora-lista'); }
+  else if(origem === 'pdf'){ q.set('utm_source','lista-pdf'); q.set('utm_medium','pdf'); }
+  return base + '?' + q;
+}
+/* abre a calculadora já no resultado, com o mesmo cálculo; não grava cálculo novo */
+function abrirListaDoLink(){
+  const q = new URLSearchParams(location.search), v = q.get('lista');
+  if(!v) return;
+  const p = v.split('.');
+  if(p.length < 11 || !SEG[p[0]]) return;
+  const lim = (x, inp, d) => { const n = Math.round(Number(x)); return x !== '' && Number.isFinite(n) ? Math.min(+inp.max, Math.max(+inp.min, n)) : d; };
+  state.segmento = p[0];
+  state.leitos = lim(p[1], $('leitos'), 1);
+  state.banheiros = lim(p[2], $('banh'), 1);
+  const t = p[3].split('-').map(x=>Math.max(0, Math.round(Number(x)) || 0));
+  TAM.forEach((k,i)=>{ state.tam[k] = t[i] || 0; });
+  state.ocupacao = p[4] === '' ? null : lim(p[4], $('ocup'), null);
+  state.locacoes = lim(p[5], $('loc'), state.locacoes);
+  state.lavanderia = inverte(LAV_COD)[p[6]] || 'terceirizada';
+  state.trocaCama = inverte(TROCA_COD)[(p[7]||'')[0]] || 'diaria';
+  state.trocaToalha = inverte(TROCA_COD)[(p[7]||'')[1]] || 'diaria';
+  state.lencol = LENCOIS.some(l=>l.id === p[9]) ? p[9] : state.lencol;
+  state.toalha = TOALHAS.some(x=>x.id === p[10]) ? p[10] : state.toalha;
+  REG.adotar(q.get('c'));
+
+  /* a tela passa a mostrar o estado restaurado */
+  $('leitos').value = state.leitos; $('banh').value = state.banheiros; $('loc').value = state.locacoes;
+  $('trocaCama').value = state.trocaCama; $('trocaToalha').value = state.trocaToalha;
+  $('opLav').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed', String(b.dataset.v === state.lavanderia)));
+  opcoesSegmento(); aplicarSegmento();
+  setMargem(p[8] === 's' ? 'sem' : 'com', false);
+  ajustarTam(state.leitos); renderTam();
+  const rec = calcular().complementos;
+  (p[11] || '').split('-').filter(Boolean).forEach(x=>{
+    const [i, qtd] = x.split('_').map(Number), c = rec[i];
+    if(c && Number.isFinite(qtd) && qtd >= 0) state.compl[c.id] = { on:true, qtd:Math.min(99999, Math.round(qtd)), base:c.rec };
+  });
+  state.visto = 3;
+  irPara(3, true);
+  const f = q.get('f') === 'excel' ? 'excel' : 'pdf';
+  const [bPdf, bXls] = ['pdf','excel'].map(k=>document.querySelector(`#pronto [data-baixar="${k}"]`));
+  bPdf.className = 'btn ' + (f === 'pdf' ? 'btn-loja' : 'btn-linha');
+  bXls.className = 'btn ' + (f === 'excel' ? 'btn-loja' : 'btn-linha');
+  if(f === 'excel') bXls.parentNode.insertBefore(bXls, bPdf);
+  $('pronto').hidden = false;
+  carregar(f).catch(()=>{});
+  requestAnimationFrame(()=>document.querySelector('.quadro').scrollIntoView({block:'start'}));
+}
+
+/* ========== PDF: páginas no formato de tela de celular (9:16), um assunto por página ========== */
+async function baixarPDF(){
+  await carregar('pdf');
+  const r = ultimo || calcular(), s = seg(), porLoc = s.porGiro === 'locacoes';
+  const cs = complSel(r).filter(c=>c.on && c.qtd>0), soma = cs.reduce((a,c)=>a+c.qtd,0);
+  const W = 360, H = 640, M = 26, CW = W - 2*M, PE = H - 46;   /* PE: limite antes do rodapé */
+  const doc = new window.jspdf.jsPDF({ unit:'pt', format:[W,H], compress:true });
+  doc.setProperties({ title:'Lista de enxoval · Conamore Hotelaria', author:'Conamore Hotelaria', subject:'Calculadora de enxoval' });
+  doc.setLineHeightFactor(1.3);
+  const AZUL=[10,71,140], SUAVE=[234,241,248], BRANCO=[255,255,255], TINTA=[10,38,41], TINTA2=[84,102,107], TINTA3=[98,114,122], LINHA=[226,233,237], WA=[37,211,102], WA_TXT=[5,57,28];
+  /* a fonte padrão do PDF só tem Latin-1: troca o que ficaria fora */
+  const limpa = t => String(t).replace(/<[^>]+>/g,'').replace(/[•●]/g,'-').replace(/[—–−]/g,'-').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/…/g,'...').replace(/→/g,'>');
+  const fonte = (tam, peso, c) => { doc.setFont('helvetica', peso || 'normal'); doc.setFontSize(tam); doc.setTextColor(...(c || TINTA)); };
+  /* a quebra de linha depende da fonte: mede sempre no tamanho e peso em que o texto vai sair */
+  const linhas = (t, larg, tam, peso) => { doc.setFont('helvetica', peso || 'normal'); doc.setFontSize(tam); return doc.splitTextToSize(limpa(t), larg); };
+  const altura = (n, tam) => n * tam * 1.3;
+  const escreve = (t, x, y, o) => doc.text(Array.isArray(t) ? t : limpa(t), x, y, o || {});
+  const caixa = (x, y, w, h, fill, rad, borda) => { doc.setFillColor(...fill); if(borda){ doc.setDrawColor(...borda); doc.setLineWidth(1.2); } doc.roundedRect(x, y, w, h, rad, rad, borda ? 'FD' : 'F'); };
+  const fio = y => { doc.setDrawColor(...LINHA); doc.setLineWidth(.8); doc.line(M, y, W - M, y); };
+  const data = new Date().toLocaleDateString('pt-BR');
+  let y = 0;
+  const pagina = () => { if(doc.getNumberOfPages() > 1 || y) doc.addPage([W,H]); doc.setFillColor(...AZUL); doc.rect(0, 0, W, 5, 'F'); y = 30; };
+  const titulo = (t, direita) => {
+    fonte(21, 'bold', AZUL); escreve(t, M, y + 18);
+    if(direita){ fonte(12.5, 'bold', TINTA); escreve(direita, W - M, y + 18, {align:'right'}); }
+    y += 32; fio(y); y += 6;
+  };
+  /* item: nome e detalhe à esquerda, quantidade à direita */
+  const item = (nome, det, qtd, cont) => {
+    const ln = linhas(nome, CW - 74, 11.5, 'bold'), ld = det ? linhas(det, CW - 74, 9.5) : [];
+    const h = 12 + altura(ln.length, 11.5) + (ld.length ? altura(ld.length, 9.5) : 0) + 8;
+    if(y + h > PE){ pagina(); titulo(cont); }
+    fonte(11.5, 'bold'); escreve(ln, M, y + 12 + 9);
+    fonte(15, 'bold', AZUL); escreve(num(qtd), W - M, y + 12 + 11, {align:'right'});
+    if(ld.length){ fonte(9.5, 'normal', TINTA3); escreve(ld, M, y + 12 + altura(ln.length, 11.5) + 7); }
+    y += h; fio(y);
+  };
+  const nota = (rot, t, cont) => {
+    const ln = linhas(t, CW - 24, 9.5), h = 18 + 14 + altura(ln.length, 9.5);
+    if(y + 14 + h > PE){ pagina(); titulo(cont); }
+    y += 14; caixa(M, y, CW, h, SUAVE, 10);
+    fonte(10, 'bold', AZUL); escreve(rot, M + 12, y + 18);
+    fonte(9.5, 'normal', TINTA2); escreve(ln, M + 12, y + 33);
+    y += h;
+  };
+  /* botão com link: o retângulo inteiro é clicável */
+  const botao = (rot, sub, url, fundo, cor, borda) => {
+    const h = sub ? 52 : 44;
+    caixa(M, y, CW, h, fundo, 10, borda);
+    fonte(14, 'bold', cor); escreve(rot, W/2, y + (sub ? 22 : 27), {align:'center'});
+    if(sub){ fonte(10, 'normal', cor); escreve(sub, W/2, y + 38, {align:'center'}); }
+    doc.link(M, y, CW, h, {url});
+    y += h + 10;
+  };
+
+  /* 1. capa: total e perfil da operação */
+  pagina();
+  const logo = document.querySelector('.marca img');
+  if(logo && /^data:image\/png;base64,/.test(logo.src) && logo.naturalWidth){
+    const lw = 120, lh = lw * logo.naturalHeight / logo.naturalWidth;
+    doc.addImage(logo.src, 'PNG', M, y, lw, lh);
+  }
+  fonte(9, 'normal', TINTA3); escreve(data, W - M, y + 12, {align:'right'});
+  y += 62;
+  fonte(25, 'bold', AZUL); escreve('Sua lista de enxoval', M, y); y += 20;
+  const ctx = linhas($('contexto').textContent || s.nome, CW, 11);
+  fonte(11, 'normal', TINTA2); escreve(ctx, M, y); y += altura(ctx.length, 11) + 8;
+  const hCard = soma ? 150 : 128;
+  caixa(M, y, CW, hCard, AZUL, 14);
+  fonte(11, 'bold', SUAVE); escreve('CAMA E BANHO', M + 20, y + 28);
+  fonte(52, 'bold', BRANCO); escreve(num(r.total), M + 20, y + 82);
+  const wNum = doc.getTextWidth(num(r.total));
+  fonte(16, 'bold', BRANCO); escreve('peças', M + 28 + wNum, y + 82);
+  fonte(10, 'normal', SUAVE); escreve(r.comMargem ? `com ${r.margemPct}% de margem de segurança (metodologia Conamore)` : 'sem margem: o mínimo, sem folga para pico ou descarte', M + 20, y + 104);
+  if(soma){ fonte(10.5, 'bold', BRANCO); escreve(`+ ${plu(soma,'peça','peças')} de complementos · total geral ${num(r.total + soma)}`, M + 20, y + 128); }
+  y += hCard + 26;
+  fonte(13, 'bold'); escreve('Perfil da operação', M, y); y += 8; fio(y);
+  const tam = TAM.filter(k=>r.tam[k]>0).map(k=>`${num(r.tam[k])} ${CAMA[k].nome.toLowerCase()}`).join(', ');
+  const perfil = [
+    ['Tipo', s.nome],
+    ['Camas', `${num(r.leitos)} (${tam})`],
+    ['Banheiros', num(r.banheiros)],
+    porLoc ? ['Locações', `${plu(state.locacoes,'locação','locações')} por suíte, por dia`] : ['Ocupação', `${r.ocup}% em média`],
+    ['Lavanderia', `${state.lavanderia}, ciclo de ${dec(r.ciclo)} dias`],
+    ...(porLoc ? [] : [['Trocas', `cama ${TROCA_TXT[state.trocaCama]} · toalha ${TROCA_TXT[state.trocaToalha]}`]]),
+    ['Lençol', descLencol(lencolAtual())],
+    ['Toalha', descToalha(toalhaAtual())]
+  ];
+  perfil.forEach(([k,v])=>{
+    const ln = linhas(v, CW - 92, 10.5, 'bold'), h = 10 + altura(ln.length, 10.5) + 4;
+    fonte(10, 'normal', TINTA3); escreve(k, M, y + 10 + 8);
+    fonte(10.5, 'bold'); escreve(ln, M + 92, y + 10 + 8);
+    y += h; fio(y);
+  });
+
+  /* 2. uma página por grupo, com a conta */
+  r.grupos.forEach(g=>{
+    pagina(); titulo(g.nome, `${num(g.total)} peças`);
+    g.itens.forEach(it=>item(it[0], it[1], it[2], g.nome + ' (continuação)'));
+    nota('Como chegamos', g.conta, g.nome + ' (continuação)');
+  });
+
+  /* 3. complementos escolhidos */
+  if(cs.length){
+    pagina(); titulo('Complementos', `${num(soma)} peças`);
+    fonte(9.5, 'normal', TINTA3); escreve('Escolhidos por você. Não entram no total de cama e banho.', M, y + 10); y += 18; fio(y);
+    cs.forEach(c=>item(c.nome, c.info, c.qtd, 'Complementos (continuação)'));
+    y += 14; caixa(M, y, CW, 44, AZUL, 10);
+    fonte(12, 'bold', BRANCO); escreve('Total geral', M + 16, y + 27);
+    fonte(17, 'bold', BRANCO); escreve(`${num(r.total + soma)} peças`, W - M - 16, y + 28, {align:'right'});
+    y += 44;
+  }
+
+  /* 4. próximo passo: contatos clicáveis */
+  pagina(); titulo('Próximo passo');
+  const intro = linhas('Mande esta lista para um consultor da Conamore e receba valores e prazo de entrega. Pelo WhatsApp, a mensagem já vai com o seu cálculo.', CW, 12);
+  fonte(12, 'normal', TINTA2); escreve(intro, M, y + 14); y += altura(intro.length, 12) + 22;
+  botao('Falar no WhatsApp', '(19) 98211-7472', linkWa(montarMensagem(r, cs)), WA, WA_TXT);
+  botao('Montar meu pedido na loja', 'conamore.com.br/compra-rapida', 'https://www.conamore.com.br/compra-rapida', AZUL, BRANCO);
+  botao('Enviar por e-mail', EMAIL, `mailto:${EMAIL}?subject=${encodeURIComponent('Lista da calculadora de enxoval ' + REG.codigo())}`, BRANCO, AZUL, AZUL);
+  y += 4;
+  fonte(11, 'bold', [34,106,167]); escreve('Abrir este cálculo na calculadora', M, y + 12);
+  doc.link(M, y, doc.getTextWidth('Abrir este cálculo na calculadora'), 16, {url: linkLista('pdf', 'pdf')});
+  y += 34;
+  const aviso = linhas('Estimativa baseada no método PAR e no ciclo de lavanderia informado. Sazonalidade, política de governança e estado atual do enxoval podem alterar a recomendação final.', CW, 9);
+  fonte(9, 'normal', TINTA3); escreve(aviso, M, y); y += altura(aviso.length, 9) + 10;
+  fonte(9, 'bold', TINTA3); escreve('Conamore Hotelaria · Enxoval profissional desde 2003', M, y);
+
+  /* rodapé com código e número da página */
+  const tot = doc.getNumberOfPages();
+  for(let i = 1; i <= tot; i++){
+    doc.setPage(i);
+    fonte(8.5, 'normal', TINTA3);
+    escreve(`Código do cálculo ${REG.codigo()}`, M, H - 20);
+    escreve(`${i} de ${tot}`, W - M, H - 20, {align:'right'});
+  }
+  salvar(doc.output('blob'), nomeArquivo('pdf'));
+}
+
 
 /* ========== RD Station: conversão com campos e tags de segmentação ========== */
 /* chave = chave PÚBLICA da conta (RD Station Marketing > Integrações > Chaves de API). Vazia, o envio fica desligado. */
@@ -1161,6 +1418,7 @@ function enviarRD(dados){
     cf_calc_lavanderia: state.lavanderia, cf_calc_total_pecas: String(r.total), cf_calc_porte: PORTE(r.leitos),
     cf_calc_complementos: cs.map(c=>`${c.nome}: ${c.qtd}`).join('; ') || undefined,
     cf_calc_receber_lista: email ? 'Sim' : 'Não', cf_calc_id: REG.codigo(),
+    cf_calc_formato: dados.formato === 'excel' ? 'Excel' : 'PDF', cf_calc_link_pdf: linkLista('pdf','email'), cf_calc_link_excel: linkLista('excel','email'),
     traffic_source: REG.origem.utm_source || undefined, traffic_medium: REG.origem.utm_medium || undefined, traffic_campaign: REG.origem.utm_campaign || undefined,
     cf_calc_lista: textoLista(r, cs).replace(/[*_]/g,''),
     tags: ['calculadora-enxoval', ...(email ? ['calculadora-enviar-lista'] : []), 'segmento-'+state.segmento, 'porte-'+PORTE(r.leitos).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')],
@@ -1199,7 +1457,7 @@ const REG = (() => {
     primeira_source:primeira.utm_source||null, primeira_medium:primeira.utm_medium||null, primeira_campaign:primeira.utm_campaign||null,
     referrer: document.referrer ? document.referrer.slice(0,300) : null, url_entrada: (location.origin+location.pathname).slice(0,400) });
   const aparelho = /Mobi|Android|iPhone/i.test(navigator.userAgent) ? 'celular' : (/iPad|Tablet/i.test(navigator.userAgent) ? 'tablet' : 'desktop');
-  let calculoId = null, n = 0;
+  let calculoId = null, n = 0, codigoLink = null;
 
   function enviar(corpo){
     const dados = Object.assign({ sessao_id:sessao, origem, aparelho, host:location.hostname }, corpo);
@@ -1209,7 +1467,8 @@ const REG = (() => {
   }
   return {
     origem, calculoId: () => calculoId,
-    codigo: () => calculoId ? calculoId.slice(0,6).toUpperCase() : '----',
+    codigo: () => calculoId ? calculoId.slice(0,6).toUpperCase() : (codigoLink || '----'),
+    adotar(c){ if(/^[0-9a-f]{6}$/i.test(c || '')) codigoLink = c.toUpperCase(); },
     visita(){ enviar({ tipo:'evento', evento:'visita' }); },
     evento(nome, detalhe){ enviar({ tipo:'evento', evento:nome, calculo_id:calculoId, detalhe }); },
     calculo(r, comSem, comCom){
@@ -1222,7 +1481,7 @@ const REG = (() => {
     },
     lead(dados, rdEnviado){
       if(!calculoId) return Promise.resolve(false);
-      return enviar({ tipo:'lead', calculo_id:calculoId, nome:dados.nome, email:dados.email, whats:dados.whats, hospedagem:dados.hospedagem, receber_lista:!!dados.receberEmail, rd_enviado:!!rdEnviado });
+      return enviar({ tipo:'lead', calculo_id:calculoId, nome:dados.nome, email:dados.email, whats:dados.whats, hospedagem:dados.hospedagem, receber_lista:!!dados.receberEmail, rd_enviado:!!rdEnviado, formato:dados.formato });
     }
   };
 })();
@@ -1287,7 +1546,20 @@ document.querySelectorAll('[data-vai]').forEach(b=>{ if(!b.closest('#trilho')) b
 /* ========== modal: foco entra, fica e volta para quem abriu ========== */
 let abridor = null;
 function inerte(on){ [...document.body.children].forEach(el=>{ if(el.id!=='modal' && el.id!=='aviso' && el.tagName!=='SCRIPT') el.inert = on; }); }
-function abrirModal(){ abridor = document.activeElement; $('modal').classList.add('on'); inerte(true); $('mNome').focus(); }
+const fmtAtual = () => (document.querySelector('input[name="mFmt"]:checked') || {}).value === 'excel' ? 'excel' : 'pdf';
+const NOME_FMT = { pdf:'PDF', excel:'Excel' };
+function marcarFormato(){
+  const f = fmtAtual();
+  document.querySelectorAll('#mFormatos .fmt').forEach(l=>l.classList.toggle('sel', l.querySelector('input').checked));
+  if(!$('mEnviar').disabled) $('mEnviar').textContent = 'Baixar ' + NOME_FMT[f];
+  carregar(f).catch(()=>{});   /* adianta a biblioteca enquanto a pessoa preenche */
+}
+$('mFormatos').addEventListener('change', marcarFormato);
+function abrirModal(){
+  abridor = document.activeElement; $('modal').classList.add('on'); inerte(true); $('mNome').focus();
+  if(IN_APP){ $('mInApp').hidden = false; $('mEmailLista').checked = true; }
+  marcarFormato();
+}
 function fecharModal(){
   if(!$('modal').classList.contains('on')) return;
   $('modal').classList.remove('on'); inerte(false);
@@ -1306,18 +1578,33 @@ $('modal').addEventListener('keydown', e=>{
 });
 document.addEventListener('keydown', e=>{ if(e.key === 'Escape') fecharModal(); });
 async function enviar(){
-  const dados = { nome:$('mNome').value.trim(), hospedagem:$('mHosp').value.trim(), email:$('mEmail').value.trim(), whats:$('mWhats').value.trim(), receberEmail:$('mEmailLista').checked };
+  const formato = fmtAtual(), nomeF = NOME_FMT[formato];
+  const dados = { nome:$('mNome').value.trim(), hospedagem:$('mHosp').value.trim(), email:$('mEmail').value.trim(), whats:$('mWhats').value.trim(), receberEmail:$('mEmailLista').checked, formato };
   const bt = $('mEnviar'); bt.disabled = true; bt.textContent = 'Gerando...';
   let ok = true;
-  try{ await baixarExcel(); }catch(e){ ok = false; console.warn(e); }
-  REG.evento('baixar_lista', {email: !!dados.receberEmail});
+  try{ await baixar(formato); }catch(e){ ok = false; console.warn(e); }
+  REG.evento('baixar_lista', {email: !!dados.receberEmail, formato, in_app: IN_APP, ok});
   const enviado = await enviarRD(dados);
   REG.lead(dados, enviado);
-  bt.disabled = false; bt.textContent = 'Baixar Excel';
+  bt.disabled = false; bt.textContent = 'Baixar ' + nomeF;
   fecharModal();
-  avisar(!ok ? 'Não foi possível gerar o Excel agora. Fale com a gente pelo WhatsApp.' : (dados.receberEmail && enviado ? 'Pronto! O Excel foi baixado e a lista segue para o seu e-mail.' : 'Pronto! O Excel foi baixado.'));
+  const porEmail = dados.receberEmail && enviado;
+  avisar(!ok
+    ? (porEmail ? `Não conseguimos gerar o ${nomeF} aqui, mas a lista em PDF e Excel segue para o seu e-mail.` : `Não foi possível gerar o ${nomeF} agora. Fale com a gente pelo WhatsApp.`)
+    : IN_APP && porEmail ? `Pronto! Se o ${nomeF} não abrir aqui no app, a lista em PDF e Excel já está a caminho do seu e-mail.`
+    : porEmail ? `Pronto! O ${nomeF} foi baixado e a lista em PDF e Excel segue para o seu e-mail.` : `Pronto! O ${nomeF} foi baixado.`);
 }
-function avisar(t){ const el = $('aviso'); el.textContent = t; el.classList.add('on'); clearTimeout(avisar.t); avisar.t = setTimeout(()=>el.classList.remove('on'), 2800); }
+function avisar(t){ const el = $('aviso'); el.textContent = t; el.classList.add('on'); clearTimeout(avisar.t); avisar.t = setTimeout(()=>el.classList.remove('on'), Math.max(2800, t.length*55)); }
+$('pronto').addEventListener('click', async e=>{
+  const b = e.target.closest('[data-baixar]'); if(!b || b.disabled) return;
+  const f = b.dataset.baixar, txt = b.textContent;
+  b.disabled = true; b.textContent = 'Gerando...';
+  let ok = true;
+  try{ await baixar(f); }catch(err){ ok = false; console.warn(err); }
+  b.disabled = false; b.textContent = txt;
+  REG.evento('baixar_lista', {formato:f, via:'link', codigo:REG.codigo(), ok});
+  avisar(ok ? `Pronto! O ${NOME_FMT[f]} foi baixado.` : 'Não foi possível gerar o arquivo agora. Fale com a gente pelo WhatsApp.');
+});
 
 document.addEventListener('click', e=>{
   if(e.target.closest('[data-wa], #btnWa')) REG.evento('whatsapp', {onde: e.target.closest('#btnWa') ? 'resultado' : (state.passo===3 ? 'resultado_outro' : 'passo_'+(state.passo+1))});
@@ -1326,6 +1613,7 @@ document.addEventListener('click', e=>{
 });
 document.querySelectorAll('.passo h2').forEach(h=>h.tabIndex = -1);
 opcoesSegmento(); aplicarSegmento(); notas(); trilho(); atualizarWhats(null);
+abrirListaDoLink();
 document.querySelectorAll("p").forEach(p=>{ if(!p.textContent.trim() && !p.querySelector("img,svg,a,button,input")) p.style.display="none"; });
 const heroTopo = document.querySelector('.topo-pagina');
 if(heroTopo && 'IntersectionObserver' in window){
