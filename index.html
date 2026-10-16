@@ -1272,7 +1272,7 @@ async function baixarPDF(){
   doc.setLineHeightFactor(1.3);
   const AZUL=[10,71,140], SUAVE=[234,241,248], BRANCO=[255,255,255], TINTA=[10,38,41], TINTA2=[84,102,107], TINTA3=[98,114,122], LINHA=[226,233,237], WA=[37,211,102], WA_TXT=[5,57,28];
   /* a fonte padrão do PDF só tem Latin-1: troca o que ficaria fora */
-  const limpa = t => String(t).replace(/<[^>]+>/g,'').replace(/[•●]/g,'-').replace(/[—–−]/g,'-').replace(/[“”]/g,'"').replace(/[‘’]/g,"'").replace(/…/g,'...').replace(/→/g,'>');
+  const limpa = t => String(t).replace(/<[^>]+>/g,'').replace(/[\u2022\u25CF]/g,'-').replace(/[\u2014\u2013\u2212]/g,'-').replace(/[\u201C\u201D]/g,'"').replace(/[\u2018\u2019]/g,"'").replace(/\u2026/g,'...').replace(/\u2192/g,'>');  /* • ● — – − “ ” ‘ ’ … → */
   const fonte = (tam, peso, c) => { doc.setFont('helvetica', peso || 'normal'); doc.setFontSize(tam); doc.setTextColor(...(c || TINTA)); };
   /* a quebra de linha depende da fonte: mede sempre no tamanho e peso em que o texto vai sair */
   const linhas = (t, larg, tam, peso) => { doc.setFont('helvetica', peso || 'normal'); doc.setFontSize(tam); return doc.splitTextToSize(limpa(t), larg); };
