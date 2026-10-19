@@ -389,6 +389,8 @@ select.sel:focus{border-color:var(--azul)}
 @media (max-width:560px){.rodape{padding:28px 0 32px}}
 .aviso{position:fixed;left:50%;bottom:88px;transform:translateX(-50%) translateY(12px);background:var(--tinta);color:var(--pagina);padding:12px 20px;border-radius:99px;font-size:15px;font-weight:500;opacity:0;transition:.25s;pointer-events:none;z-index:70}
 .aviso.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.aviso.com-acao{pointer-events:auto;display:flex;align-items:center;gap:16px;width:max-content;max-width:min(92vw,520px);border-radius:16px;text-align:left;line-height:1.35}
+.aviso-acao,.aviso-acao:hover,.aviso-acao:focus{flex:none;border:0!important;background:none!important;color:inherit!important;font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:6px 2px}
 
 /* ---------- v2: camas por tamanho, complementos ---------- */
 .sub{font-size:14px;color:var(--tinta-3);line-height:1.4;margin-top:8px;min-height:2.8em}
@@ -704,7 +706,7 @@ select.sel:focus{border-color:var(--azul)}
     </form>
   </div>
 </div>
-<div class="aviso" id="aviso"></div>
+<div class="aviso" id="aviso" role="status"></div>
 
 <script>
 /* ========== coeficientes ========== */
@@ -1592,9 +1594,25 @@ async function enviar(){
   avisar(!ok
     ? (porEmail ? `Não conseguimos gerar o ${nomeF} aqui, mas a lista em PDF e Excel segue para o seu e-mail.` : `Não foi possível gerar o ${nomeF} agora. Fale com a gente pelo WhatsApp.`)
     : IN_APP && porEmail ? `Pronto! Se o ${nomeF} não abrir aqui no app, a lista em PDF e Excel já está a caminho do seu e-mail.`
-    : porEmail ? `Pronto! O ${nomeF} foi baixado e a lista em PDF e Excel segue para o seu e-mail.` : `Pronto! O ${nomeF} foi baixado.`);
+    : porEmail ? `Pronto! O ${nomeF} foi baixado e a lista em PDF e Excel segue para o seu e-mail.` : `Pronto! O ${nomeF} foi baixado.`,
+    ok ? ofereceOutro(formato) : null);
 }
-function avisar(t){ const el = $('aviso'); el.textContent = t; el.classList.add('on'); clearTimeout(avisar.t); avisar.t = setTimeout(()=>el.classList.remove('on'), Math.max(2800, t.length*55)); }
+function avisar(t, acao){
+  const el = $('aviso'); el.textContent = t;
+  if(acao){ const b = document.createElement('button'); b.type = 'button'; b.className = 'aviso-acao'; b.textContent = acao.rot; b.addEventListener('click', () => { el.classList.remove('on'); acao.fn(); }); el.appendChild(b); }
+  el.classList.toggle('com-acao', !!acao); el.classList.add('on');
+  clearTimeout(avisar.t); avisar.t = setTimeout(()=>el.classList.remove('on'), acao ? 14000 : Math.max(2800, t.length*55));
+}
+/* depois do download, oferece o outro formato em um clique (gesto do usuário, então o navegador não bloqueia) */
+function ofereceOutro(formato){
+  const outro = formato === 'pdf' ? 'excel' : 'pdf';
+  return { rot: 'Baixar também em ' + NOME_FMT[outro], fn: async () => {
+    let ok = true;
+    try{ await baixar(outro); }catch(e){ ok = false; console.warn(e); }
+    REG.evento('baixar_lista', {formato:outro, via:'segundo_clique', in_app: IN_APP, ok});
+    avisar(ok ? `Pronto! O ${NOME_FMT[outro]} foi baixado.` : 'Não foi possível gerar o arquivo agora. Fale com a gente pelo WhatsApp.');
+  } };
+}
 $('pronto').addEventListener('click', async e=>{
   const b = e.target.closest('[data-baixar]'); if(!b || b.disabled) return;
   const f = b.dataset.baixar, txt = b.textContent;
