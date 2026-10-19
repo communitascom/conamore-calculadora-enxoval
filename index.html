@@ -1404,6 +1404,7 @@ async function baixarPDF(){
 
 
 /* ========== RD Station: conversão com campos e tags de segmentação ========== */
+/* os campos cf_calc_link_* vão SEM https:// (o e-mail do RD escreve o https:// antes da variável) */
 /* chave = chave PÚBLICA da conta (RD Station Marketing > Integrações > Chaves de API). Vazia, o envio fica desligado. */
 const RD = { chave:"5c6543e148c47703d38aebac8bab6345", identificador:"calculadora-enxoval", url:"https://api.rd.services/platform/conversions" };
 const PORTE = l => l <= 10 ? "Até 10 camas" : (l <= 50 ? "11 a 50 camas" : "Mais de 50 camas");
@@ -1420,7 +1421,7 @@ function enviarRD(dados){
     cf_calc_lavanderia: state.lavanderia, cf_calc_total_pecas: String(r.total), cf_calc_porte: PORTE(r.leitos),
     cf_calc_complementos: cs.map(c=>`${c.nome}: ${c.qtd}`).join('; ') || undefined,
     cf_calc_receber_lista: email ? 'Sim' : 'Não', cf_calc_id: REG.codigo(),
-    cf_calc_formato: dados.formato === 'excel' ? 'Excel' : 'PDF', cf_calc_link_pdf: linkLista('pdf','email'), cf_calc_link_excel: linkLista('excel','email'),
+    cf_calc_formato: dados.formato === 'excel' ? 'Excel' : 'PDF', cf_calc_link_pdf: linkLista('pdf','email').replace(/^https?:\/\//,''), cf_calc_link_excel: linkLista('excel','email').replace(/^https?:\/\//,''),
     traffic_source: REG.origem.utm_source || undefined, traffic_medium: REG.origem.utm_medium || undefined, traffic_campaign: REG.origem.utm_campaign || undefined,
     cf_calc_lista: textoLista(r, cs).replace(/[*_]/g,''),
     tags: ['calculadora-enxoval', ...(email ? ['calculadora-enviar-lista'] : []), 'segmento-'+state.segmento, 'porte-'+PORTE(r.leitos).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')],
