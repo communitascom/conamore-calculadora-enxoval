@@ -1215,7 +1215,7 @@ function linkLista(f, origem){
   const h = location.hostname;
   const base = (h === 'hotelaria.conamore.com.br' || h === 'communitascom.github.io') ? location.origin + location.pathname : URL_PUBLICA;
   const q = new URLSearchParams({ lista:codificarLista(), c:REG.codigo().replace(/-/g,''), f });
-  if(origem === 'email'){ q.set('utm_source','rd-station'); q.set('utm_medium','email'); q.set('utm_campaign','calculadora-lista'); }
+  if(origem === 'email'){ q.set('utm_source','rd-station'); q.set('utm_medium','email'); q.set('utm_campaign','calculadora-lista'); q.set('auto','1'); }
   else if(origem === 'pdf'){ q.set('utm_source','lista-pdf'); q.set('utm_medium','pdf'); }
   return base + '?' + q;
 }
@@ -1260,7 +1260,8 @@ function abrirListaDoLink(){
   bXls.className = 'btn ' + (f === 'excel' ? 'btn-loja' : 'btn-linha');
   if(f === 'excel') bXls.parentNode.insertBefore(bXls, bPdf);
   $('pronto').hidden = false;
-  carregar(f).catch(()=>{});
+  /* link vindo do e-mail (auto=1): baixa o arquivo na hora; se o navegador bloquear, o botão em destaque faz o mesmo com um clique */
+  carregar(f).then(()=>{ if(q.get('auto') === '1') (f === 'excel' ? bXls : bPdf).click(); }).catch(()=>{});
   requestAnimationFrame(()=>document.querySelector('.quadro').scrollIntoView({block:'start'}));
 }
 
