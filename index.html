@@ -1330,6 +1330,7 @@ function abrirListaDoLink(){
 
   /* link vindo do e-mail (auto=1): baixa o arquivo na hora; se o navegador bloquear, o botão em destaque faz o mesmo com um clique */
   const auto = q.get('auto') === '1';
+  REG.evento('abriu_lista', { formato:f, auto, origem:(q.get('utm_medium') || 'direto').slice(0,30), in_app:IN_APP, ...(/^[0-9A-Fa-f]{6}$/.test(cod) ? { codigo:cod.toUpperCase() } : {}) });
   if(auto) $('lpStatus').textContent = `Estamos baixando o ${NOME_FMT[f]}. Se não começar em instantes, toque em “Baixar ${NOME_FMT[f]}”.`;
   carregar(f).then(()=>{ if(auto) (f === 'excel' ? lXls : lPdf).click(); }).catch(()=>{});
 }
