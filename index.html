@@ -438,7 +438,59 @@ select.sel:focus{border-color:var(--azul)}
 .ck em{display:block;font-style:normal;font-size:14px;color:var(--tinta-3)}
 .compl li.off .stepper{opacity:.45}
 @media(max-width:560px){.grade4{grid-template-columns:repeat(2,minmax(0,1fr))}.compl li{grid-template-columns:minmax(0,1fr)}.compl .stepper{max-width:150px}}
+
+/* tela "lista pronta": quem chega pelo link do e-mail ou do PDF vê só o cálculo dele e os arquivos, sem formulário */
+body.lp-ativo .topo-pagina,body.lp-ativo .apos,body.lp-ativo .conteudo,body.lp-ativo .relacionados,body.lp-ativo .wa-flut{display:none!important}
+.lista-pronta[hidden]{display:none}
+.lista-pronta{padding:34px 0 64px}
+.lp-wrap{max-width:640px}
+.lp-wrap .marca{margin-bottom:26px}
+.lp-cartao{background:var(--card);border:1px solid var(--linha);border-radius:var(--r);box-shadow:var(--sombra);overflow:hidden}
+.lp-topo{background:var(--azul-fundo);color:#fff;padding:28px 32px 24px}
+.lp-topo h1{font-size:clamp(25px,4.6vw,32px);line-height:1.15;font-weight:700;margin:0 0 8px;color:#fff}
+.lp-topo p{margin:0;font-size:16px;line-height:1.5;color:rgba(255,255,255,.9)}
+.lp-resumo{padding:22px 32px 18px;border-bottom:1px solid var(--linha-2)}
+.lp-num{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.lp-num strong{font-size:clamp(40px,8vw,54px);line-height:1;font-weight:700;color:var(--azul)}
+.lp-num span{font-size:16px;color:var(--tinta-2)}
+.lp-ctx{margin:8px 0 0;font-size:15px;line-height:1.5;color:var(--tinta-2)}
+.lp-cod{margin:6px 0 0;font-size:13px;color:var(--tinta-3)}
+.lp-baixar{padding:20px 32px 6px}
+.lp-baixar h2{font-size:18px;margin:0 0 4px;color:var(--tinta);line-height:1.3}
+.lp-status{margin:0 0 12px;font-size:15px;line-height:1.45;color:var(--tinta-2)}
+.lp-btns{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-top:12px}
+.lp-btns>p{display:contents}
+.lp-esp{padding:18px 32px 8px}
+.lp-esp p{margin:0 0 10px;font-size:15px;line-height:1.5;color:var(--tinta-2)}
+.lp-ajuste{padding:6px 32px 24px;margin:0!important;font-size:15px;color:var(--tinta-3)}
+@media (max-width:620px){.lp-topo,.lp-resumo,.lp-baixar,.lp-esp{padding-left:18px;padding-right:18px}.lp-ajuste{padding-left:18px;padding-right:18px}.lp-btns{grid-template-columns:1fr}}
 </style></head><body>
+<section class="lista-pronta" id="listaPronta" hidden aria-labelledby="lpTit">
+  <div class="wrap lp-wrap">
+    <div id="lpMarca"></div>
+    <div class="lp-cartao">
+      <div class="lp-topo">
+        <h1 id="lpTit" tabindex="-1">Sua lista de enxoval está pronta</h1>
+        <p>É o cálculo que você fez na calculadora da Conamore. Não precisa preencher nada de novo: é só baixar os arquivos.</p>
+      </div>
+      <div class="lp-resumo">
+        <div class="lp-num"><strong id="lpTotal">0</strong><span>peças de cama e banho</span></div>
+        <p class="lp-ctx" id="lpCtx"></p>
+        <p class="lp-cod" id="lpCod" hidden></p>
+      </div>
+      <div class="lp-baixar">
+        <h2>Baixe a sua lista</h2>
+        <p class="lp-status" id="lpStatus" role="status" aria-live="polite">Escolha o formato. O PDF é bom para ler e compartilhar, e o Excel para ajustar as quantidades.</p>
+        <div class="lp-btns" id="prontoLista"><button class="btn btn-loja" type="button" data-baixar="pdf">Baixar PDF</button><button class="btn btn-linha" type="button" data-baixar="excel">Baixar Excel</button></div>
+      </div>
+      <div class="lp-esp">
+        <p>Quer valores, prazo de entrega ou revisar a lista com alguém? Um especialista confere com você e ajusta para a sua operação.</p>
+        <a class="btn btn-wa" id="lpWa" href="https://wa.me/5519982117472" target="_blank" rel="noopener" data-wa>Falar com um especialista</a>
+      </div>
+      <p class="refazer lp-ajuste">Quer mudar algum dado? <button type="button" id="lpAbrir">Abrir a calculadora com este cálculo</button></p>
+    </div>
+  </div>
+</section>
 <section class="topo-pagina">
   <div class="wrap">
 
@@ -1260,9 +1312,26 @@ function abrirListaDoLink(){
   bXls.className = 'btn ' + (f === 'excel' ? 'btn-loja' : 'btn-linha');
   if(f === 'excel') bXls.parentNode.insertBefore(bXls, bPdf);
   $('pronto').hidden = false;
+
+  /* tela própria: o cálculo dele já está feito, só falta baixar os arquivos */
+  const [lPdf, lXls] = ['pdf','excel'].map(k=>document.querySelector(`#prontoLista [data-baixar="${k}"]`));
+  lPdf.className = 'btn ' + (f === 'pdf' ? 'btn-loja' : 'btn-linha');
+  lXls.className = 'btn ' + (f === 'excel' ? 'btn-loja' : 'btn-linha');
+  if(f === 'excel') lXls.parentNode.insertBefore(lXls, lPdf);
+  const marca = document.querySelector('.topo-pagina .marca');
+  if(marca) $('lpMarca').appendChild(marca.cloneNode(true));
+  $('lpTotal').textContent = $('total').textContent;
+  $('lpCtx').textContent = $('contexto').textContent;
+  const cod = REG.codigo().replace(/-/g,'');
+  if(/^[0-9A-Fa-f]{6}$/.test(cod)){ $('lpCod').textContent = 'Cálculo nº ' + cod.toUpperCase(); $('lpCod').hidden = false; }
+  $('lpWa').href = 'https://wa.me/5519982117472?text=' + encodeURIComponent('Olá! Recebi minha lista da calculadora de enxoval' + (/^[0-9A-Fa-f]{6}$/.test(cod) ? ' (código ' + cod.toUpperCase() + ')' : '') + ' e quero falar com um especialista.\n\n' + $('total').textContent + ' peças de cama e banho. ' + $('contexto').textContent);
+  document.body.classList.add('lp-ativo'); $('listaPronta').hidden = false;
+  window.scrollTo(0, 0);
+
   /* link vindo do e-mail (auto=1): baixa o arquivo na hora; se o navegador bloquear, o botão em destaque faz o mesmo com um clique */
-  carregar(f).then(()=>{ if(q.get('auto') === '1') (f === 'excel' ? bXls : bPdf).click(); }).catch(()=>{});
-  requestAnimationFrame(()=>document.querySelector('.quadro').scrollIntoView({block:'start'}));
+  const auto = q.get('auto') === '1';
+  if(auto) $('lpStatus').textContent = `Estamos baixando o ${NOME_FMT[f]}. Se não começar em instantes, toque em “Baixar ${NOME_FMT[f]}”.`;
+  carregar(f).then(()=>{ if(auto) (f === 'excel' ? lXls : lPdf).click(); }).catch(()=>{});
 }
 
 /* logo em alta (960 px, original da identidade visual) só para PDF e Excel; o da página fica leve */
@@ -1614,7 +1683,7 @@ function ofereceOutro(formato){
     avisar(ok ? `Pronto! O ${NOME_FMT[outro]} foi baixado.` : 'Não foi possível gerar o arquivo agora. Fale com a gente pelo WhatsApp.');
   } };
 }
-$('pronto').addEventListener('click', async e=>{
+const cliqueBaixar = async e=>{
   const b = e.target.closest('[data-baixar]'); if(!b || b.disabled) return;
   const f = b.dataset.baixar, txt = b.textContent;
   b.disabled = true; b.textContent = 'Gerando...';
@@ -1623,10 +1692,20 @@ $('pronto').addEventListener('click', async e=>{
   b.disabled = false; b.textContent = txt;
   REG.evento('baixar_lista', {formato:f, via:'link', codigo:REG.codigo(), ok});
   avisar(ok ? `Pronto! O ${NOME_FMT[f]} foi baixado.` : 'Não foi possível gerar o arquivo agora. Fale com a gente pelo WhatsApp.');
+  if(document.body.classList.contains('lp-ativo')){
+    const outro = f === 'pdf' ? 'excel' : 'pdf';
+    $('lpStatus').textContent = ok ? `Pronto! O ${NOME_FMT[f]} foi baixado. Se quiser, baixe também o ${NOME_FMT[outro]}.` : 'Não foi possível gerar o arquivo agora. Toque no botão para tentar de novo ou fale com um especialista.';
+  }
+};
+$('pronto').addEventListener('click', cliqueBaixar);
+$('prontoLista').addEventListener('click', cliqueBaixar);
+$('lpAbrir').addEventListener('click', ()=>{
+  document.body.classList.remove('lp-ativo'); $('listaPronta').hidden = true;
+  requestAnimationFrame(()=>document.querySelector('.quadro').scrollIntoView({block:'start'}));
 });
 
 document.addEventListener('click', e=>{
-  if(e.target.closest('[data-wa], #btnWa')) REG.evento('whatsapp', {onde: e.target.closest('#btnWa') ? 'resultado' : (state.passo===3 ? 'resultado_outro' : 'passo_'+(state.passo+1))});
+  if(e.target.closest('[data-wa], #btnWa')) REG.evento('whatsapp', {onde: e.target.closest('#lpWa') ? 'lista_pronta' : e.target.closest('#btnWa') ? 'resultado' : (state.passo===3 ? 'resultado_outro' : 'passo_'+(state.passo+1))});
   else if(e.target.closest('#btnLoja')) REG.evento('loja');
   else if(e.target.closest('.refazer button')) REG.evento('refazer');
 });
