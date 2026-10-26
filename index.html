@@ -788,6 +788,7 @@ const TAM = ["solteiro","casal","queen","king"];
 const FREQ = { diaria:1, alternada:0.5, saida:0.34 };
 const TAT = { interna:1, terceirizada:2.5 };
 const DESCANSO = 1;
+const PISO_MIN = 2;  /* toalha de piso: uma em uso e uma de reserva por banheiro */
 const PAR_CAPA = 3;  /* a capa não troca a cada locação como o lençol: vale o PAR de 3 (em uso, lavanderia, reposição) em todos os segmentos */
 /* linhas do catálogo do site (conamore.com.br). A linha muda o produto, nunca a quantidade. */
 const LENCOIS = [
@@ -871,20 +872,17 @@ function calcular(comMargem = state.margem === "com"){
   /* banho: hóspedes pelo giro; piso de PAR por banheiro; toalha de piso por banheiro */
   const trocaT = porLoc ? 1 : fToalha;
   const banhoGiro = teto(hospedesDia*trocaT*ciclo*(1+m));
-  const banhoPiso = teto(banheiros*s.par);
-  const banhoHosp = teto(hospedesDia);  /* no mínimo 1 toalha por hóspede médio */
-  const banho = Math.max(banhoGiro, banhoPiso, banhoHosp);
-  const pisoForm = teto(banheiros*trocasToalhaDia*ciclo*(1+m)), pisoMinVale = banheiros > pisoForm;
-  const pisoT = Math.max(banheiros, pisoForm);  /* todo banheiro precisa de ao menos 1 toalha de piso */
-  const minVale = banho > banhoGiro && banhoPiso >= banhoHosp, hospVale = banho > banhoGiro && !minVale, nBanh = `${num(banheiros)} ${banheiros>1?'banheiros':'banheiro'}`, nHosp = `${hf(hospedesDia)} ${hospedesDia===1?'hóspede':'hóspedes'}`;
+  const banhoPiso = itensCama.filter(i=>i[3]==='Fronha').reduce((a,i)=>a+i[2],0);  /* a toalha de banho segue as fronhas (1 por pessoa, com o mesmo PAR e a mesma margem): o estoque cobre a casa cheia e a ocupação média só dimensiona o giro */
+  const banho = Math.max(banhoGiro, banhoPiso);
+  const pisoForm = teto(banheiros*trocasToalhaDia*ciclo*(1+m)), pisoMin = banheiros*PISO_MIN, pisoMinVale = pisoMin > pisoForm;
+  const pisoT = Math.max(pisoMin, pisoForm);  /* todo banheiro precisa de uma toalha de piso em uso e uma de reserva */
+  const minVale = banho > banhoGiro, nBanh = `${num(banheiros)} ${banheiros>1?'banheiros':'banheiro'}`, nHosp = `${hf(hospedesDia)} ${hospedesDia===1?'hóspede':'hóspedes'}`;
   const baseHosp = porLoc ? `${plu(state.locacoes,'locação','locações')} por dia × ${plu(capacidade,'pessoa','pessoas')}` : `${nHosp} por dia × ${virg(trocaT)} troca`;
   const contaBanho = (minVale
-      ? `Toalhas de banho e de rosto: o giro de ${baseHosp} × ${dec(ciclo)} dias de ciclo dá ${num(banhoGiro)}, abaixo do mínimo de ${num(banhoPiso)} (${s.par} por banheiro × ${nBanh}). Vale o mínimo.`
-      : hospVale
-      ? `Toalhas de banho e de rosto: o giro de ${baseHosp} × ${dec(ciclo)} dias de ciclo dá ${num(banhoGiro)}, abaixo de 1 por hóspede (${nHosp} por dia, arredondado para cima: ${num(banhoHosp)}). Vale 1 por hóspede.`
+      ? `Toalhas de banho e de rosto: o giro de ${baseHosp} × ${dec(ciclo)} dias de ciclo dá ${num(banhoGiro)}, abaixo da quantidade de fronhas, ${num(banhoPiso)} (1 por pessoa, ${plu(capacidade,'pessoa','pessoas')} na casa cheia, com o mesmo PAR da cama). A toalha acompanha as fronhas. Vale o mínimo.`
       : `Toalhas de banho e de rosto: ${baseHosp} × ${dec(ciclo)} dias de ciclo.`)
-    + ` Toalha de piso: ${nBanh} × ${fat(trocasToalhaDia)} ${trocasToalhaDia===1?'troca':'trocas'} por dia × ${dec(ciclo)} dias de ciclo. ${comMargem ? `Margem de ${mPct}%.` : "Sem margem (mínimo)."}${pisoMinVale ? ` Vale o mínimo de 1 toalha de piso por banheiro (${num(banheiros)}), porque a conta deu ${num(pisoForm)}.` : ''} Tudo arredondado para cima.${banheiros>2*leitos ? ' Atenção: são mais de 2 banheiros por cama, uma proporção incomum. Confira se os números estão certos.' : ''}`;
-  const subBanho = minVale ? `mínimo de ${s.par} por banheiro · ${LINHA.banho}` : `${porLoc?'1 por pessoa por locação':'1 por hóspede'} · ${LINHA.banho}`;
+    + ` Toalha de piso: ${nBanh} × ${fat(trocasToalhaDia)} ${trocasToalhaDia===1?'troca':'trocas'} por dia × ${dec(ciclo)} dias de ciclo. ${comMargem ? `Margem de ${mPct}%.` : "Sem margem (mínimo)."}${pisoMinVale ? ` Vale o mínimo de ${PISO_MIN} toalhas de piso por banheiro (${num(pisoMin)}: uma em uso e uma de reserva), porque a conta deu ${num(pisoForm)}.` : ''} Tudo arredondado para cima.${banheiros>2*leitos ? ' Atenção: são mais de 2 banheiros por cama, uma proporção incomum. Confira se os números estão certos.' : ''}`;
+  const subBanho = minVale ? `mesma quantidade das fronhas · ${LINHA.banho}` : `${porLoc?'1 por pessoa por locação':'1 por hóspede'} · ${LINHA.banho}`;
 
   const grupos = [
     { id:"cama", nome:"Cama",
@@ -897,7 +895,7 @@ function calcular(comMargem = state.margem === "com"){
       itens:[
         ["Toalha de banho", subBanho, banho],
         ["Toalha de rosto", subBanho, banho],
-        ["Toalha de piso", `${pisoMinVale ? 'mínimo de 1 por banheiro' : '1 por banheiro por troca'} · ${LINHA.banho}`, pisoT]] }
+        ["Toalha de piso", `${pisoMinVale ? `mínimo de ${PISO_MIN} por banheiro` : '1 por banheiro por troca'} · ${LINHA.banho}`, pisoT]] }
   ];
   grupos.forEach(g => g.total = g.itens.reduce((a,i)=>a+i[2],0));
   const total = grupos.reduce((a,g)=>a+g.total,0);

@@ -19,14 +19,14 @@ O piso é o **PAR**: cada leito precisa de N jogos para a operação nunca parar
 
 ```
 Cama       jogos por cama = máx( PAR ,  trocas/dia × dias de ciclo );  por tamanho: camas × jogos por cama × (1 + margem)
-Banho      peças = máx( hóspedes/dia × trocas/dia × dias de ciclo × (1 + margem) ,  banheiros × PAR ,  ⌈hóspedes/dia⌉ )   (mínimo de 1 toalha por hóspede, decisão de 09/10/2026)
-Piso       toalha de piso = máx( banheiros ,  banheiros × trocas/dia × dias de ciclo × (1 + margem) )   (mínimo de 1 por banheiro, decisão de 09/10/2026)
+Banho      peças = máx( hóspedes/dia × trocas/dia × dias de ciclo × (1 + margem) ,  total de fronhas )   (a toalha acompanha as fronhas: 1 por pessoa, mesmo PAR e mesma margem da cama; decisão de 23/10 e 26/10/2026, a partir de dois cálculos de clientes que davam 3 toalhas para 4 pessoas)
+Piso       toalha de piso = máx( banheiros × 2 ,  banheiros × trocas/dia × dias de ciclo × (1 + margem) )   (mínimo de 2 por banheiro, uma em uso e uma de reserva; decisão de 23/10/2026)
 Complementos (fora do total)  protetores = camas (ou travesseiros) × 2;  capa = camas × 3 × (1 + margem)  (PAR 3 em todos os segmentos: a capa não troca a cada locação; decisão de 09/10/2026);  enchimento = camas × 1,5
 ```
 
 Entradas da etapa 2: camas no total, banheiros e a distribuição das camas por tamanho (solteiro 1 pessoa e 1 travesseiro; casal, queen e king 2 e 2). Camas sem tamanho escolhido contam como casal. Hóspedes por dia = capacidade das camas × ocupação. O total do topo é só cama e banho; os complementos são recomendados, marcados e editados pela pessoa, e entram à parte.
 
-Fora da metodologia original (decisão de 30/09/2026): mínimo de toalhas de banho e rosto por banheiro (banheiros × PAR) e ocupação padrão de 50% para hotel, pousada e Airbnb. Na explicação do resultado esse mínimo só aparece quando ele passa o giro ("Vale o mínimo"); quando o giro é maior, o texto fala só de hóspedes × trocas × ciclo. A palavra "piso" fica reservada à toalha de piso (tapete de banheiro), para não confundir com o mínimo.
+Fora da metodologia original (decisão de 30/09/2026): mínimo de toalhas de banho e rosto por pessoa (igual ao total de fronhas, trocado em 23/10 e 26/10/2026; antes era banheiros × PAR) e ocupação padrão de 50% para hotel, pousada e Airbnb. Na explicação do resultado esse mínimo só aparece quando ele passa o giro ("Vale o mínimo"); quando o giro é maior, o texto fala só de hóspedes × trocas × ciclo. A palavra "piso" fica reservada à toalha de piso (tapete de banheiro), para não confundir com o mínimo.
 
 `dias de ciclo = TAT da lavanderia + 1 dia de descanso`
 
@@ -61,12 +61,14 @@ Camas de casal, lavanderia terceirizada, troca diária, ocupação padrão do se
 
 | Cenário | Com margem | Sem margem |
 |---|---|---|
-| Hotel, 1 cama, 1 banheiro (padrão inicial da tela) | 25 | 22 |
-| Hotel, 2 camas, 1 banheiro | 46 | 40 |
-| Hotel, 20 camas, 20 banheiros | 457 | 415 |
-| Airbnb, 1 cama, 1 banheiro, só na saída (55% de ocupação) | 22 | 19 |
-| Hotel, 50 camas queen, 50 banheiros, 80%, lavanderia própria | 1.100 | 1.000 |
+| Hotel, 1 cama, 1 banheiro (padrão inicial da tela) | 31 | 26 |
+| Hotel, 2 camas, 1 banheiro | 58 | 50 |
+| Hotel, 20 camas, 20 banheiros | 568 | 520 |
+| Airbnb, 1 cama, 1 banheiro, só na saída (55% de ocupação) | 31 | 26 |
+| Hotel, 50 camas queen, 50 banheiros, 80%, lavanderia própria | 1.420 | 1.300 |
 | Motel, 10 suítes (10 camas, 10 banheiros), 3 locações/dia | 1.134 | 945 |
+
+Valores atualizados em 23/10/2026 (banho por pessoa e piso de 2 por banheiro; o motel não mudou porque o giro já passava o mínimo). Cálculos de cliente usados na correção, sem margem: Airbnb 2 queen, 1 banheiro, 50%, própria, só na saída = 50 sem margem (era 31); hotel 10 camas (5 solteiro, 5 casal), 10 banheiros, 50%, própria, diária = 215 sem margem, 238 com margem (era 175).
 
 Rodar esses seis cenários, com e sem margem, contra o motor (bloco `<script>`, coeficientes no topo) antes de publicar qualquer mudança de fórmula.
 
