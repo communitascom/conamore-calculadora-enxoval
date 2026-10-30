@@ -1146,6 +1146,16 @@ function textoLista(r, cs){
   }
   return L.join('\n');
 }
+/* a lista como a pessoa vê agora (já com margem, linhas e complementos que ela escolheu); é o que o comercial lê na exportação do painel */
+function itensAtuais(){
+  if(!ultimo) return null;
+  const r = ultimo, cs = complSel(r).filter(c=>c.on && c.qtd>0), pecas = [];
+  r.grupos.forEach(g=>g.itens.forEach(it=>{
+    const nome = it[3] || it[0], p = pecas.find(x=>x.nome===nome);
+    if(p) p.qtd += it[2]; else pecas.push({nome, qtd:it[2]});
+  }));
+  return { total:r.total, margem:state.margem, lencol:state.lencol, toalha:state.toalha, pecas, compl:cs.map(c=>({nome:c.nome, qtd:c.qtd})), texto:textoLista(r, cs).replace(/[*_]/g,'') };
+}
 function montarMensagem(r, cs){
   return `Olá! Usei a calculadora de enxoval da Conamore Hotelaria e gostaria de uma proposta com estes dados.\n\n${textoLista(r, cs)}\n\nPode me ajudar com valores e prazo?\n\nCódigo do cálculo: ${REG.codigo()}`;
 }
@@ -1488,15 +1498,14 @@ async function baixarPDF(){
 
 
 /* ========== RD Station: conversão com campos e tags de segmentação ========== */
-/* chave = chave PÚBLICA da conta (RD Station Marketing > Integrações > Chaves de API). Vazia, o envio fica desligado. */
-const RD = { chave:"5c6543e148c47703d38aebac8bab6345", identificador:"calculadora-enxoval", url:"https://api.rd.services/platform/conversions" };
+/* a conversão vai pela edge function calculadora-registrar: no iPhone/Safari o fetch direto ao RD morria no aparelho, sem sair para a rede (leads AC1418, D30B79, 5B6D4B) */
+const RD = { identificador:"calculadora-enxoval" };
 const PORTE = l => l <= 10 ? "Até 10 camas" : (l <= 50 ? "11 a 50 camas" : "Mais de 50 camas");
-function enviarRD(dados){
-  if(!RD.chave){ console.warn('RD Station: chave pública não configurada, conversão não enviada.'); return Promise.resolve(false); }
+function conversaoRD(dados){
   const r = ultimo || calcular(), s = seg();
   const cs = complSel(r).filter(c=>c.on && c.qtd>0);
   const email = !!dados.receberEmail;
-  const payload = {
+  return {
     conversion_identifier: RD.identificador,
     name: dados.nome, email: dados.email, personal_phone: dados.whats, company_name: dados.hospedagem || undefined,
     cf_calc_segmento: s.nome, cf_calc_camas: String(r.leitos), cf_calc_banheiros: String(r.banheiros),
@@ -1510,10 +1519,6 @@ function enviarRD(dados){
     tags: ['calculadora-enxoval', ...(email ? ['calculadora-enviar-lista'] : []), 'segmento-'+state.segmento, 'porte-'+PORTE(r.leitos).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')],
     legal_bases: [{category:'communications', type:'consent', status:'granted'}]
   };
-  return fetch(`${RD.url}?api_key=${encodeURIComponent(RD.chave)}`, {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body: JSON.stringify({event_type:'CONVERSION', event_family:'CDP', payload})
-  }).then(res=>res.ok).catch(()=>false);
 }
 
 /* ========== registro: toda consulta, cliques e leads vão para o banco (anônimo; só o lead leva e-mail) ========== */
@@ -1549,7 +1554,7 @@ const REG = (() => {
     const dados = Object.assign({ sessao_id:sessao, origem, aparelho, host:location.hostname }, corpo);
     try{ (window.dataLayer = window.dataLayer || []).push({ event:'calc_'+(corpo.evento || corpo.tipo), calculo_id:calculoId, segmento:corpo.segmento }); }catch(e){}
     if(desligado) return Promise.resolve(false);
-    return fetch(URL_REG, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(dados), keepalive:true, mode:'cors' }).then(r=>r.ok).catch(()=>false);
+    return fetch(URL_REG, { method:'POST', headers:{'Content-Type':'text/plain'}, body:JSON.stringify(dados), keepalive:true, mode:'cors' }).then(r=>r.ok ? r.text() : '').then(t=>t === 'ok').catch(()=>false);
   }
   return {
     origem, calculoId: () => calculoId,
@@ -1563,11 +1568,13 @@ const REG = (() => {
       enviar({ tipo:'calculo', calculo_id:calculoId, n, segmento:state.segmento, camas:r.leitos, banheiros:r.banheiros, tamanhos:r.tam,
         ocupacao: s.porGiro==='locacoes' ? null : r.ocup, locacoes: s.porGiro==='locacoes' ? state.locacoes : null,
         lavanderia:state.lavanderia, troca_cama:state.trocaCama, troca_toalha:state.trocaToalha, margem:state.margem,
-        total_pecas:r.total, total_sem_margem:comSem, total_com_margem:comCom, porte, linha_lencol:state.lencol, linha_toalha:state.toalha, complementos:[] });
+        total_pecas:r.total, total_sem_margem:comSem, total_com_margem:comCom, porte, linha_lencol:state.lencol, linha_toalha:state.toalha, complementos:[], itens:itensAtuais() });
     },
-    lead(dados, rdEnviado){
-      if(!calculoId) return Promise.resolve(false);
-      return enviar({ tipo:'lead', calculo_id:calculoId, nome:dados.nome, email:dados.email, whats:dados.whats, hospedagem:dados.hospedagem, receber_lista:!!dados.receberEmail, rd_enviado:!!rdEnviado, formato:dados.formato });
+    itens(){ if(calculoId) enviar({ tipo:'itens', calculo_id:calculoId, itens:itensAtuais() }); },
+    /* resolve true só quando o RD aceitou a conversão; sem cálculo novo (aberto pelo link da lista) não há lead a gravar, só a conversão */
+    lead(dados, rd){
+      if(!calculoId) return enviar({ tipo:'rd', rd });
+      return enviar({ tipo:'lead', calculo_id:calculoId, nome:dados.nome, email:dados.email, whats:dados.whats, hospedagem:dados.hospedagem, receber_lista:!!dados.receberEmail, rd, formato:dados.formato });
     }
   };
 })();
@@ -1669,9 +1676,9 @@ async function enviar(){
   const bt = $('mEnviar'); bt.disabled = true; bt.textContent = 'Gerando...';
   let ok = true;
   try{ await baixar(formato); }catch(e){ ok = false; console.warn(e); }
+  REG.itens();
   REG.evento('baixar_lista', {email: !!dados.receberEmail, formato, in_app: IN_APP, ok});
-  const enviado = await enviarRD(dados);
-  REG.lead(dados, enviado);
+  const enviado = await REG.lead(dados, conversaoRD(dados));
   bt.disabled = false; bt.textContent = 'Baixar ' + nomeF;
   fecharModal();
   const porEmail = dados.receberEmail && enviado;
@@ -1719,7 +1726,7 @@ $('lpAbrir').addEventListener('click', ()=>{
 });
 
 document.addEventListener('click', e=>{
-  if(e.target.closest('[data-wa], #btnWa')) REG.evento('whatsapp', {onde: e.target.closest('#lpWa') ? 'lista_pronta' : e.target.closest('#btnWa') ? 'resultado' : (state.passo===3 ? 'resultado_outro' : 'passo_'+(state.passo+1))});
+  if(e.target.closest('[data-wa], #btnWa')){ REG.itens(); REG.evento('whatsapp', {onde: e.target.closest('#lpWa') ? 'lista_pronta' : e.target.closest('#btnWa') ? 'resultado' : (state.passo===3 ? 'resultado_outro' : 'passo_'+(state.passo+1))}); }
   else if(e.target.closest('#btnLoja')) REG.evento('loja');
   else if(e.target.closest('.refazer button')) REG.evento('refazer');
 });
